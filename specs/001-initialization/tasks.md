@@ -32,7 +32,7 @@ MVP; US4–US6 are later increments.
 - [ ] T002 [P] Create `composer.json` with dev dependencies `mediawiki/mediawiki-codesniffer`, `mediawiki/mediawiki-phan-config`, `php-parallel-lint/php-parallel-lint`, `mediawiki/minus-x` and scripts `test` (parallel-lint, phpcs, minus-x) and `fix`; add `.phpcs.xml`
 - [ ] T003 [P] Create `package.json`, `Gruntfile.js`, `.eslintrc.json`, `.stylelintrc.json` using `eslint-config-wikimedia`, `stylelint-config-wikimedia`, `grunt-banana-checker`; `npm test` runs all three
 - [ ] T004 [P] Create `.phan/config.php` from `mediawiki-phan-config` with Bucket/Scribunto not required for analysis
-- [ ] T005 [P] Create `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`, `i18n/api/en.json`, `i18n/api/vi.json`, `i18n/api/qqq.json` with `@metadata` and the `right-wizz-*`, `action-wizz-*`, `grouppage`-free rights messages and `editinfobox` special page title
+- [ ] T005 [P] Create `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`, `i18n/api/en.json`, `i18n/api/vi.json`, `i18n/api/qqq.json` with `@metadata` and the `right-wizz-*`, `action-wizz-*` rights messages and the `editinfobox` special page title
 - [ ] T006 [P] Create `Wizz.alias.php` (`EditInfobox` en, `SửaInfobox` vi) and `Wizz.namespaces.php` (`Wizz`, `Wizz_talk`, with vi aliases)
 - [ ] T007 [P] Create `.github/workflows/ci.yml`: job 1 `composer test` + `npm test`; job 2 installs MediaWiki 1.45 and 1.46 with MariaDB, Scribunto and Bucket (REL1_45), loads Wizz and runs `tests/phpunit/unit` and `tests/phpunit/integration`
 - [ ] T008 [P] Replace `README.md` with summary, requirements (MW ≥ 1.45, Bucket, Scribunto), install steps (`wfLoadExtension`), configuration table and link to the spec
