@@ -7,6 +7,14 @@
 
 **Bối cảnh**: Page Forms có input OOUI/VEForAll hiển thị lỗi, không hỗ trợ Bucket (chỉ SMW và Cargo), hay regression giữa các phiên bản, và Miraheze đã ngừng cho bật Page Forms trên wiki mới. Wizz mượn ý tưởng của Page Forms nhưng không dùng lại code.
 
+## Clarifications
+
+### Session 2026-11-19
+
+- Q: Khi trình duyệt tắt JavaScript, Special:EditInfobox có cần chạy được không? → A: Không; hiện thông báo cần JavaScript kèm liên kết sang sửa wikitext.
+- Q: Đo SC-005 thế nào? → A: 5 người thử, ít nhất 4/5 hoàn thành, mỗi lần dưới 3 phút.
+- Q: Khi lời gọi template viết sai cú pháp, Wizz từ chối mở form hay mở kèm cảnh báo? → A: Từ chối mở form, báo vị trí lỗi và đưa liên kết sang sửa wikitext.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Biên tập viên sửa infobox qua form (Priority: P1)
@@ -116,7 +124,7 @@ Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" h
 ### Edge Cases
 
 - Trang không có infobox gắn với form nào thì Special:EditInfobox báo gì?
-- Lời gọi template viết sai cú pháp (thiếu `}}`, lồng lẫn lộn) thì form từ chối mở hay mở với cảnh báo?
+- Lời gọi template viết sai cú pháp (thiếu `}}`, lồng lẫn lộn): form không mở; hệ thống báo vị trí lỗi và đưa liên kết sang sửa wikitext. Wizz không đoán ranh giới template.
 - Giá trị tham số chứa template lồng nhau, `<ref>`, comment hoặc `<nowiki>` ở một ô TEXT thì có giữ nguyên khi không sửa không?
 - Schema bucket thay đổi (thêm, xóa hoặc đổi kiểu trường) sau khi định nghĩa form đã lưu thì form xử lý thế nào?
 - Template được gọi qua trang đổi hướng hoặc tên viết khác (chữ hoa đầu, khoảng trắng/gạch dưới) có được nhận ra không?
