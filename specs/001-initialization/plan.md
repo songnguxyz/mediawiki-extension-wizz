@@ -1,113 +1,134 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: Wizz — Form sửa infobox gắn với Bucket
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Branch**: `001-initialization` | **Date**: 2026-11-19 | **Spec**: [spec.md](spec.md)
 
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/speckit-plan` command; its definition describes the execution workflow.
+**Input**: Feature specification from `/specs/001-initialization/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Wizz is a new MediaWiki extension that lets editors change the parameters of an existing
+infobox template call through a validated form, without touching the rest of the page. A form
+is defined on a JSON page `Wizz:<Template>` that binds the template to a Bucket; field types
+come from the Bucket schema page. A small byte-offset tokenizer locates template calls and
+rewrites only changed parameter values; all validation runs server-side; saving goes through
+core's `action=edit` as the user so protection, AbuseFilter, CAPTCHA and edit-conflict
+detection apply. A Vue 3 + Codex app (special page and optional dialog) talks to three Action
+API modules backed by shared DI services.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+**Language/Version**: PHP (minimum required by MediaWiki 1.45), JavaScript ES2017+ (Vue 3 as
+shipped by MediaWiki core), LESS.
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Primary Dependencies**: MediaWiki core ≥ 1.45 (Action API, `EditPage` via `action=edit`,
+`ContentRenderer`, `SlotDiffRenderer`, `ChangeTagsStore`, `RevisionLookup`, Codex via
+`CodexModule`); Bucket (schema pages only, no PHP API); Scribunto (indirect, used by wiki
+templates). Dev: mediawiki-codesniffer, phan, parallel-lint, minus-x (Composer);
+eslint-config-wikimedia, stylelint-config-wikimedia, banana-checker (npm).
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Storage**: No own tables. Wiki pages only: `Wizz:` namespace (JSON definitions), `Bucket:`
+pages (read-only), article wikitext.
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Testing**: PHPUnit (unit + integration, extension.json auto-discovery), round-trip fixture
+corpus in `tests/phpunit/data/roundtrip/`, QUnit for client validation/serialisation helpers;
+manual cross-skin checks per [quickstart.md](quickstart.md). CI on GitHub Actions against MW
+1.45 and 1.46 with MariaDB, Scribunto and Bucket.
 
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
+**Target Platform**: MediaWiki 1.45+ on Miraheze and WikiOasis (both run 1.46 stable);
+skins Minerva (mobile), Citizen, Vector 2022; light and dark mode; LTR and RTL.
 
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: MediaWiki extension (server PHP + ResourceLoader front-end).
 
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
+**Performance Goals**: `wizzload`/`wizzpreview`/`wizzsave` add < 300 ms server time on top of
+core parse/save for pages up to 200 KB of wikitext; tokenizer linear in page size and handles
+the 2 MB core page limit without exhausting default PHP memory.
 
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Constraints**: No DB tables, no external resources, no Bucket PHP API, no Page Forms code or
+name collisions; regex work bounded (research R9); all writes CSRF-protected; JS required for
+the form (no-JS notice only).
 
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
-
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Scale/Scope**: Fan wikis with up to ~100k pages; forms with up to 60 fields (Bucket max 64
+incl. system fields); typical page has 1–5 infobox calls.
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+| Principle | How the design complies | Status |
+|-----------|-------------------------|--------|
+| I. Wikitext preservation | Tokenizer with byte offsets; only changed value spans replaced; byte-identical result → `nochange`; malformed markup → refuse (R3, R11). | Pass |
+| II. Regression-proof testing | Test-first tokenizer/serializer/validator; permanent round-trip corpus; integration test against `preprocessToDom`; CI blocks merge. | Pass |
+| III. Server-side validation | `FieldValidator` in PHP runs on preview and save; types from Bucket page; regex bounded; only changed fields validated; definitions validated in `JsonValidateSave`. | Pass |
+| IV. No privilege bypass | Internal `action=edit` as the user (R2); own rights `wizz-edit`, `wizz-editdefinition`; tab/button default off. | Pass |
+| V. Wiki-farm compatibility | No tables, no external assets, Bucket read via core page APIs, `Wizz` namespace declared in ManageWiki, GPL-2.0-or-later, distinct names (`wizz-`, `Wizz`, `EditInfobox`). | Pass (namespace IDs to register) |
+| VI. Newcomers, any device | Codex components + tokens; Minerva one-column; dark mode; RTL via CSSJanus; `en`/`vi`/`qqq`; labelled inputs, errors bound to fields. | Pass |
+| VII. Simplicity | One app for page and dialog; three API modules over one service; no custom ContentHandler; no user preferences; no new wikitext syntax. | Pass |
+| VIII. Extension best practices | DI services in `ServiceWiring.php`; API parity; `Wizz` log channel; standard layout; CSRF; banana-checker; translatewiki.net; mediawiki.org docs (deferred to release); GitHub exception per constitution. | Pass |
+
+**Post-design re-check (after Phase 1)**: still Pass. Two items carry follow-ups, not
+violations: namespace IDs 9620/9621 must be registered (R6), and the new rights must be
+announced to target communities before release (Principle VIII).
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit-plan command output)
-├── research.md          # Phase 0 output (/speckit-plan command)
-├── data-model.md        # Phase 1 output (/speckit-plan command)
-├── quickstart.md        # Phase 1 output (/speckit-plan command)
-├── contracts/           # Phase 1 output (/speckit-plan command)
-└── tasks.md             # Phase 2 output (/speckit-tasks command - NOT created by /speckit-plan)
+specs/001-initialization/
+├── plan.md              # This file
+├── research.md          # Phase 0 output
+├── data-model.md        # Phase 1 output
+├── quickstart.md        # Phase 1 output
+├── contracts/
+│   ├── action-api.md
+│   ├── wiki-interface.md
+│   └── form-definition.schema.json
+├── checklists/requirements.md
+└── tasks.md             # Phase 2 output (/speckit-tasks, not created here)
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+extension.json
+Wizz.alias.php
+Wizz.namespaces.php
+README.md
+LICENSE
+composer.json
+package.json
+.phan/config.php
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
+├── ServiceWiring.php
+├── Wikitext/            # TemplateTokenizer, TemplateCall, TemplateParam,
+│                        # TemplateParseError, TemplateEditor (serializer)
+├── Bucket/              # BucketSchemaLookup, BucketSchema
+├── Definition/          # FormDefinition, FieldDefinition, DefinitionParser,
+│                        # DefinitionLookup
+├── Validation/          # FieldValidator, ValidationError, SafeRegex
+├── Edit/                # InfoboxEditor (load/preview/save), TemplateMatcher,
+│                        # EditSaver (internal action=edit), SummaryBuilder
+├── Api/                 # ApiWizzLoad, ApiWizzPreview, ApiWizzSave
+├── Special/             # SpecialEditInfobox
+└── Hooks/               # DefinitionValidationHooks, ChangeTagHooks, EntryPointHooks
+modules/
+└── ext.wizz.form/       # Vue 3 + Codex app, field components, client validation
+i18n/
+├── en.json  vi.json  qqq.json
+└── api/  (en.json vi.json qqq.json)
 tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+├── phpunit/
+│   ├── unit/            # tokenizer, editor, validator, definition parser
+│   ├── integration/     # API modules, save path, preprocessToDom comparison
+│   └── data/roundtrip/  # *.wikitext fixtures + expected edits
+└── qunit/
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Standard MediaWiki extension layout (Constitution VIII) with PSR-4
+`MediaWiki\Extension\Wizz\` → `src/`. Business logic lives in `Wikitext`, `Bucket`,
+`Definition`, `Validation` and `Edit` services; `Api`, `Special` and `Hooks` are thin
+bindings. The front-end is a single ResourceLoader module.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+No constitution violations to justify.

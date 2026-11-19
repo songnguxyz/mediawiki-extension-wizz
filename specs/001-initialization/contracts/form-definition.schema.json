@@ -1,0 +1,57 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/songnguxyz/mediawiki-extension-wizz/form-definition.schema.json",
+	"title": "Wizz form definition (content of a Wizz:<Template> page)",
+	"description": "Structural contract. Cross-checks against the bucket schema (field exists, rule fits type) are done in PHP on save; see data-model.md.",
+	"type": "object",
+	"additionalProperties": false,
+	"required": [ "bucket", "fields" ],
+	"properties": {
+		"bucket": { "type": "string", "minLength": 1 },
+		"fields": {
+			"type": "array",
+			"minItems": 1,
+			"items": { "$ref": "#/$defs/field" }
+		}
+	},
+	"$defs": {
+		"field": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [ "field" ],
+			"properties": {
+				"field": { "type": "string", "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$" },
+				"param": { "type": "string", "minLength": 1 },
+				"label": { "type": "string", "minLength": 1 },
+				"help": { "type": "string" },
+				"required": { "type": "boolean" },
+				"min": { "type": "number" },
+				"max": { "type": "number" },
+				"pattern": { "type": "string", "minLength": 1, "maxLength": 500 },
+				"allowed": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+				"namespaces": { "type": "array", "minItems": 1, "items": { "type": "integer" } },
+				"mustExist": { "type": "boolean" },
+				"category": { "type": "string", "minLength": 1 },
+				"separator": { "type": "string", "minLength": 1, "pattern": "\\S" },
+				"booleanValues": {
+					"type": "array",
+					"prefixItems": [ { "type": "string" }, { "type": "string" } ],
+					"minItems": 2,
+					"maxItems": 2
+				}
+			}
+		}
+	},
+	"examples": [
+		{
+			"bucket": "nhan_vat",
+			"fields": [
+				{ "field": "ten", "label": "Tên", "required": true, "max": 200 },
+				{ "field": "chieu_cao", "param": "chiều cao", "label": "Chiều cao (cm)", "min": 0, "max": 300 },
+				{ "field": "cung", "label": "Cung hoàng đạo", "allowed": [ "Bạch Dương", "Song Ngư" ] },
+				{ "field": "ban_be", "param": "bạn bè", "label": "Bạn bè", "namespaces": [ 0 ], "mustExist": true, "category": "Nhân vật", "separator": ";" },
+				{ "field": "con_song", "param": "còn sống", "label": "Còn sống", "booleanValues": [ "có", "không" ] }
+			]
+		}
+	]
+}
