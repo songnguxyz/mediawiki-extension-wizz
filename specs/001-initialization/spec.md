@@ -17,6 +17,7 @@
 - Q: Khi schema bucket đổi sau khi định nghĩa form đã lưu, form xử lý thế nào? → A: Luôn dùng schema hiện hành; ô trỏ tới trường đã xóa thành chỉ đọc kèm cảnh báo; ô đổi kiểu validate theo kiểu mới; các ô khác dùng bình thường.
 - Q: Ô TEXT chứa wikitext phức tạp (template lồng, `<ref>`, comment, `<nowiki>`) có sửa được trong form không? → A: Có; ô hiện nguyên wikitext gốc trong khung nhiều dòng, không sửa thì giữ nguyên từng byte, có sửa thì lưu đúng nội dung đã nhập.
 - Q: Giá trị nhập vào ô nhiều giá trị chứa chính ký tự phân tách thì sao? → A: Tự tách thành nhiều giá trị, không cảnh báo.
+- Q: Có giữ nút sửa ngay trên infobox (mở form dạng hộp thoại) không? → A: Không; bỏ khỏi phạm vi, chỉ giữ Special:EditInfobox và tab "Sửa infobox".
 - Q: Wizz có nhận ra template gọi qua trang đổi hướng hoặc tên viết khác không? → A: Có, nhận cả biến thể tên (chữ đầu, `_`/khoảng trắng, tiền tố namespace) và trang đổi hướng tới template; khi lưu giữ nguyên tên gọi gốc.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -110,7 +111,7 @@ Trên trang gọi cùng một template infobox nhiều lần, biên tập viên 
 
 ### User Story 6 - Mở form từ nhiều lối vào, trên cả điện thoại (Priority: P3)
 
-Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" hoặc từ nút trên infobox, tùy wiki bật lối vào nào, và dùng form thoải mái trên điện thoại.
+Biên tập viên mở form từ trang đặc biệt, hoặc từ tab "Sửa infobox" nếu wiki bật, và dùng form thoải mái trên điện thoại.
 
 **Why this priority**: Tăng khả năng người mới tìm thấy form, nhưng trang đặc biệt đã đủ để dùng được sản phẩm.
 
@@ -119,7 +120,7 @@ Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" h
 **Acceptance Scenarios**:
 
 1. **Given** bất kỳ wiki nào cài Wizz, **When** người dùng vào Special:EditInfobox/<Tên trang>, **Then** form mở được mà không cần cấu hình thêm.
-2. **Given** wiki bật lối vào tab hoặc nút trên infobox, **When** người dùng xem trang có infobox gắn form, **Then** lối vào tương ứng hiện ra; khi tắt thì không hiện.
+2. **Given** wiki bật tab "Sửa infobox", **When** người dùng xem trang có infobox gắn form, **Then** tab hiện ra; khi tắt thì không hiện.
 3. **Given** người dùng trên skin Minerva, **When** mở form, **Then** form hiển thị một cột, mọi ô dùng được và nút lưu luôn trong tầm với.
 4. **Given** người dùng bật chế độ tối, **When** mở form, **Then** mọi chữ và ô nhập đều đọc được.
 
@@ -177,7 +178,7 @@ Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" h
 **Lối vào và giao diện**
 
 - **FR-022**: Trang đặc biệt Special:EditInfobox MUST luôn có sẵn trên mọi wiki cài Wizz.
-- **FR-023**: Wiki MUST bật hoặc tắt riêng được tab "Sửa infobox" và nút sửa ngay trên infobox (mở form dạng hộp thoại); cả hai mặc định tắt.
+- **FR-023**: Wiki MUST bật hoặc tắt được tab "Sửa infobox"; mặc định tắt.
 - **FR-024**: Form MUST dùng được trên các skin Minerva (điện thoại), Citizen và Vector 2022, ở cả chế độ sáng và tối.
 - **FR-025**: Giao diện MUST dịch được qua hệ thống dịch chuẩn của MediaWiki, có sẵn tiếng Việt và tiếng Anh.
 - **FR-026**: Wiki MUST giới hạn được namespace nào dùng form (mặc định chỉ namespace chính).
@@ -212,6 +213,6 @@ Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" h
 - **Đích triển khai**: Miraheze và WikiOasis, qua quy trình duyệt extension của từng nơi; vì vậy MVP không tạo bảng cơ sở dữ liệu riêng và không tải tài nguyên từ bên ngoài.
 - **Môi trường test**: một wiki trên Wikimedia Cloud VPS, dùng dữ liệu tự tạo theo cấu trúc infobox thật, không chép nội dung wiki thật; wiki này cũng dùng để test gadget.
 - **Phụ thuộc**: dữ liệu vào Bucket qua template và module Lua của wiki; Wizz chỉ sửa tham số template, không ghi trực tiếp vào Bucket. API Bucket cho bên thứ ba chưa ổn định nên MVP không phụ thuộc vào nó.
-- **Ngoài phạm vi MVP**: tạo trang mới bằng form, form truy vấn kiểu RunQuery, sửa nhiều template khác nhau trong một form, sửa hàng loạt, chế độ chạy không cần Bucket, gợi ý giá trị từ dữ liệu Bucket.
+- **Ngoài phạm vi MVP**: tạo trang mới bằng form, form truy vấn kiểu RunQuery, sửa nhiều template khác nhau trong một form, sửa hàng loạt, nút sửa đặt ngay trên infobox, chế độ chạy không cần Bucket, gợi ý giá trị từ dữ liệu Bucket.
 - **Giấy phép**: GPL-2.0-or-later.
 - **Quan hệ với Page Forms**: Wizz là extension mới, không dùng lại code Page Forms, và có thể cài song song mà không xung đột tên.

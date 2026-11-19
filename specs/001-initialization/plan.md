@@ -12,8 +12,8 @@ is defined on a JSON page `Wizz:<Template>` that binds the template to a Bucket;
 come from the Bucket schema page. A small byte-offset tokenizer locates template calls and
 rewrites only changed parameter values; all validation runs server-side; saving goes through
 core's `action=edit` as the user so protection, AbuseFilter, CAPTCHA and edit-conflict
-detection apply. A Vue 3 + Codex app (special page and optional dialog) talks to three Action
-API modules backed by shared DI services.
+detection apply. A Vue 3 + Codex app on `Special:EditInfobox` (reachable also from an optional "Edit
+infobox" tab) talks to three Action API modules backed by shared DI services.
 
 ## Technical Context
 
@@ -62,7 +62,7 @@ incl. system fields); typical page has 1–5 infobox calls.
 | IV. No privilege bypass | Internal `action=edit` as the user (R2); own rights `wizz-edit`, `wizz-editdefinition`; tab/button default off. | Pass |
 | V. Wiki-farm compatibility | No tables, no external assets, Bucket read via core page APIs, `Wizz` namespace declared in ManageWiki, GPL-2.0-or-later, distinct names (`wizz-`, `Wizz`, `EditInfobox`). | Pass (namespace IDs to register) |
 | VI. Newcomers, any device | Codex components + tokens; Minerva one-column; dark mode; RTL via CSSJanus; `en`/`vi`/`qqq`; labelled inputs, errors bound to fields. | Pass |
-| VII. Simplicity | One app for page and dialog; three API modules over one service; no custom ContentHandler; no user preferences; no new wikitext syntax. | Pass |
+| VII. Simplicity | One app on one special page; three API modules over one service; no custom ContentHandler; no user preferences; no new wikitext syntax. | Pass |
 | VIII. Extension best practices | DI services in `ServiceWiring.php`; API parity; `Wizz` log channel; standard layout; CSRF; banana-checker; translatewiki.net; mediawiki.org docs (deferred to release); GitHub exception per constitution. | Pass |
 
 **Post-design re-check (after Phase 1)**: still Pass. Two items carry follow-ups, not

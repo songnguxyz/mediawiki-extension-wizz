@@ -65,5 +65,5 @@ QUnit: open `Special:JavaScriptTest/qunit?module=ext.wizz` on the dev wiki. Expe
 | 8 (US4) | Open form in two browsers, save in A, then save in B | B gets `conflict`, form reloads new revision keeping B's typed values. |
 | 9 (US4) | Protect page / add AbuseFilter rule / enable ConfirmEdit for edits | Same outcome as editing wikitext; CAPTCHA appears in form. |
 | 10 (US5) | Page with two calls; open form | Picker lists both; editing #2 changes only #2. |
-| 11 (US6) | Add the `wizz-edit` marker to the template; enable `$wgWizzEditTab`, `$wgWizzInfoboxButton`; check Minerva, Citizen, Vector 2022, light/dark, `uselang=ar` | Entry points appear only when enabled; form usable one-column on Minerva; readable in dark mode; mirrored layout in RTL. |
+| 11 (US6) | Toggle `$wgWizzEditTab`; check Minerva, Citizen, Vector 2022, light/dark, `uselang=ar` | Tab appears only when enabled; form usable one-column on Minerva; readable in dark mode; mirrored layout in RTL. |
 | 12 (Edge) | Malformed call (missing `}}`); no infobox page; JS disabled; template via redirect `{{infobox_nhân_vật}}` | Refuse with line number + edit link; "no infobox" notice; no-JS notice + edit link; redirect call is recognised and its name is preserved on save. |
