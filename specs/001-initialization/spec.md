@@ -17,6 +17,7 @@
 - Q: Khi schema bucket đổi sau khi định nghĩa form đã lưu, form xử lý thế nào? → A: Luôn dùng schema hiện hành; ô trỏ tới trường đã xóa thành chỉ đọc kèm cảnh báo; ô đổi kiểu validate theo kiểu mới; các ô khác dùng bình thường.
 - Q: Ô TEXT chứa wikitext phức tạp (template lồng, `<ref>`, comment, `<nowiki>`) có sửa được trong form không? → A: Có; ô hiện nguyên wikitext gốc trong khung nhiều dòng, không sửa thì giữ nguyên từng byte, có sửa thì lưu đúng nội dung đã nhập.
 - Q: Giá trị nhập vào ô nhiều giá trị chứa chính ký tự phân tách thì sao? → A: Tự tách thành nhiều giá trị, không cảnh báo.
+- Q: Wizz có nhận ra template gọi qua trang đổi hướng hoặc tên viết khác không? → A: Có, nhận cả biến thể tên (chữ đầu, `_`/khoảng trắng, tiền tố namespace) và trang đổi hướng tới template; khi lưu giữ nguyên tên gọi gốc.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -130,7 +131,7 @@ Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" h
 - Lời gọi template viết sai cú pháp (thiếu `}}`, lồng lẫn lộn): form không mở; hệ thống báo vị trí lỗi và đưa liên kết sang sửa wikitext. Wizz không đoán ranh giới template.
 - Giá trị tham số ô TEXT chứa template lồng nhau, `<ref>`, comment hoặc `<nowiki>`: ô hiện nguyên wikitext gốc trong khung nhiều dòng và sửa được; không sửa thì giữ nguyên từng byte, có sửa thì lưu đúng nội dung đã nhập.
 - Schema bucket thay đổi sau khi định nghĩa form đã lưu: form luôn đọc schema hiện hành khi mở. Ô trỏ tới trường đã bị xóa hiện ở chế độ chỉ đọc kèm cảnh báo và giữ nguyên giá trị; ô bị đổi kiểu được validate theo kiểu mới; các ô khác dùng bình thường.
-- Template được gọi qua trang đổi hướng hoặc tên viết khác (chữ hoa đầu, khoảng trắng/gạch dưới) có được nhận ra không?
+- Template được gọi qua trang đổi hướng hoặc tên viết khác (chữ hoa đầu, khoảng trắng/gạch dưới, tiền tố namespace): Wizz nhận ra là cùng template; khi lưu giữ nguyên tên gọi gốc trong wikitext.
 - Giá trị nhập vào ô nhiều giá trị chứa chính ký tự phân tách: hệ thống tách thành nhiều giá trị, không cảnh báo; từng giá trị sau khi tách được validate riêng theo FR-013.
 - Một mẫu regex quá chậm thì máy chủ dừng kiểm tra và báo lỗi thay vì treo.
 - Người không đăng nhập mở form khi wiki chưa cấp quyền thì thấy thông báo gì?
