@@ -123,7 +123,7 @@ Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" h
 - Giá trị của ô nhiều giá trị chứa chính ký tự phân tách thì sao?
 - Một mẫu regex quá chậm thì máy chủ dừng kiểm tra và báo lỗi thay vì treo.
 - Người không đăng nhập mở form khi wiki chưa cấp quyền thì thấy thông báo gì?
-- Trình duyệt tắt JavaScript thì người dùng được gì? [NEEDS CLARIFICATION: có cần chế độ dự phòng không JavaScript cho Special:EditInfobox, hay chỉ cần báo và dẫn về sửa wikitext?]
+- Trình duyệt tắt JavaScript: Special:EditInfobox không hiện form mà hiện thông báo cần JavaScript, kèm liên kết sang trang sửa wikitext của trang đó.
 
 ## Requirements *(mandatory)*
 
@@ -191,7 +191,7 @@ Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" h
 - **SC-002**: 0 giá trị vi phạm luật được ghi vào trang qua Wizz trong toàn bộ bộ test validate, kể cả khi bỏ qua kiểm tra phía trình duyệt.
 - **SC-003**: Mọi loại ô hiển thị và lưu được trên Minerva, Citizen và Vector 2022, ở cả chế độ sáng và tối.
 - **SC-004**: Mỗi lỗi được báo về làm hỏng wikitext có một ca round-trip tương ứng trong bộ test trước khi được sửa, và không tái diễn ở phiên bản sau.
-- **SC-005**: Người đóng góp mới chưa từng sửa wikitext hoàn thành một lần sửa infobox trên điện thoại mà không cần đọc hướng dẫn. [NEEDS CLARIFICATION: chốt cách đo — số người thử, tỉ lệ hoàn thành và thời gian mục tiêu]
+- **SC-005**: Trong buổi thử với 5 người đóng góp mới chưa từng sửa wikitext, ít nhất 4/5 người hoàn thành một lần sửa infobox trên điện thoại mà không cần đọc hướng dẫn, mỗi lần dưới 3 phút.
 
 ## Assumptions
 

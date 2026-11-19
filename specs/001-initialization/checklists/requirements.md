@@ -13,9 +13,9 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [ ] Requirements are testable and unambiguous
-- [ ] Success criteria are measurable
+- [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
 - [x] Edge cases are identified
@@ -33,8 +33,8 @@
 
 - Spec copied verbatim from the author's draft (only `Feature Branch` changed to
   `001-initialization`), so failing items were not auto-fixed.
-- Two `[NEEDS CLARIFICATION]` markers remain: no-JavaScript fallback (Edge Cases) and how to
-  measure SC-005.
+- Resolved 2026-11-19: no-JS → notice + link to wikitext editing; SC-005 → 5 testers,
+  ≥4/5 complete, <3 minutes each.
 - "Testable and unambiguous" fails because most Edge Cases are open questions without an
   expected behaviour (no infobox, malformed template call, nested markup in TEXT, Bucket schema
   change, redirects/name variants, separator inside a value, anonymous user without rights).
