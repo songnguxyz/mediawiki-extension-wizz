@@ -15,6 +15,7 @@
 - Q: Đo SC-005 thế nào? → A: 5 người thử, ít nhất 4/5 hoàn thành, mỗi lần dưới 3 phút.
 - Q: Khi lời gọi template viết sai cú pháp, Wizz từ chối mở form hay mở kèm cảnh báo? → A: Từ chối mở form, báo vị trí lỗi và đưa liên kết sang sửa wikitext.
 - Q: Khi schema bucket đổi sau khi định nghĩa form đã lưu, form xử lý thế nào? → A: Luôn dùng schema hiện hành; ô trỏ tới trường đã xóa thành chỉ đọc kèm cảnh báo; ô đổi kiểu validate theo kiểu mới; các ô khác dùng bình thường.
+- Q: Ô TEXT chứa wikitext phức tạp (template lồng, `<ref>`, comment, `<nowiki>`) có sửa được trong form không? → A: Có; ô hiện nguyên wikitext gốc trong khung nhiều dòng, không sửa thì giữ nguyên từng byte, có sửa thì lưu đúng nội dung đã nhập.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -126,7 +127,7 @@ Biên tập viên mở form từ trang đặc biệt, từ tab "Sửa infobox" h
 
 - Trang không có infobox gắn với form nào thì Special:EditInfobox báo gì?
 - Lời gọi template viết sai cú pháp (thiếu `}}`, lồng lẫn lộn): form không mở; hệ thống báo vị trí lỗi và đưa liên kết sang sửa wikitext. Wizz không đoán ranh giới template.
-- Giá trị tham số chứa template lồng nhau, `<ref>`, comment hoặc `<nowiki>` ở một ô TEXT thì có giữ nguyên khi không sửa không?
+- Giá trị tham số ô TEXT chứa template lồng nhau, `<ref>`, comment hoặc `<nowiki>`: ô hiện nguyên wikitext gốc trong khung nhiều dòng và sửa được; không sửa thì giữ nguyên từng byte, có sửa thì lưu đúng nội dung đã nhập.
 - Schema bucket thay đổi sau khi định nghĩa form đã lưu: form luôn đọc schema hiện hành khi mở. Ô trỏ tới trường đã bị xóa hiện ở chế độ chỉ đọc kèm cảnh báo và giữ nguyên giá trị; ô bị đổi kiểu được validate theo kiểu mới; các ô khác dùng bình thường.
 - Template được gọi qua trang đổi hướng hoặc tên viết khác (chữ hoa đầu, khoảng trắng/gạch dưới) có được nhận ra không?
 - Giá trị của ô nhiều giá trị chứa chính ký tự phân tách thì sao?
