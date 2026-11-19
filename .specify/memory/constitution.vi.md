@@ -96,6 +96,47 @@ Lý do: người dùng mục tiêu là người mới ngại wikitext, và ngày
 
 Lý do: codebase nhỏ dễ duyệt, dễ giữ không hồi quy và dễ được farm chấp thuận.
 
+### VIII. Thông lệ tốt cho extension MediaWiki
+
+Wizz MUST tuân thủ mọi mục MUST của
+[Best practices for extensions](https://www.mediawiki.org/wiki/Best_practices_for_extensions)
+và SHOULD tuân thủ các mục SHOULD; chỉ được bỏ một mục SHOULD khi có lý do ghi trong plan. Những
+mục quan trọng nhất với Wizz:
+
+- Kiến trúc: logic nghiệp vụ nằm trong các service class dùng DI, đăng ký trong service wiring,
+  dùng chung cho lớp mỏng Special page và Action API, để cùng một năng lực (đọc form, validate,
+  xem trước/diff, lưu) có ở cả hai. Không dùng trạng thái toàn cục, singleton hay gọi static
+  ngoài các tiện ích không trạng thái. Chỉ ném exception cho tình huống mà bên gọi không nên xử
+  lý.
+- Logging: structured logging (PSR-3) trên kênh riêng `Wizz`, dùng mức độ nghiêm trọng phù hợp.
+- Không viết cứng wikitext hay giả định về template: mọi thứ riêng của từng wiki lấy từ định
+  nghĩa form hoặc cấu hình.
+- Không làm lại những gì MediaWiki đã có: dùng `WebRequest`, hook, `Html`/`Sanitizer`,
+  ContentHandler khi đã có abstraction, Composer cho thư viện PHP bên thứ ba, tự động phát hiện
+  test của extension.json; tôn trọng chế độ chỉ đọc; không tắt parser cache hay `OutputPage`;
+  không giả định extension nằm trong `/extensions`.
+- Bảo mật: mọi thao tác ghi được chống CSRF bằng hệ thống token chuẩn của MediaWiki; không sửa
+  HTML sau khi đã sanitize; tôn trọng việc xóa/ẩn phiên bản và nhật trình (nội dung đã bị ẩn
+  không bao giờ lộ ra qua xem trước, diff hay giá trị trong form).
+- Ngôn ngữ: mọi thông điệp dùng tiền tố `wizz-`, có tài liệu `qqq.json`, được banana-checker
+  kiểm tra trong CI và đồng bộ với translatewiki.net; tham số thông điệp được escape càng gần
+  chỗ xuất ra càng tốt. Giao diện MUST dùng được với ngôn ngữ viết từ phải sang trái.
+- Cấu trúc thư mục: theo bố cục chuẩn (`src/` dùng PSR-4 qua `AutoloadNamespaces`, mỗi file một
+  class, `modules/`, `i18n/`, `tests/phpunit/unit/`, `tests/phpunit/integration/`,
+  `tests/qunit/`, `LICENSE`, `README`); giữ thư mục gốc gọn.
+- Tài liệu: trang `Extension:Wizz` và `Help:Extension:Wizz` trên mediawiki.org, liệt kê phụ
+  thuộc (Bucket, Scribunto) kèm cách cài và cấu hình, mọi thiết lập cấu hình ở một chỗ, chính
+  sách tương thích và các hook Wizz cung cấp.
+- Quyền người dùng mới được thông báo và thảo luận với cộng đồng các wiki mục tiêu trước khi
+  phát hành phiên bản đưa quyền đó vào.
+- Ngoại lệ được chấp nhận: theo dõi lỗi và duyệt code dùng GitHub Issues và pull request thay
+  vì Phabricator và Gerrit, vì các farm mục tiêu chấp nhận extension đặt trên GitHub. Vẫn MUST
+  có một project Phabricator để người dùng MediaWiki báo lỗi; các báo cáo đó được chép sang
+  GitHub.
+
+Lý do: người duyệt của farm và cộng đồng MediaWiki đánh giá extension theo các thông lệ này;
+tuân thủ chúng giúp Wizz duy trì được cả khi không còn nhóm tác giả ban đầu.
+
 ## Ràng buộc kỹ thuật
 
 - Ngôn ngữ và cấu trúc: PHP (phiên bản theo yêu cầu của MediaWiki 1.45) với `extension.json`,
@@ -103,8 +144,8 @@ Lý do: codebase nhỏ dễ duyệt, dễ giữ không hồi quy và dễ đư�
   ResourceLoader và Codex.
 - Quy chuẩn code: `mediawiki/mediawiki-codesniffer` và `phan` cho PHP; `eslint-config-wikimedia`
   và `stylelint-config-wikimedia` cho JS/CSS/LESS. Lỗi lint chặn merge.
-- Test: PHPUnit (unit test không dùng DB; integration test khi cần service của core). Test mức
-  trình duyệt chỉ thêm khi spec yêu cầu.
+- Test: PHPUnit (unit test không dùng DB; integration test khi cần service của core) và QUnit
+  cho logic frontend. Test mức trình duyệt chỉ thêm khi spec yêu cầu.
 - Phụ thuộc: Bucket và Scribunto là bắt buộc lúc chạy cho MVP. Không thêm phụ thuộc
   Composer/npm lúc chạy nếu không có giải trình ở mức plan.
 - Môi trường test: một wiki trên Wikimedia Cloud VPS dùng dữ liệu tự tạo theo cấu trúc infobox
@@ -113,8 +154,8 @@ Lý do: codebase nhỏ dễ duyệt, dễ giữ không hồi quy và dễ đư�
 ## Quy trình phát triển
 
 - Công việc theo Spec Kit: spec → (clarify) → plan → tasks → implement. Mỗi plan MUST có mục
-  Constitution Check đối chiếu Nguyên tắc I–VII và ghi lại mọi ngoại lệ có giải trình.
-- Thay đổi vào qua pull request. Người duyệt MUST kiểm tra: tuân thủ hiến pháp, có test cho
+  Constitution Check đối chiếu Nguyên tắc I–VIII và ghi lại mọi ngoại lệ có giải trình.
+- Thay đổi vào qua pull request trên GitHub (xem ngoại lệ ở Nguyên tắc VIII). Người duyệt MUST kiểm tra: tuân thủ hiến pháp, có test cho
   hành vi mới, có mẫu round-trip cho mọi thay đổi parser/serializer, có i18n cho chuỗi mới.
 - Phát hành theo semantic versioning; thay đổi người dùng thấy được ghi vào changelog.
 
@@ -129,4 +170,4 @@ Lý do: codebase nhỏ dễ duyệt, dễ giữ không hồi quy và dễ đư�
 - Việc tuân thủ được kiểm tra khi lập plan (Constitution Check) và khi review. Ngoại lệ MUST
   được ghi lại kèm lý do ở mục Complexity Tracking của plan.
 
-**Phiên bản**: 1.0.0 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-19
+**Phiên bản**: 1.1.0 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-19

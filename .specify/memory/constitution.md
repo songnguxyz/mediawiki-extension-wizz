@@ -94,6 +94,48 @@ Rationale: the target users are newcomers who avoid wikitext, increasingly on ph
 
 Rationale: a small codebase is easier to review, keep regression-free and get approved by farms.
 
+### VIII. MediaWiki Extension Best Practices
+
+Wizz MUST comply with every MUST item of
+[Best practices for extensions](https://www.mediawiki.org/wiki/Best_practices_for_extensions)
+and SHOULD comply with its SHOULD items; a SHOULD item may be skipped only with a reason
+recorded in the plan. Items that matter most for Wizz:
+
+- Architecture: business logic lives in DI service classes registered in service wiring and is
+  shared by thin Special page and Action API bindings, so the same capabilities (read form,
+  validate, preview/diff, save) are available through both. No global state, singletons or
+  static calls beyond stateless utilities. Exceptions only for conditions callers should not
+  handle.
+- Logging: structured logging (PSR-3) on a dedicated `Wizz` channel with appropriate severity
+  levels.
+- No hard-coded wikitext or template assumptions: everything wiki-specific comes from form
+  definitions or configuration.
+- Don't reinvent MediaWiki: use `WebRequest`, hooks, `Html`/`Sanitizer`, ContentHandler where an
+  abstraction exists, Composer for third-party PHP libraries, extension.json test
+  auto-discovery; respect read-only mode; never disable the parser cache or `OutputPage`; never
+  assume the extension lives under `/extensions`.
+- Security: every write action is CSRF-protected with MediaWiki's standard token system;
+  sanitized HTML is never modified afterwards; revision/log deletion and suppression are
+  respected (deleted content is never exposed via preview, diff or form values).
+- Language: all messages use the `wizz-` prefix, have `qqq.json` documentation, are linted by
+  banana-checker in CI and synchronised with translatewiki.net; message parameters are escaped
+  as close to output as possible. UI MUST work in right-to-left languages.
+- File layout: the standard layout (`src/` with PSR-4 via `AutoloadNamespaces`, one class per
+  file, `modules/`, `i18n/`, `tests/phpunit/unit/`, `tests/phpunit/integration/`,
+  `tests/qunit/`, `LICENSE`, `README`); root kept uncluttered.
+- Documentation: `Extension:Wizz` and `Help:Extension:Wizz` pages on mediawiki.org, listing
+  dependencies (Bucket, Scribunto) with install/config steps, all configuration settings in one
+  place, a compatibility policy and any hooks Wizz provides.
+- New user rights are announced to and discussed with the target wiki communities before a
+  release that introduces them.
+- Accepted exception: issues and code review use GitHub Issues and pull requests instead of
+  Phabricator and Gerrit, because the target farms accept GitHub-hosted extensions. A
+  Phabricator project MUST still exist so MediaWiki users can report bugs there; those reports
+  are mirrored to GitHub.
+
+Rationale: farm reviewers and the wider MediaWiki community judge extensions by these
+practices; following them keeps Wizz maintainable beyond its original authors.
+
 ## Technical Constraints
 
 - Language and layout: PHP (version per MediaWiki 1.45 requirements) with `extension.json`,
@@ -101,8 +143,8 @@ Rationale: a small codebase is easier to review, keep regression-free and get ap
   ResourceLoader and Codex.
 - Code style: `mediawiki/mediawiki-codesniffer` and `phan` for PHP; `eslint-config-wikimedia`
   and `stylelint-config-wikimedia` for JS/CSS/LESS. Lint errors block merge.
-- Tests: PHPUnit (unit tests with no DB; integration tests where core services are needed).
-  Browser-level tests are added only where a spec requires them.
+- Tests: PHPUnit (unit tests with no DB; integration tests where core services are needed)
+  and QUnit for frontend logic. Browser-level tests are added only where a spec requires them.
 - Dependencies: Bucket and Scribunto are required at runtime for the MVP. No new runtime
   Composer/npm dependency without plan-level justification.
 - Test environment: a Wikimedia Cloud VPS wiki using self-made data modelled on real infobox
@@ -111,8 +153,8 @@ Rationale: a small codebase is easier to review, keep regression-free and get ap
 ## Development Workflow
 
 - Work follows Spec Kit: spec → (clarify) → plan → tasks → implement. Each plan MUST include a
-  Constitution Check against Principles I–VII and record any justified exception.
-- Changes land via pull request. Reviewers MUST verify: constitution compliance, tests added
+  Constitution Check against Principles I–VIII and record any justified exception.
+- Changes land via GitHub pull request (see the exception in Principle VIII). Reviewers MUST verify: constitution compliance, tests added
   for new behaviour, round-trip fixtures for any parser/serializer change, i18n for new strings.
 - Releases follow semantic versioning; user-visible changes are recorded in a changelog.
 
@@ -127,4 +169,4 @@ Rationale: a small codebase is easier to review, keep regression-free and get ap
 - Compliance is checked at plan time (Constitution Check) and at review. Exceptions MUST be
   documented with rationale in the plan's Complexity Tracking.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-19
+**Version**: 1.1.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-19
