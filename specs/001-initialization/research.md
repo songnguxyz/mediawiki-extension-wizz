@@ -116,6 +116,12 @@ from the research environment; items that depend on their documentation are mark
   `mediawiki.skin.variables.less`, so night mode works on skins that support it; RTL is
   handled by ResourceLoader's CSSJanus flipping. The same app mounts on the special page and
   inside a `CdxDialog` for the in-infobox button.
+- **Button placement**: the template opts in by emitting
+  `<span class="wizz-edit" data-wizz-template="…"></span>` where the button should appear;
+  the n-th marker maps to the n-th call. A parser function (`{{#wizz:…}}`) was rejected
+  because it adds wikitext syntax (Constitution VIII) and cannot know its call index either;
+  guessing from a skin/infobox CSS class was rejected as unreliable. On marker/instance count
+  mismatch the dialog falls back to the instance picker.
 - **Rationale**: Constitution VI; CommunityConfiguration is a working example of
   `CodexModule`. **verify**: Minerva/MobileFrontend loading of the module on special pages and
   Citizen's night-mode token support.

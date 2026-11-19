@@ -35,8 +35,27 @@ IDs MUST be registered on mediawiki.org before release and declared in the farms
 | `$wgWizzNamespaces` | `[0]` | Namespaces whose pages may be edited by forms (FR-026). |
 | `$wgWizzEditTab` | `false` | Show an "Edit infobox" tab on pages with a form-backed infobox (FR-023). |
 | `$wgWizzInfoboxButton` | `false` | Add an edit button on rendered infoboxes, opening the form in a dialog (FR-023). |
-| `$wgWizzInfoboxSelector` | `".infobox"` | CSS selector for rendered infoboxes; the n-th match maps to instance n. |
 | `$wgWizzChangeTag` | `true` | Tag edits with `wizz` (FR-007). |
+
+## In-infobox button marker (template opt-in)
+
+The template decides where the button goes by emitting a plain HTML marker (no new wikitext
+syntax; `data-*` attributes pass the Sanitizer):
+
+```wikitext
+<span class="wizz-edit" data-wizz-template="Infobox nhân vật"></span>
+```
+
+When `$wgWizzInfoboxButton` is true, the button module replaces each marker with a Codex
+button. The n-th marker carrying a given `data-wizz-template` maps to instance n of that
+template (same order as the calls in the wikitext). Templates without the marker get no
+button; Wizz never guesses from skin or infobox CSS classes. Markers on pages without a form,
+or in namespaces outside `$wgWizzNamespaces`, are left empty.
+
+Limitation: if a call renders no marker (e.g. hidden by a conditional) or the marker is
+emitted from inside `<ref>`, the order shifts. To avoid opening the wrong instance, the module
+compares the marker count with the instance count from `wizzload`; on mismatch it opens the
+instance picker instead of a specific instance.
 
 ## Hooks used (no new hooks provided in MVP)
 
