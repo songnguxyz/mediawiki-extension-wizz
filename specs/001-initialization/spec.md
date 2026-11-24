@@ -90,7 +90,7 @@ Trước khi lưu, biên tập viên xem infobox sẽ hiển thị ra sao với 
 
 1. **Given** form có giá trị hợp lệ, **When** biên tập viên chọn xem trước, **Then** infobox được hiển thị với giá trị mới và diff wikitext được hiển thị trước khi xác nhận lưu.
 2. **Given** trang đã có phiên bản mới hơn từ lúc mở form, **When** biên tập viên lưu, **Then** form báo xung đột, nạp phiên bản mới và giữ các giá trị biên tập viên đã nhập.
-3. **Given** trang bị khóa, AbuseFilter hoặc CAPTCHA áp dụng, **When** biên tập viên lưu qua form, **Then** các cơ chế đó áp dụng giống như khi sửa wikitext thông thường.
+3. **Given** trang bị khóa, AbuseFilter hoặc CAPTCHA áp dụng, **When** biên tập viên mở hoặc lưu qua form, **Then** các cơ chế đó áp dụng giống như khi sửa wikitext thông thường.
 
 ---
 
