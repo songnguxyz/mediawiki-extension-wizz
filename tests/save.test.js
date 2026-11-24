@@ -45,6 +45,7 @@ QUnit.test( 'sends the edit with the revision base and returns newrevid', async 
 		starttimestamp: '2026-11-24T10:00:00Z',
 		nocreate: 1,
 		assert: 'user',
+		errorformat: 'plaintext',
 		summary: 'Edit infobox: cung'
 	} );
 } );
@@ -63,12 +64,12 @@ QUnit.test( 'server-side nochange', async ( assert ) => {
 } );
 
 QUnit.test( 'API error rejects with its code and info', async ( assert ) => {
-	const api = { postWithEditToken: () => ( { then: ( ok, fail ) => Promise.resolve( fail( 'protectedpage', { error: { info: 'Protected' } } ) ) } ) };
+	const api = { postWithEditToken: () => ( { then: ( ok, fail ) => Promise.resolve( fail( 'protectedpage', { errors: [ { code: 'protectedpage', text: 'Protected' } ] } ) ) } ) };
 	await assert.rejects( save( api, state(), 'new', 's' ), ( e ) => e.code === 'protectedpage' && e.message === 'Protected' );
 } );
 
 // Fake mw.Api that rejects like mw.Api: ( code, data ).
-const failing = ( code, info ) => ( { postWithEditToken: () => ( { then: ( ok, fail ) => Promise.resolve( fail( code, { error: { info } } ) ) } ) } );
+const failing = ( code, info ) => ( { postWithEditToken: () => ( { then: ( ok, fail ) => Promise.resolve( fail( code, { errors: [ { code, text: info } ] } ) ) } ) } );
 
 QUnit.test( 'editconflict resolves as conflict', async ( assert ) => {
 	assert.deepEqual( await save( failing( 'editconflict', 'Edit conflict' ), state(), 'new', 's' ), { result: 'conflict' } );

@@ -18,7 +18,7 @@ edit-conflict detection apply. The form is a Vue 3 + Codex app opened by `?wizz=
 ## Technical Context
 
 **Language/Version**: source in CommonJS JavaScript, `.vue` single-file components and LESS.
-Vite builds the form into one file, `wizz-form.js` (target `es2018`): `.vue` compiled, i18n,
+Vite builds the form into one file, `wizz-form.js` (target `es2017`): `.vue` compiled, i18n,
 CSS, icons and the regex worker source bundled in; `vue` and `@wikimedia/codex` stay external
 and are reached through `require`. The entry `wizz.js` is not bundled: the build copies it and
 injects the version number.
@@ -39,7 +39,7 @@ definition checker, summary). Round-trip fixture corpus in `tests/fixtures/round
 stored core parse trees (research R3). Manual cross-skin checks per
 [quickstart.md](quickstart.md). CI on GitHub Actions: lint + tests.
 
-**Target Platform**: browsers supported by MediaWiki 1.43+ (ES2018 output) on Miraheze and
+**Target Platform**: browsers supported by MediaWiki 1.43+ (ES2017 output) on Miraheze and
 WikiOasis (both run 1.46) and self-hosted wikis; skins Minerva, Citizen, Vector 2022; light and dark; LTR and RTL.
 
 **Project Type**: MediaWiki package gadget (front-end only).
@@ -141,5 +141,5 @@ parameter for testing with a fake.
 | Addition | Why needed | Simpler alternative rejected because |
 |----------|------------|--------------------------------------|
 | Second hidden gadget `wizz-form` loaded on demand | Keeps Vue/Codex and the form code off normal page views | A single default gadget would load Vue on every page for every reader |
-| Vite build | jsDelivr cannot serve `.vue` to ResourceLoader; one compiled bundle serves all three deploy routes; ES2018 output and bundled icons work on MW 1.43 | Shipping raw package files rules out the jsDelivr route and `codexIcons` on 1.43 |
+| Vite build | jsDelivr cannot serve `.vue` to ResourceLoader; one compiled bundle serves all three deploy routes; ES2017 output and bundled icons work on MW 1.43 | Shipping raw package files rules out the jsDelivr route and `codexIcons` on 1.43 |
 | Regex Web Worker from a Blob URL | Only way to stop a runaway regex in a browser (Constitution III) | Main-thread regex cannot be interrupted |

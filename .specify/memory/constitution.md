@@ -129,7 +129,8 @@ self-contained, documented code is what earns that trust.
 
 ## Technical Constraints
 
-- Language and layout: JavaScript built with Vite to target ES2018; Vue 3 and Codex as shipped by
+- Language and layout: JavaScript built with Vite to target ES2017
+  (ResourceLoader's minifier rejects newer syntax such as object spread); Vue 3 and Codex as shipped by
   MediaWiki (never bundled); LESS compiled by Vite, using Codex design tokens through CSS custom
   properties with fallbacks.
 - Code style: `eslint-config-wikimedia` and `stylelint-config-wikimedia`; message bundles
@@ -163,4 +164,4 @@ self-contained, documented code is what earns that trust.
 - Compliance is checked at plan time (Constitution Check) and at review. Exceptions MUST be
   documented with rationale in the plan's Complexity Tracking.
 
-**Version**: 2.2.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24
+**Version**: 2.2.1 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24

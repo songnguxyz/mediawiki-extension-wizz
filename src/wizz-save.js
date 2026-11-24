@@ -29,6 +29,7 @@ async function save( api, state, newText, summary, extra ) {
 		starttimestamp: state.starttimestamp,
 		nocreate: 1,
 		assert: state.assert,
+		errorformat: 'plaintext',
 		summary
 	}, extra );
 	if ( state.canTag ) {
@@ -37,7 +38,7 @@ async function save( api, state, newText, summary, extra ) {
 	// mw.Api rejects with ( code, data ), which `await` would reduce to the code.
 	let failed;
 	const data = await api.postWithEditToken( params ).then( null, ( code, info ) => {
-		failed = Object.assign( new Error( info && info.error ? info.error.info : code ), { code } );
+		failed = Object.assign( new Error( info && info.errors ? info.errors[ 0 ].text : code ), { code } );
 	} );
 	if ( failed ) {
 		if ( failed.code === 'editconflict' ) {

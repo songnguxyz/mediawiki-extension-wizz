@@ -58,7 +58,7 @@ Deploy `dist/` with `node dev/test-wiki/deploy.js` (pages listed in
 | 7 (US3) | Point the definition at a missing bucket / unknown field / break the JSON; view the definition page, then open the form | Definition page lists each error; form refuses with the same list. |
 | 8 (US3) | View a valid definition page; press "Preview form" | Check says valid; empty form opens with no save button. |
 | 9 (US4) | Preview | Rendered infobox and diff shown before save. |
-| 10 (US4) | Open the form in two browsers, save in A, then save in B | B is told about the conflict; form reloads the new revision keeping B's typed values. |
+| 10 (US4) | Open the form as two different users (MediaWiki ignores conflicts with your own earlier edit), save as A, then save as B | B is told about the conflict; form reloads the new revision keeping B's typed values. |
 | 11 (US4) | Protect the article / add an AbuseFilter rule / require CAPTCHA for edits | Same outcome as editing wikitext; CAPTCHA appears in the form. |
 | 12 (US5) | Page with two calls; open form | Picker lists both; editing #2 changes only #2. |
 | 13 (US6) | Check the tab with `editTab` true and false; Minerva, Citizen, Vector 2022; light/dark; `uselang=ar` | Tab only when enabled and the page has a form-backed infobox; one column on Minerva; readable in dark mode; mirrored in RTL. |

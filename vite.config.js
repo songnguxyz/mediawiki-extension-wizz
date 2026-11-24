@@ -10,7 +10,7 @@ const vue = require( '@vitejs/plugin-vue' );
 module.exports = defineConfig( {
 	plugins: [ vue() ],
 	build: {
-		target: 'es2018',
+		target: 'es2017',
 		minify: false, // readable for interface admins reviewing the code
 		lib: { entry: 'src/wizz-form.js', formats: [ 'cjs' ], fileName: () => 'wizz-form.js' },
 		rollupOptions: {

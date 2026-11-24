@@ -30,7 +30,7 @@ Hướng đi: Wizz là **gadget** (không phải extension), Vue 3 + Codex, gi�
 - Tag `wizz` chỉ gắn khi tag đã bật và người dùng có `applychangetags`.
 - Hai gadget: `wizz` (mặc định, nhỏ) và `wizz-form` (ẩn, nạp khi cần).
 - Cấu hình `MediaWiki:Gadget-wizz-config.json`: `namespaces`, `editTab`, `tabLabel`, `cdn`.
-- Build bằng Vite (target ES2018, giữ LESS); Vue/Codex lấy từ MediaWiki, icon gói từ
+- Build bằng Vite (target ES2017, giữ LESS); Vue/Codex lấy từ MediaWiki, icon gói từ
   `@wikimedia/codex-icons` (MIT).
 - Ba cách triển khai từ cùng một bản phát hành: chép tay, Litmus `gadget-deploy`, jsDelivr
   (`cdn: true`, ghim phiên bản). Workflow phát hành commit `dist/` lên commit gắn tag tách khỏi

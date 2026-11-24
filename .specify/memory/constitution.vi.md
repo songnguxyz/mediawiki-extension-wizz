@@ -131,7 +131,8 @@ liệu là thứ giúp có được sự tin tưởng đó.
 
 ## Ràng buộc kỹ thuật
 
-- Ngôn ngữ và cấu trúc: JavaScript build bằng Vite với target ES2018; Vue 3 và Codex theo bản
+- Ngôn ngữ và cấu trúc: JavaScript build bằng Vite với target ES2017
+  (trình minify của ResourceLoader từ chối cú pháp mới hơn như object spread); Vue 3 và Codex theo bản
   MediaWiki cung cấp (không bao giờ gói vào bundle); LESS do Vite biên dịch, dùng design token
   của Codex qua CSS custom property có giá trị dự phòng.
 - Quy chuẩn code: `eslint-config-wikimedia` và `stylelint-config-wikimedia`; gói thông điệp
@@ -164,4 +165,4 @@ liệu là thứ giúp có được sự tin tưởng đó.
 - Việc tuân thủ được kiểm tra khi lập plan (Constitution Check) và khi review. Ngoại lệ MUST
   được ghi lại kèm lý do ở mục Complexity Tracking của plan.
 
-**Phiên bản**: 2.2.0 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24
+**Phiên bản**: 2.2.1 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24

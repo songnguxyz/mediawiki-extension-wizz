@@ -46,8 +46,7 @@ marked **verify**.
   - Only `MediaWiki:Gadgets-definition` lines are used: `Gadget definition:` pages need
     `$wgGadgetsRepo = 'json-definition'`, which wikis do not set by default, and Litmus
     `gadget-deploy` merges only into `MediaWiki:Gadgets-definition`.
-  - MediaWiki 1.43+ serves JavaScript to ES2017 browsers; the ES2018 build drops the few
-    ES2017-only browsers (e.g. Safari 11), accepted by Song Ngư.
+  - MediaWiki 1.43+ serves JavaScript to ES2017 browsers; the build targets ES2017 too: MW 1.45's ResourceLoader minifier rejects ES2018 syntax (object spread), which would break the by-hand and Litmus routes. `npm run build` re-parses the bundle as ES2017 and fails on newer syntax.
 - **Rationale**: Install needs only interface-admin rights (Constitution V); the lazy second
   gadget keeps page-view cost close to zero; one bundle file serves all three deploy routes.
 - **Alternatives rejected**: one big default gadget (loads Vue on every page); a user-script
@@ -193,7 +192,7 @@ marked **verify**.
 
 ## R12. Build and release
 
-- **Decision**: `npm run build` runs Vite (`target: 'es2018'`, `vue` and `@wikimedia/codex`
+- **Decision**: `npm run build` runs Vite (`target: 'es2017'`, `vue` and `@wikimedia/codex`
   external, LESS imported with `?inline` and added with `mw.util.addCSS`) and writes `dist/`:
   `wizz.js` (version injected), `wizz-config.json`, `wizz-form.js`, `gadgets-definition.txt`,
   `deploy.json` (Litmus format, `pages[{file,title,createOnly?}]` with `wizz-config.json`

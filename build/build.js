@@ -30,6 +30,9 @@ async function main() {
 	// Vite empties dist/ first, so it runs before anything else is written.
 	await require( 'vite' ).build( { root, logLevel: 'warn' } );
 
+	// ResourceLoader's minifier rejects syntax newer than ES2017 (e.g. object spread).
+	require( 'acorn' ).parse( fs.readFileSync( path.join( dist, 'wizz-form.js' ), 'utf8' ), { ecmaVersion: 2017 } );
+
 	const entry = fs.readFileSync( path.join( root, 'src/wizz.js' ), 'utf8' );
 	if ( !entry.includes( '@@WIZZ_VERSION@@' ) ) {
 		throw new Error( 'src/wizz.js has no @@WIZZ_VERSION@@ placeholder' );
