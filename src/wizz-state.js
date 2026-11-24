@@ -93,4 +93,21 @@ function buildState( page, definition, schema, call ) {
 	};
 }
 
-module.exports = { findCall, buildState };
+/**
+ * After an edit conflict (FR-006): move the values the user changed onto the state built from
+ * the new revision.
+ *
+ * @param {Object} fresh FormState of the new revision, changed in place
+ * @param {Object[]} fields The fields of the form the user was typing in
+ */
+function keepDirty( fresh, fields ) {
+	for ( const old of fields.filter( ( f ) => f.dirty ) ) {
+		const f = fresh.fields.find( ( x ) => x.param === old.param );
+		if ( f && f.state === 'ok' ) {
+			f.value = old.value;
+			f.dirty = f.value !== f.initial;
+		}
+	}
+}
+
+module.exports = { findCall, buildState, keepDirty };

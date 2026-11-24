@@ -82,7 +82,7 @@ async function definitionPage( props ) {
 	// The summary is in the wiki's content language, not the user's.
 	const content = messages( mw.config.get( 'wgContentLanguage' ) );
 	const summaryMsg = ( key, ...params ) => params.reduce( ( s, p, i ) => s.replace( '$' + ( i + 1 ), p ), content[ key ] );
-	const props = { api, summaryMsg, regex: { source: regexWorker } };
+	const props = { api, summaryMsg, reload: load, regex: { source: regexWorker } };
 	if ( mw.config.get( 'wgNamespaceNumber' ) === 828 && mw.config.get( 'wgTitle' ).endsWith( '/wizz.json' ) ) {
 		await definitionPage( props );
 		return;

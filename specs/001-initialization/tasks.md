@@ -140,15 +140,15 @@ later increments.
 
 ### Tests for User Story 4
 
-- [ ] T040 [P] [US4] Extend `tests/save.test.js`: `editconflict` → `conflict`; `edit.captcha` → `captcha` then resend with `captchaid`/`captchaword`; `abusefilter-warning` → `warning` then resend; other errors → `error` with API message (contracts/api-calls.md request 6 table)
+- [X] T040 [P] [US4] Extend `tests/save.test.js`: `editconflict` → `conflict`; `edit.captcha` → `captcha` then resend with `captchaid`/`captchaword`; `abusefilter-warning` → `warning` then resend; other errors → `error` with API message (contracts/api-calls.md request 6 table)
 
 ### Implementation for User Story 4
 
-- [ ] T041 [US4] Add `preview( api, state, callText, newText )` to `src/wizz-save.js`: parallel `action=parse` (edited call only) and `action=compare` (contracts/api-calls.md request 5)
-- [ ] T042 [US4] Implement result handling of T040 in `src/wizz-save.js`
-- [ ] T043 [US4] Add preview step to `src/wizz-App.vue`: show parsed infobox and diff (core HTML via `v-html`, the only allowed use) before confirming save
-- [ ] T044 [US4] Handle `conflict` in `src/wizz-form.js`: reload page, rebuild state on the new revision, re-apply dirty values, tell the user (FR-006)
-- [ ] T045 [US4] Add CAPTCHA (`CdxTextInput` plus image or question) and AbuseFilter warning confirmation to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
+- [X] T041 [US4] Add `preview( api, state, callText, newText )` to `src/wizz-save.js`: parallel `action=parse` (edited call only) and `action=compare` (contracts/api-calls.md request 5)
+- [X] T042 [US4] Implement result handling of T040 in `src/wizz-save.js`
+- [X] T043 [US4] Add preview step to `src/wizz-App.vue`: show parsed infobox and diff (core HTML via `v-html`, the only allowed use) before confirming save
+- [X] T044 [US4] Handle `conflict` in `src/wizz-form.js`: reload page, rebuild state on the new revision, re-apply dirty values, tell the user (FR-006)
+- [X] T045 [US4] Add CAPTCHA (`CdxTextInput` plus image or question) and AbuseFilter warning confirmation to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
 
 **Checkpoint**: safe for real wikis
 

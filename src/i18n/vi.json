@@ -35,5 +35,15 @@
 	"wizz-definition-valid": "Định nghĩa form hợp lệ.",
 	"wizz-definition-warnings": "Định nghĩa form dùng được nhưng có các cảnh báo sau:",
 	"wizz-definition-removed": "Trường này không còn trong bucket. Ô được hiện ở chế độ chỉ đọc và giữ nguyên giá trị.",
-	"wizz-ui-preview-form": "Xem thử form"
+	"wizz-ui-preview-form": "Xem thử form",
+	"wizz-ui-review": "Xem lại thay đổi",
+	"wizz-ui-back": "Quay lại",
+	"wizz-ui-preview-heading": "Xem trước",
+	"wizz-ui-diff-heading": "Thay đổi",
+	"wizz-error-preview": "Không tải được bản xem trước: $1",
+	"wizz-conflict": "Có người khác vừa lưu trang này trong lúc bạn đang sửa. Phiên bản mới nhất đã được nạp và các thay đổi của bạn vẫn được giữ. Hãy kiểm tra rồi lưu lại.",
+	"wizz-abusefilter-warning": "Wiki cảnh báo về sửa đổi này: $1 Nhấn Lưu để vẫn lưu.",
+	"wizz-captcha-intro": "Wiki yêu cầu bạn giải CAPTCHA trước khi lưu.",
+	"wizz-captcha-image-label": "Nhập các ký tự trong hình",
+	"wizz-captcha-unsupported": "Wiki này dùng loại CAPTCHA mà Wizz không hiển thị được. Hãy sửa mã nguồn trang."
 }

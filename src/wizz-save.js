@@ -9,14 +9,17 @@
  *  being the wikitext the form was built from
  * @param {string} newText Full new page text
  * @param {string} summary
- * @return {Promise<Object>} { result: 'nochange' } or { result: 'success', newrevid }; rejects
- *  with an Error carrying the API error `code`
+ * @param {Object} [extra] More request parameters, e.g. { captchaid, captchaword }
+ * @return {Promise<Object>} { result: 'nochange' }, { result: 'success', newrevid },
+ *  { result: 'conflict' }, { result: 'captcha', captcha } (resend with `extra`) or
+ *  { result: 'warning', message } (AbuseFilter; sending the same edit again confirms it);
+ *  rejects with an Error carrying the API error `code` and message for anything else
  */
-async function save( api, state, newText, summary ) {
+async function save( api, state, newText, summary, extra ) {
 	if ( newText === state.text ) {
 		return { result: 'nochange' };
 	}
-	const params = {
+	const params = Object.assign( {
 		action: 'edit',
 		formatversion: 2,
 		title: state.page,
@@ -27,15 +30,51 @@ async function save( api, state, newText, summary ) {
 		nocreate: 1,
 		assert: state.assert,
 		summary
-	};
+	}, extra );
 	if ( state.canTag ) {
 		params.tags = 'wizz';
 	}
 	// mw.Api rejects with ( code, data ), which `await` would reduce to the code.
+	let failed;
 	const data = await api.postWithEditToken( params ).then( null, ( code, info ) => {
-		throw Object.assign( new Error( info && info.error ? info.error.info : code ), { code } );
+		failed = Object.assign( new Error( info && info.error ? info.error.info : code ), { code } );
 	} );
+	if ( failed ) {
+		if ( failed.code === 'editconflict' ) {
+			return { result: 'conflict' };
+		}
+		if ( failed.code === 'abusefilter-warning' ) {
+			return { result: 'warning', message: failed.message };
+		}
+		throw failed;
+	}
+	if ( data.edit.captcha ) {
+		return { result: 'captcha', captcha: data.edit.captcha };
+	}
 	return data.edit.nochange ? { result: 'nochange' } : { result: 'success', newrevid: data.edit.newrevid };
+}
+
+/**
+ * Preview and diff (contracts/api-calls.md request 5); both HTML strings come from core.
+ *
+ * @param {Object} api mw.Api-like object with post( params )
+ * @param {Object} state As for save
+ * @param {string} callText The edited template call only
+ * @param {string} newText Full new page text
+ * @return {Promise<Object>} { html, diff }: the rendered call and the diff rows (<tr>s)
+ */
+async function preview( api, state, callText, newText ) {
+	const [ parsed, compared ] = await Promise.all( [
+		api.post( {
+			action: 'parse', formatversion: 2, title: state.page, text: callText, pst: 1,
+			prop: 'text', disablelimitreport: 1, contentmodel: 'wikitext'
+		} ),
+		api.post( {
+			action: 'compare', formatversion: 2, fromrev: state.revid, toslots: 'main',
+			'totext-main': newText, 'tocontentmodel-main': 'wikitext', prop: 'diff'
+		} )
+	] );
+	return { html: parsed.parse.text, diff: compared.compare.body };
 }
 
 // Titles per query for users without apihighlimits.
@@ -71,4 +110,4 @@ async function findMissing( api, titles ) {
 	return missing;
 }
 
-module.exports = { save, findMissing };
+module.exports = { save, preview, findMissing };

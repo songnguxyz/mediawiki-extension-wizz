@@ -20,3 +20,20 @@
 		margin-block-end: var( --spacing-50, 8px );
 	}
 }
+
+.wizz-review {
+	h3 {
+		margin-block: var( --spacing-75, 12px ) var( --spacing-50, 8px );
+		font-size: 1em;
+	}
+
+	// Wide infobox or diff scrolls inside the dialog instead of widening it.
+	&__box {
+		overflow-x: auto;
+	}
+}
+
+.wizz-captcha img {
+	display: block;
+	margin-block-end: var( --spacing-50, 8px );
+}

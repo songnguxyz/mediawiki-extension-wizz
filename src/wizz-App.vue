@@ -4,10 +4,10 @@
 		class="wizz-dialog"
 		:title="$i18n( 'wizz-ui-title' ).text()"
 		:use-close-button="true"
-		:primary-action="state && !preview ? { label: $i18n( 'wizz-ui-save' ).text(), actionType: 'progressive', disabled: saving } : undefined"
-		:default-action="{ label: $i18n( 'wizz-ui-cancel' ).text() }"
-		@primary="onSave"
-		@default="open = false"
+		:primary-action="state && !preview ? { label: ( review ? $i18n( 'wizz-ui-save' ) : $i18n( 'wizz-ui-review' ) ).text(), actionType: 'progressive', disabled: saving } : undefined"
+		:default-action="{ label: ( review ? $i18n( 'wizz-ui-back' ) : $i18n( 'wizz-ui-cancel' ) ).text() }"
+		@primary="review ? onSave() : onReview()"
+		@default="onDefault"
 		@update:open="onOpen"
 	>
 		<cdx-message
@@ -26,9 +26,9 @@
 			<a :href="editUrl">{{ $i18n( 'wizz-ui-editsource' ).text() }}</a>
 		</p>
 		<form
-			v-if="state"
+			v-if="state && !review"
 			class="wizz-form"
-			@submit.prevent="onSave"
+			@submit.prevent="onReview"
 		>
 			<wizz-field
 				v-for="f in fields"
@@ -37,26 +37,62 @@
 				@update:model-value="onInput( f, $event )"
 				@blur="onBlur( f )"
 			></wizz-field>
-			<cdx-message
-				v-if="notice"
-				:type="notice.type"
-				:inline="true"
-			>
-				{{ notice.text }}
-			</cdx-message>
 		</form>
+		<form
+			v-else-if="review"
+			class="wizz-review"
+			@submit.prevent="onSave"
+		>
+			<h3>{{ $i18n( 'wizz-ui-preview-heading' ).text() }}</h3>
+			<!-- Core-parsed HTML of action=parse, the only v-html besides the diff. -->
+			<!-- eslint-disable-next-line vue/no-v-html -->
+			<div class="wizz-review__box" v-html="review.html"></div>
+			<h3>{{ $i18n( 'wizz-ui-diff-heading' ).text() }}</h3>
+			<div class="wizz-review__box">
+				<table class="diff diff-editfont-monospace">
+					<colgroup>
+						<col class="diff-marker">
+						<col class="diff-content">
+						<col class="diff-marker">
+						<col class="diff-content">
+					</colgroup>
+					<!-- Core-built rows of action=compare. -->
+					<!-- eslint-disable-next-line vue/no-v-html -->
+					<tbody v-html="review.diff"></tbody>
+				</table>
+			</div>
+			<cdx-field v-if="captcha && ( captcha.question || captcha.url )" class="wizz-captcha">
+				<img
+					v-if="captcha.url"
+					:src="captcha.url"
+					:alt="$i18n( 'wizz-captcha-image-label' ).text()"
+				>
+				<cdx-text-input v-model="captchaWord" autocomplete="off"></cdx-text-input>
+				<template #label>
+					{{ captcha.question || $i18n( 'wizz-captcha-image-label' ).text() }}
+				</template>
+			</cdx-field>
+		</form>
+		<cdx-message
+			v-if="notice"
+			:type="notice.type"
+			:inline="true"
+		>
+			{{ notice.text }}
+		</cdx-message>
 	</cdx-dialog>
 </template>
 
 <script>
-import { CdxDialog, CdxMessage } from '@wikimedia/codex';
+import { CdxDialog, CdxField, CdxMessage, CdxTextInput } from '@wikimedia/codex';
 import WizzField from './wizz-Field.vue';
 import { applyEdits, buildSummary } from './wizz-editor.js';
-import { save, findMissing } from './wizz-save.js';
+import { save, preview, findMissing } from './wizz-save.js';
+import { keepDirty } from './wizz-state.js';
 import { validateField, validatePattern, mustExistErrors, itemsOf } from './wizz-validate.js';
 
 export default {
-	components: { CdxDialog, CdxMessage, WizzField },
+	components: { CdxDialog, CdxField, CdxMessage, CdxTextInput, WizzField },
 	props: {
 		// FormState, or null when the form is refused
 		state: { type: Object, default: null },
@@ -65,6 +101,8 @@ export default {
 		// { code, line?, list?, message? } when the form is refused
 		error: { type: Object, default: null },
 		api: { type: Object, required: true },
+		// Loads the page again into a new FormState (after an edit conflict)
+		reload: { type: Function, default: null },
 		summaryMsg: { type: Function, required: true },
 		// { source, createWorker? } of the regex worker, see testPattern
 		regex: { type: Object, default: null }
@@ -75,6 +113,13 @@ export default {
 			open: true,
 			saving: false,
 			notice: null,
+			// Current FormState; replaced by the one of the new revision after a conflict.
+			cur: this.state,
+			// { html, diff, text, summary } while the preview step is shown
+			review: null,
+			// The CAPTCHA the wiki asked for, and the answer typed
+			captcha: null,
+			captchaWord: '',
 			fields: this.state ? this.state.fields : [],
 			// Latest check per field: a slower, older check must not overwrite a newer one.
 			latest: {}
@@ -140,7 +185,17 @@ export default {
 				history.replaceState( null, '', url );
 			}
 		},
-		onSave() {
+		onDefault() {
+			if ( this.review ) {
+				this.review = null;
+				this.captcha = null;
+				this.notice = null;
+			} else {
+				this.open = false;
+			}
+		},
+		// Validate, then show the preview and diff; the save itself is onSave.
+		onReview() {
 			if ( this.preview ) {
 				return Promise.resolve();
 			}
@@ -160,23 +215,24 @@ export default {
 					for ( const f of dirty ) {
 						changes[ f.param ] = f.type === 'BOOLEAN' ? f.booleanValues[ f.value ? 0 : 1 ] : f.value;
 					}
-					const text = applyEdits( this.state.text, this.state.call, changes );
-					const summary = buildSummary( dirty.map( ( f ) => f.param ), this.summaryMsg );
-					return save( this.api, this.state, text, summary );
-				} )
-				.then( ( saved ) => {
-					if ( !saved ) {
-						return;
-					}
-					if ( saved.result === 'nochange' ) {
+					const { text: old, call } = this.cur;
+					const text = applyEdits( old, call, changes );
+					if ( text === old ) {
 						this.notice = { type: 'notice', text: mw.msg( 'wizz-ui-nochange' ) };
-					} else {
-						const url = new URL( location.href );
-						url.searchParams.delete( 'wizz' );
-						url.searchParams.delete( 'wizzinstance' );
-						location.assign( url );
+						return null;
 					}
-				}, ( e ) => {
+					const summary = buildSummary( dirty.map( ( f ) => f.param ), this.summaryMsg );
+					// Edits stay inside the call, so what follows it is unchanged.
+					const callText = text.slice( call.start, text.length - ( old.length - call.end ) );
+					mw.loader.load( 'mediawiki.diff.styles' );
+					return preview( this.api, this.cur, callText, text ).then( ( p ) => {
+						this.review = Object.assign( p, { text, summary } );
+						this.notice = null;
+					}, ( e ) => {
+						this.notice = { type: 'error', text: mw.msg( 'wizz-error-preview', e.message || e ) };
+					} );
+				} )
+				.then( null, ( e ) => {
 					let text = mw.msg( 'wizz-error-save', e.message || e );
 					if ( e.code === 'wizz-unsafevalue' ) {
 						text = mw.msg( 'wizz-unsafevalue' );
@@ -191,6 +247,56 @@ export default {
 						this.$nextTick( () => this.focusFirstError() );
 					}
 				} );
+		},
+		// Send the reviewed edit; the wiki's answer decides what is shown next.
+		onSave() {
+			const extra = this.captcha ? { captchaid: this.captcha.id, captchaword: this.captchaWord } : undefined;
+			this.saving = true;
+			return save( this.api, this.cur, this.review.text, this.review.summary, extra )
+				.then( ( saved ) => this.afterSave( saved ) )
+				.then( null, ( e ) => {
+					const own = /^wizz-/.test( e.code ) && mw.messages.exists( e.code );
+					this.notice = { type: 'error', text: own ? mw.msg( e.code, e.line ) : mw.msg( 'wizz-error-save', e.message || e ) };
+				} )
+				.then( () => {
+					this.saving = false;
+				} );
+		},
+		afterSave( saved ) {
+			if ( saved.result === 'success' ) {
+				const url = new URL( location.href );
+				url.searchParams.delete( 'wizz' );
+				url.searchParams.delete( 'wizzinstance' );
+				location.assign( url );
+			} else if ( saved.result === 'nochange' ) {
+				this.notice = { type: 'notice', text: mw.msg( 'wizz-ui-nochange' ) };
+			} else if ( saved.result === 'warning' ) {
+				// Saving again confirms it.
+				this.notice = { type: 'warning', text: mw.msg( 'wizz-abusefilter-warning', saved.message ) };
+			} else if ( saved.result === 'captcha' ) {
+				this.captcha = saved.captcha;
+				this.captchaWord = '';
+				const usable = saved.captcha.question || saved.captcha.url;
+				this.notice = { type: usable ? 'notice' : 'error', text: mw.msg( usable ? 'wizz-captcha-intro' : 'wizz-captcha-unsupported' ) };
+				this.$nextTick( () => {
+					const input = document.querySelector( '.wizz-captcha input' );
+					if ( input ) {
+						input.focus();
+					}
+				} );
+			} else {
+				// Conflict (FR-006): the new revision, the user's changed values kept.
+				return this.reload().then( ( fresh ) => {
+					keepDirty( fresh, this.fields );
+					this.cur = fresh;
+					this.fields = fresh.fields;
+					this.review = null;
+					this.captcha = null;
+					this.notice = { type: 'warning', text: mw.msg( 'wizz-conflict' ) };
+					return Promise.all( this.fields.filter( ( f ) => f.dirty ).map( ( f ) => this.validate( f ) ) );
+				} );
+			}
+			return null;
 		},
 		focusFirstError() {
 			// The dialog is teleported, so it is not under this.$el.

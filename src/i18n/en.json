@@ -35,5 +35,15 @@
 	"wizz-definition-valid": "The form definition is valid.",
 	"wizz-definition-warnings": "The form definition works, but with these warnings:",
 	"wizz-definition-removed": "This field no longer exists in the bucket. It is shown read-only and its value is kept.",
-	"wizz-ui-preview-form": "Preview form"
+	"wizz-ui-preview-form": "Preview form",
+	"wizz-ui-review": "Review changes",
+	"wizz-ui-back": "Back",
+	"wizz-ui-preview-heading": "Preview",
+	"wizz-ui-diff-heading": "Changes",
+	"wizz-error-preview": "Could not load the preview: $1",
+	"wizz-conflict": "Someone else saved this page while you were editing. The latest version was loaded and your changes were kept. Check them and save again.",
+	"wizz-abusefilter-warning": "The wiki warns about this edit: $1 Press Save to save it anyway.",
+	"wizz-captcha-intro": "This wiki asks you to solve a CAPTCHA before saving.",
+	"wizz-captcha-image-label": "Type the characters shown in the image",
+	"wizz-captcha-unsupported": "This wiki uses a CAPTCHA that Wizz cannot show. Edit the page source instead."
 }

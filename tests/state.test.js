@@ -1,6 +1,6 @@
 'use strict';
 
-const { findCall, buildState } = require( '../src/wizz-state.js' );
+const { findCall, buildState, keepDirty } = require( '../src/wizz-state.js' );
 
 const page = ( text, over ) => Object.assign( {
 	title: 'P', revid: 7, timestamp: 'T1', starttimestamp: 'T2', text,
@@ -81,4 +81,19 @@ QUnit.test( 'assert follows the loaded user', ( assert ) => {
 QUnit.test( 'canTag needs the tag active and the right', ( assert ) => {
 	assert.false( build( page( '{{IX}}', { tagActive: false } ) ).canTag );
 	assert.false( build( page( '{{IX}}', { rights: [ 'edit' ] } ) ).canTag );
+} );
+
+QUnit.test( 'keepDirty: changed values move to the new revision, others take its values (FR-006)', ( assert ) => {
+	const mine = build( page( '{{IX|ten=a|chiều cao=1|moi=x}}' ) );
+	mine.fields.find( ( f ) => f.field === 'ten' ).value = 'mine';
+	mine.fields.find( ( f ) => f.field === 'ten' ).dirty = true;
+	mine.fields.find( ( f ) => f.field === 'cao' ).value = '9';
+	mine.fields.find( ( f ) => f.field === 'cao' ).dirty = true;
+	const fresh = build( page( '{{IX|ten=theirs|chiều cao=9|moi=y}}', { revid: 8 } ) );
+	keepDirty( fresh, mine.fields );
+	const get = ( n ) => fresh.fields.find( ( f ) => f.field === n );
+	assert.deepEqual( [ get( 'ten' ).value, get( 'ten' ).dirty ], [ 'mine', true ] );
+	// Someone else made the same change: nothing left to save for that field.
+	assert.deepEqual( [ get( 'cao' ).value, get( 'cao' ).dirty ], [ '9', false ] );
+	assert.deepEqual( [ get( 'moi' ).value, get( 'moi' ).dirty ], [ 'y', false ] );
 } );

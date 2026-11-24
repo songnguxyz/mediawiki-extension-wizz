@@ -35,5 +35,15 @@
 	"wizz-definition-valid": "Shown on a definition page (Module:<Name>/wizz.json) when the check finds no error.",
 	"wizz-definition-warnings": "Heading of the list of warnings (for example a rule ignored because it does not fit the field type) shown on a definition page.",
 	"wizz-definition-removed": "Field warning for a field in the definition that no longer exists in the bucket schema; the field is read-only.",
-	"wizz-ui-preview-form": "Label of the button on a definition page that opens the form with empty values, for trying it out. Nothing is saved."
+	"wizz-ui-preview-form": "Label of the button on a definition page that opens the form with empty values, for trying it out. Nothing is saved.",
+	"wizz-ui-review": "Label of the primary button of the form: validates the values, then shows the preview and the diff before saving.",
+	"wizz-ui-back": "Label of the secondary button on the preview step: goes back to the form with the values kept.",
+	"wizz-ui-preview-heading": "Heading above the rendered infobox with the new values.",
+	"wizz-ui-diff-heading": "Heading above the wikitext diff between the current page and the new text.",
+	"wizz-error-preview": "Shown when the preview or diff could not be loaded. Parameters:\n* $1 - error message or code",
+	"wizz-conflict": "Shown after an edit conflict: another user saved the page first. Wizz reloads the page and keeps the values the user had changed.",
+	"wizz-abusefilter-warning": "Shown when AbuseFilter warns about the edit. Parameters:\n* $1 - the warning text from the wiki. Saving again confirms the edit.",
+	"wizz-captcha-intro": "Shown when the wiki requires a CAPTCHA to save.",
+	"wizz-captcha-image-label": "Label of the answer field, and alt text of the image, for an image CAPTCHA.",
+	"wizz-captcha-unsupported": "Shown when the wiki's CAPTCHA is of a kind Wizz cannot display (neither a question nor an image)."
 }
