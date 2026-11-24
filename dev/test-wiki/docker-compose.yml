@@ -1,0 +1,22 @@
+# Local test wiki for Wizz: http://localhost:8080. Run ./setup.sh (it calls `docker compose up -d`).
+name: wizz-wiki-${MW_VERSION:-1.45}
+services:
+  db:
+    image: mariadb:11
+    environment: { MARIADB_ROOT_PASSWORD: root, MARIADB_DATABASE: wiki }
+    volumes: [ "db:/var/lib/mysql" ]
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 3s
+      retries: 40
+  web:
+    image: mediawiki:${MW_VERSION:-1.45}
+    depends_on: { db: { condition: service_healthy } }
+    ports: [ "8080:80" ]
+    environment: { MW_CONFIG_FILE: /conf/LocalSettings.php }
+    volumes:
+      - conf:/conf
+      - ./ext/Bucket-${MW_VERSION:-1.45}:/var/www/html/extensions/Bucket:ro
+    restart: unless-stopped
+volumes: { db: {}, conf: {} }
