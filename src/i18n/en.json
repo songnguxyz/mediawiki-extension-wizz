@@ -30,7 +30,7 @@
 	"wizz-error-regex-timeout": "Checking “$1” took too long and was stopped. Ask an administrator to simplify the pattern of this field.",
 	"wizz-error-regex-unavailable": "“$1” could not be checked against the pattern of this field in this browser.",
 	"wizz-warning-invalid-existing": "This value was already not valid on the page. It is kept as it is until you change it.",
-	"wizz-definition-invalid": "The form definition has errors, so the form cannot open:",
+	"wizz-definition-invalid": "The form definition has errors:",
 	"wizz-definition-untrusted": "This form definition is not edit-protected at administrator level, so Wizz does not use it.",
 	"wizz-definition-valid": "The form definition is valid.",
 	"wizz-definition-warnings": "The form definition works, but with these warnings:",

@@ -169,7 +169,7 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 
 - **FR-017**: Quản trị viên MUST định nghĩa được form trên trang `Module:<Tên template>/wizz.json` (JSON; Scribunto tự gán content model JSON và module Lua đọc được bằng `mw.loadJsonData`), trỏ tới đúng một bucket; vị trí trang tự bảo đảm mỗi template chỉ có một form.
 - **FR-018**: Hệ thống MUST ghép tham số template với trường bucket theo tên mặc định, và cho khai ánh xạ đè khi tên khác nhau.
-- **FR-019**: Hệ thống MUST kiểm tra định nghĩa form khi nạp; nếu sai cấu trúc, trỏ tới bucket không tồn tại hoặc khai trường không có trong bucket thì form MUST NOT mở và MUST liệt kê lỗi cho mọi người dùng.
+- **FR-019**: Hệ thống MUST kiểm tra định nghĩa form khi nạp; nếu sai cấu trúc, trỏ tới bucket không tồn tại hoặc khai trường không có trong bucket thì form MUST NOT mở và MUST liệt kê lỗi cho mọi người dùng. Ngoại lệ: trường đã bị xóa khỏi bucket sau khi định nghĩa được lưu thì form vẫn mở, ô đó chỉ đọc kèm cảnh báo (xem Edge Cases); trang định nghĩa (FR-029) vẫn báo đó là lỗi.
 - **FR-020**: Định nghĩa form MUST cho khai nhãn hiển thị, thứ tự các ô và các luật ở FR-012.
 
 **Gợi ý**
