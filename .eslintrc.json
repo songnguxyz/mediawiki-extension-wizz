@@ -7,8 +7,16 @@
 	],
 	"overrides": [
 		{
-			"files": [ "tests/**", "build/**", "dev/**" ],
+			"files": [ "tests/**", "build/**", "dev/**", "vite.config.js" ],
 			"extends": "wikimedia/server"
+		},
+		{
+			"files": [ "src/wizz-form.js" ],
+			"parserOptions": { "sourceType": "module" }
+		},
+		{
+			"files": [ "tests/**" ],
+			"extends": "wikimedia/qunit"
 		}
 	]
 }

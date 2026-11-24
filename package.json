@@ -10,11 +10,16 @@
 		"fixtures:parsetree": "node build/fetch-parsetree.js"
 	},
 	"devDependencies": {
+		"@vitejs/plugin-vue": "6.0.11",
+		"@wikimedia/codex-icons": "2.8.0",
 		"eslint": "^8.57.1",
 		"eslint-config-wikimedia": "^0.33.1",
 		"grunt-banana-checker": "^0.13.0",
+		"less": "4.9.1",
 		"qunit": "^3.0.0",
 		"stylelint": "^17.6.0",
-		"stylelint-config-wikimedia": "^0.20.1"
+		"stylelint-config-wikimedia": "^0.20.1",
+		"vite": "8.3.8",
+		"vue": "3.4.27"
 	}
 }
