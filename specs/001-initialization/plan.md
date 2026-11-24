@@ -39,7 +39,7 @@ stored core parse trees (research R3). Manual cross-skin checks per
 **Project Type**: MediaWiki package gadget (front-end only).
 
 **Performance Goals**: page views without `?wizz=1` load only the entry gadget (entry file,
-config and the `wizz-tab` message; < 3 KB before gzip) plus one batched API request when the
+config with the tab label; < 3 KB before gzip) plus one batched API request when the
 tab is enabled; the form opens in ≤ 3 requests (research R5); tokenizer linear in page size,
 < 50 ms for 200 KB of wikitext in the Node test run.
 

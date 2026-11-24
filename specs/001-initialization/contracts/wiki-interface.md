@@ -14,7 +14,7 @@
 
 ## Tab
 
-"Edit infobox" (`wizz-tab`) in the page actions, only on pages that transclude a template with
+"Edit infobox" (label from `tabLabel`) in the page actions, only on pages that transclude a template with
 an existing `/wizz.json` subpage. On by default; `editTab: false` in the config hides it
 (FR-023).
 
@@ -31,7 +31,7 @@ form" button that opens the form with empty values and no save button (FR-029).
 | `MediaWiki:Gadgets-definition` lines or `Gadget definition:wizz.json` / `wizz-form.json` | `wizz` (default, entry) and `wizz-form` (hidden, loaded on demand) |
 | `MediaWiki:Gadget-wizz.js` | Entry |
 | `MediaWiki:Gadget-wizz-*.js`, `-*.vue`, `wizz.less` | Form code |
-| `MediaWiki:Gadget-wizz-config.json` | Config and the `wizz-tab` label (entry gadget) |
+| `MediaWiki:Gadget-wizz-config.json` | Config and the tab label (entry gadget) |
 | `MediaWiki:Gadget-wizz-i18n-en.json`, `-vi.json` | Messages (form gadget) |
 | `MediaWiki:Gadget-wizz` | Gadget description in Special:Preferences |
 
@@ -58,4 +58,4 @@ Only global: `mw.libs.wizz` (exposes `version`). CSS classes and message keys st
 ## Messages
 
 Bundles `en`, `vi`, documentation `qqq` (repo only). Key families: `wizz-summary`,
-`wizz-error-*`, `wizz-warning-*`, `wizz-ui-*`, `wizz-tab`, `wizz-definition-*`.
+`wizz-error-*`, `wizz-warning-*`, `wizz-ui-*`, `wizz-definition-*`.

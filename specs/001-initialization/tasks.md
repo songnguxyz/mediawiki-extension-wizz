@@ -31,9 +31,10 @@ later increments.
 - [ ] T001 Create `package.json` (license `MIT`, private, dev dependencies `qunit`, `eslint-config-wikimedia`, `stylelint-config-wikimedia`, `grunt-banana-checker` (its `banana-checker` CLI, no Grunt); scripts `test` = lint + banana + `qunit tests/`, `build` = `node build/build.js`, `fixtures:parsetree` = `node build/fetch-parsetree.js`)
 - [ ] T002 [P] Create `.eslintrc.json` (root, `wikimedia/client`, `wikimedia/vue3-es6`, `wikimedia/mediawiki`; override `tests/` and `build/` for `wikimedia/server` Node env) and `.eslintignore` for `dist/`
 - [ ] T003 [P] Create `.stylelintrc.json` extending `stylelint-config-wikimedia` and `.gitignore` (`node_modules/`, `dist/`)
-- [ ] T004 [P] Create `src/i18n/en.json`, `src/i18n/vi.json`, `src/i18n/qqq.json` with `@metadata` and the key families of contracts/wiki-interface.md (Messages), starting with `wizz-tab`, `wizz-summary`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-noeditright`
+- [ ] T004 [P] Create `src/i18n/en.json`, `src/i18n/vi.json`, `src/i18n/qqq.json` with `@metadata` and the key families of contracts/wiki-interface.md (Messages), starting with `wizz-summary`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-noeditright`
 - [ ] T005 [P] Create `.github/workflows/ci.yml` running `npm ci` and `npm test` on Node LTS for pushes and pull requests
 - [ ] T006 [P] Create `src/wizz-config.json` with `{ "namespaces": [0], "editTab": true, "tabLabel": { "en": "Edit infobox", "vi": "Sửa infobox" } }` (contracts/wiki-interface.md Configuration; research R2 entry message)
+- [ ] T007 Set up the Cloud VPS test wiki: MediaWiki 1.45 with Gadgets, Scribunto, Bucket, AbuseFilter and ConfirmEdit; an interface-admin bot password for `WIZZ_TEST_API`; create the test data of quickstart.md "Test data (self-made)" steps 1 to 5
 
 ---
 
@@ -43,16 +44,16 @@ later increments.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create round-trip fixture corpus in `tests/fixtures/roundtrip/` (≥ 20 self-made `*.wikitext` files covering: one-per-line and inline params, comments, `<ref>`, `<nowiki>`, `<pre>`, nested templates, `{{{ }}}`, `[[ ]]` with `|`, duplicate params, positional params, redirect/variant names, two calls of one template, malformed calls) each with a `*.edits.json` describing an edit and its exact expected output (research R3, R4)
-- [ ] T008 [P] Create `build/fetch-parsetree.js`: for each fixture, POST `action=parse&prop=parsetree&contentmodel=wikitext` to a wiki URL given by env `WIZZ_TEST_API`, write `*.parsetree.xml` beside it; commit the generated files
-- [ ] T009 [P] Write `tests/tokenizer.test.js`: offsets of call/name/param spans per fixture; agreement with `*.parsetree.xml` (template names, param names, values); malformed fixtures produce a parse error with line number; calls named `#…`, `subst:`, `safesubst:`, `:` are not template calls (data-model.md TemplateCall, TemplateParam)
-- [ ] T010 [P] Write `tests/editor.test.js`: unchanged edit returns identical string for every fixture; each `*.edits.json` gives byte-identical expected output; rules of research R4 (whitespace kept, append in last param's layout, cleared field keeps `|a=`, last duplicate edited, positional untouched)
-- [ ] T011 Implement `src/wizz-tokenizer.js` (pure CommonJS, no `mw`/DOM): `parse( text ) → { calls: TemplateCall[] }` or throws `{ code: 'wizz-parseerror', line }` per data-model.md TemplateCall (`index`, `start`, `end`, `nameText`, `params`) and TemplateParam (`name`, `nameSpan`, `valueSpan`, `rawValue`, `value`) until T009 passes
-- [ ] T012 Implement `src/wizz-editor.js` (pure): `applyEdits( text, call, changes ) → newText` and `matchesTemplate( nameText, templateTitle, redirects, nsIds )` (data-model.md TemplateCall normalisation rules) until T010 passes
-- [ ] T013 Implement `src/wizz-load.js`: `loadPage( api, title )` (contracts/api-calls.md request 1, incl. `intestactions=edit`), `loadDefinitions( api, templates )` (request 2 incl. protection and redirects), `loadSchema( api, bucket )` (request 3) returning plain objects; Bucket defaults `index: true`, `repeated: false` (research R1)
-- [ ] T014 [P] Write `tests/load.test.js` with a fake `api` object returning recorded responses: user cannot edit → `wizz-noeditright`; protection `sysop` direct and cascading → trusted; `autoconfirmed` or none → `wizz-definition-untrusted` (research R5, FR-028)
-- [ ] T015 Create `src/wizz.js` (entry gadget): exit unless `wgAction === 'view'`, latest revision and namespace in `wizz-config.json` `namespaces`; on `?wizz=1` call `mw.loader.using( 'ext.gadget.wizz-form' )` and start the form; expose `mw.libs.wizz = { version }` (research R2, R9)
-- [ ] T016 Create `build/build.js`: copy `src/*` to `dist/` with on-wiki names (`i18n/en.json` → `wizz-i18n-en.json`), print `MediaWiki:Gadgets-definition` lines and `Gadget definition:` JSON for gadgets `wizz` (default, `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`, pages `wizz.js`, `wizz-config.json`) and `wizz-form` (hidden, `package`, `dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`, `codexIcons`, all other pages) (research R2, R12)
+- [ ] T008 Create round-trip fixture corpus in `tests/fixtures/roundtrip/` (≥ 20 self-made `*.wikitext` files covering: one-per-line and inline params, comments, `<ref>`, `<nowiki>`, `<pre>`, nested templates, `{{{ }}}`, `[[ ]]` with `|`, duplicate params, positional params, redirect/variant names, two calls of one template, malformed calls) each with a `*.edits.json` describing an edit and its exact expected output (research R3, R4)
+- [ ] T009 [P] Create `build/fetch-parsetree.js`: for each fixture, POST `action=parse&prop=parsetree&contentmodel=wikitext` to a wiki URL given by env `WIZZ_TEST_API`, write `*.parsetree.xml` beside it; commit the generated files
+- [ ] T010 [P] Write `tests/tokenizer.test.js`: offsets of call/name/param spans per fixture; agreement with `*.parsetree.xml` (template names, param names, values); malformed fixtures produce a parse error with line number; calls named `#…`, `subst:`, `safesubst:`, `:` are not template calls (data-model.md TemplateCall, TemplateParam); a timing case asserts parsing a generated 200 KB page takes < 50 ms
+- [ ] T011 [P] Write `tests/editor.test.js`: unchanged edit returns identical string for every fixture; each `*.edits.json` gives byte-identical expected output; rules of research R4 (whitespace kept, append in last param's layout, cleared field keeps `|a=`, last duplicate edited, positional untouched)
+- [ ] T012 Implement `src/wizz-tokenizer.js` (pure CommonJS, no `mw`/DOM): `parse( text ) → { calls: TemplateCall[] }` or throws `{ code: 'wizz-parseerror', line }` per data-model.md TemplateCall (`index`, `start`, `end`, `nameText`, `params`) and TemplateParam (`name`, `nameSpan`, `valueSpan`, `rawValue`, `value`) until T010 passes
+- [ ] T013 Implement `src/wizz-editor.js` (pure): `applyEdits( text, call, changes ) → newText` and `matchesTemplate( nameText, templateTitle, redirects, nsIds )` (data-model.md TemplateCall normalisation rules) until T011 passes
+- [ ] T014 Implement `src/wizz-load.js`: `loadPage( api, title )` (contracts/api-calls.md request 1, incl. `intestactions=edit`), `loadDefinitions( api, templates )` (request 2 incl. protection and redirects), `loadSchema( api, bucket )` (request 3) returning plain objects; Bucket defaults `index: true`, `repeated: false` (research R1); the schema result follows data-model.md BucketSchema.fields
+- [ ] T015 [P] Write `tests/load.test.js` with a fake `api` object returning recorded responses: user cannot edit → `wizz-noeditright`; protection `sysop` direct and cascading → trusted; `autoconfirmed` or none → `wizz-definition-untrusted` (research R5, FR-028)
+- [ ] T016 Create `src/wizz.js` (entry gadget): exit unless `wgAction === 'view'`, latest revision and namespace in `wizz-config.json` `namespaces`; on `?wizz=1` call `mw.loader.using( 'ext.gadget.wizz-form' )` and call `start()` exported by `wizz-form.js` (written in T025; until then the entry only logs that the form gadget is missing); expose `mw.libs.wizz = { version }` (research R2, R9)
+- [ ] T017 Create `build/build.js`: copy `src/*` to `dist/` with on-wiki names (`i18n/en.json` → `wizz-i18n-en.json`), print `MediaWiki:Gadgets-definition` lines and `Gadget definition:` JSON for gadgets `wizz` (default, `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`, pages `wizz.js`, `wizz-config.json`) and `wizz-form` (hidden, `package`, `dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`, `codexIcons`, all other pages) (research R2, R12); fail the build if the entry gadget (`wizz.js` + `wizz-config.json`) exceeds 3 KB
 
 **Checkpoint**: tokenizer and editor proven on the corpus (SC-001 suite green); data can be loaded
 
@@ -66,19 +67,19 @@ later increments.
 
 ### Tests for User Story 1
 
-- [ ] T017 [P] [US1] Write `tests/summary.test.js`: summary lists changed params in order; no change → no summary
-- [ ] T018 [P] [US1] Write `tests/save.test.js` with a fake `api`: identical text → `nochange` with no `postWithEditToken` call (FR-003); `tags=wizz` sent only when tag active and user has `applychangetags` (data-model.md FormState.canTag); success returns `newrevid`
+- [ ] T018 [P] [US1] Write `tests/summary.test.js`: summary lists changed params in order; no change → no summary
+- [ ] T019 [P] [US1] Write `tests/save.test.js` with a fake `api`: identical text → `nochange` with no `postWithEditToken` call (FR-003); `tags=wizz` sent only when tag active and user has `applychangetags` (data-model.md FormState.canTag); success returns `newrevid`
 
 ### Implementation for User Story 1
 
-- [ ] T019 [P] [US1] Add `buildSummary( changedParams, msg )` to `src/wizz-editor.js` using message `wizz-summary` (FR-007)
-- [ ] T020 [US1] Implement `src/wizz-save.js` `save( api, state, newText )` per contracts/api-calls.md request 6 (`baserevid`, `basetimestamp`, `starttimestamp`, `nocreate`, optional `tags`), mapping `Success` → `success` until T018 passes
-- [ ] T021 [US1] Implement form state building in `src/wizz-form.js`: from loaded page, definition and schema produce data-model.md FormState (`page`, `revid`, `basetimestamp`, `starttimestamp`, `instance`, `fields[].value`, `fields[].dirty`, `canTag`); refuse with `wizz-noinfobox` (and `action=edit` link) when no call matches; refuse with `wizz-parseerror` and line on malformed call
-- [ ] T022 [US1] Create `src/wizz-Field.vue`: Codex input per type (TEXT → `CdxTextArea` when the raw value contains markup, else `CdxTextInput`; INTEGER/DOUBLE → `CdxTextInput` `inputmode="decimal"`; BOOLEAN → `CdxCheckbox` writing data-model.md FieldDefinition.booleanValues; PAGE → `CdxTextInput` for now) inside `CdxField` with label/help from FieldDefinition.label and FieldDefinition.help; marks `dirty` on input
-- [ ] T023 [US1] Create `src/wizz-App.vue`: `CdxDialog` (full screen on Minerva) rendering fields in definition order, save and cancel buttons, refusal messages; on save build text with `applyEdits` and call `save`; on success reload the page view without `wizz`
-- [ ] T024 [US1] Add `start()` to `src/wizz-form.js` that loads data (T013), builds state (T021), loads `wizz-i18n-<lang>.json` into `mw.messages` with `en` fallback (research R11) and mounts `wizz-App.vue` with `Vue.createMwApp`
-- [ ] T025 [P] [US1] Create `src/wizz.less` using only Codex CSS custom properties and logical properties (`margin-inline-start`, …) for dark mode and RTL (research R10)
-- [ ] T026 [US1] Add US1 messages (`wizz-ui-save`, `wizz-ui-cancel`, `wizz-ui-title`, `wizz-summary`) to `src/i18n/en.json`, `vi.json`, `qqq.json`
+- [ ] T020 [P] [US1] Add `buildSummary( changedParams, msg )` to `src/wizz-editor.js` using message `wizz-summary` (FR-007)
+- [ ] T021 [US1] Implement `src/wizz-save.js` `save( api, state, newText )` per contracts/api-calls.md request 6 (`baserevid`, `basetimestamp`, `starttimestamp`, `nocreate`, optional `tags`), mapping `Success` → `success` until T019 passes
+- [ ] T022 [US1] Implement form state building in `src/wizz-form.js`: from loaded page, definition and schema produce data-model.md FormState (`page`, `revid`, `basetimestamp`, `starttimestamp`, `instance`, `fields[].value`, `fields[].dirty`, `canTag`); refuse with `wizz-noinfobox` (and `action=edit` link) when no call matches; refuse with `wizz-parseerror` and line on malformed call
+- [ ] T023 [US1] Create `src/wizz-Field.vue`: Codex input per type (TEXT → `CdxTextArea` when the raw value contains markup, else `CdxTextInput`; INTEGER/DOUBLE → `CdxTextInput` `inputmode="decimal"`; BOOLEAN → `CdxCheckbox` writing data-model.md FieldDefinition.booleanValues; PAGE → `CdxTextInput` for now) inside `CdxField` with label/help from FieldDefinition.label and FieldDefinition.help; marks `dirty` on input
+- [ ] T024 [US1] Create `src/wizz-App.vue`: `CdxDialog` (full screen on Minerva) rendering fields in definition order, save and cancel buttons, refusal messages; on save build text with `applyEdits` and call `save`; on success reload the page view without `wizz`
+- [ ] T025 [US1] Add `start()` to `src/wizz-form.js` that loads data (T014), builds state (T022), loads `wizz-i18n-<lang>.json` into `mw.messages` with `en` fallback (research R11) and mounts `wizz-App.vue` with `Vue.createMwApp`
+- [ ] T026 [P] [US1] Create `src/wizz.less` using only Codex CSS custom properties and logical properties (`margin-inline-start`, …) for dark mode and RTL (research R10)
+- [ ] T027 [US1] Add US1 messages (`wizz-ui-save`, `wizz-ui-cancel`, `wizz-ui-title`, `wizz-summary`) to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
 **Checkpoint**: US1 works end to end on the test wiki
 
@@ -92,16 +93,16 @@ later increments.
 
 ### Tests for User Story 2
 
-- [ ] T027 [P] [US2] Write `tests/validate.test.js`: types INTEGER/DOUBLE reject text, wikitext and `~150` (FR-011); data-model.md FieldDefinition.required, FieldDefinition.min / FieldDefinition.max (value for numbers, length for TEXT), FieldDefinition.allowed, FieldDefinition.namespaces; repeated values split on FieldDefinition.separator and checked per item with the failing item reported (FR-013); untouched invalid existing value → warning only (FR-015)
-- [ ] T028 [P] [US2] Write `tests/regex.test.js` (Node `worker_threads` stand-in for the Worker): FieldDefinition.pattern applied with flag `u`; `(a+)+$` on a long `a…!` value fails with `wizz-error-regex-timeout` within ~200 ms (FR-016, research R6)
+- [ ] T028 [P] [US2] Write `tests/validate.test.js`: types INTEGER/DOUBLE reject text, wikitext and `~150` (FR-011); data-model.md FieldDefinition.required, FieldDefinition.min / FieldDefinition.max (value for numbers, length for TEXT), FieldDefinition.allowed, FieldDefinition.namespaces; repeated values split on FieldDefinition.separator and checked per item with the failing item reported (FR-013); untouched invalid existing value → warning only (FR-015)
+- [ ] T029 [P] [US2] Write `tests/regex.test.js` (passes a Node `worker_threads` `createWorker` to `testPattern`): FieldDefinition.pattern applied with flag `u`; `(a+)+$` on a long `a…!` value fails with `wizz-error-regex-timeout` within ~200 ms (FR-016, research R6)
 
 ### Implementation for User Story 2
 
-- [ ] T029 [US2] Implement `src/wizz-validate.js` (pure): `validateField( field, value, opts ) → { errors, warnings }` for the rules cited in T027, with type and repeated-ness from the bucket schema only (Constitution III) until T027 passes
-- [ ] T030 [US2] Implement `src/wizz-regex-worker.js` (worker source) and a `testPattern( pattern, value )` runner in `src/wizz-validate.js` that starts the Worker from a Blob URL, terminates and recreates it after 200 ms, and uses the fallback of research R6 when `Worker` cannot start, until T028 passes
-- [ ] T031 [US2] Add FieldDefinition.mustExist check to `src/wizz-save.js`: one batched `action=query&titles=` before save (contracts/api-calls.md request 4), missing titles become field errors
-- [ ] T032 [US2] Wire validation in `src/wizz-App.vue` and `src/wizz-Field.vue`: validate dirty fields on input and blur, show `CdxField` status `error`/`warning` with message tied to the field, block save and send nothing while any error remains (FR-009, FR-014); keep typed values
-- [ ] T033 [US2] Add messages `wizz-error-*` and `wizz-warning-invalid-existing` to `src/i18n/en.json`, `vi.json`, `qqq.json`
+- [ ] T030 [US2] Implement `src/wizz-validate.js` (pure): `validateField( field, value, opts ) → { errors, warnings }` for data-model.md FieldDefinition.required, FieldDefinition.min, FieldDefinition.max, FieldDefinition.allowed, FieldDefinition.namespaces and FieldDefinition.separator, with type and repeated-ness from data-model.md BucketSchema.fields only (Constitution III), until T028 passes
+- [ ] T031 [US2] Implement `src/wizz-regex-worker.js` (worker source) and a `testPattern( pattern, value )` runner in `src/wizz-validate.js` that starts the Worker from a Blob URL, terminates and recreates it after 200 ms, and uses the fallback of research R6 when `Worker` cannot start; `testPattern` takes a `createWorker( source )` function so tests can pass a Node `worker_threads` version, the browser default uses a Blob URL; until T029 passes
+- [ ] T032 [US2] Add FieldDefinition.mustExist check to `src/wizz-save.js`: one batched `action=query&titles=` before save (contracts/api-calls.md request 4), missing titles become field errors
+- [ ] T033 [US2] Wire validation in `src/wizz-App.vue` and `src/wizz-Field.vue`: validate dirty fields on input and blur, show `CdxField` status `error`/`warning` with message tied to the field, block save and send nothing while any error remains (FR-009, FR-014); keep typed values
+- [ ] T034 [US2] Add messages `wizz-error-*` and `wizz-warning-invalid-existing` to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
 **Checkpoint**: SC-002 suite green; US1 and US2 work together
 
@@ -115,14 +116,14 @@ later increments.
 
 ### Tests for User Story 3
 
-- [ ] T034 [P] [US3] Write `tests/definition.test.js`: structure per contracts/form-definition.schema.json; data-model.md FormDefinition.bucket missing schema → error; FormDefinition.fields empty or duplicate `field`/`param` → error; FieldDefinition.field not in schema → error with JSON path; FieldDefinition.param defaults to `field` and override mapping works (FR-018); FieldDefinition.label defaults to `param`; FieldDefinition.pattern must compile with `u` and be ≤ 500 chars; rules not fitting the type (e.g. `pattern` on INTEGER, FieldDefinition.category / FieldDefinition.mustExist on non-PAGE, FieldDefinition.booleanValues on non-BOOLEAN) → warning and ignored; field removed from schema → `state: removed`, read-only
+- [ ] T035 [P] [US3] Write `tests/definition.test.js`: structure per contracts/form-definition.schema.json; data-model.md FormDefinition.bucket missing schema → error; FormDefinition.fields empty or duplicate `field`/`param` → error; FieldDefinition.field not in schema → error with JSON path; FieldDefinition.param defaults to `field` and override mapping works (FR-018); FieldDefinition.label defaults to `param`; FieldDefinition.pattern must compile with `u` and be ≤ 500 chars; rules not fitting the type (e.g. `pattern` on INTEGER, FieldDefinition.category / FieldDefinition.mustExist on non-PAGE, FieldDefinition.booleanValues on non-BOOLEAN) → warning and ignored; field removed from schema → `state: removed`, read-only
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] Implement `src/wizz-definition.js` (pure): `checkDefinition( json, schema ) → { definition, errors, warnings }` covering data-model.md FormDefinition and every FieldDefinition attribute cited in T034 (defaults from data-model.md), until T034 passes
-- [ ] T036 [US3] Use `checkDefinition` in `src/wizz-form.js`: any error → refuse with `wizz-definition-invalid` and the full list for every user (FR-019); untrusted → `wizz-definition-untrusted` (FR-028); removed fields rendered read-only with warning in `src/wizz-Field.vue`
-- [ ] T037 [US3] Add definition-page mode to `src/wizz.js`: on view of `Template:*/wizz.json` load the `wizz-form` gadget and show the check result plus a "Preview form" button that opens the form with empty values and no save button (FR-029)
-- [ ] T038 [US3] Add messages `wizz-definition-*` and `wizz-ui-preview-form` to `src/i18n/en.json`, `vi.json`, `qqq.json`
+- [ ] T036 [US3] Implement `src/wizz-definition.js` (pure): `checkDefinition( json, schema ) → { definition, errors, warnings }` checking data-model.md FormDefinition.bucket and FormDefinition.fields, and FieldDefinition.field, FieldDefinition.param, FieldDefinition.label, FieldDefinition.pattern, FieldDefinition.separator and the type fit of every other FieldDefinition rule, with the defaults given there, until T035 passes
+- [ ] T037 [US3] Use `checkDefinition` in `src/wizz-form.js`: any error → refuse with `wizz-definition-invalid` and the full list for every user (FR-019); untrusted → `wizz-definition-untrusted` (FR-028); removed fields rendered read-only with warning in `src/wizz-Field.vue`
+- [ ] T038 [US3] Add definition-page mode to `src/wizz.js`: on view of `Template:*/wizz.json` load the `wizz-form` gadget and show the check result plus a "Preview form" button that opens the form with empty values and no save button (FR-029)
+- [ ] T039 [US3] Add messages `wizz-definition-*` and `wizz-ui-preview-form` to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
 **Checkpoint**: MVP (US1–US3) complete
 
@@ -136,15 +137,15 @@ later increments.
 
 ### Tests for User Story 4
 
-- [ ] T039 [P] [US4] Extend `tests/save.test.js`: `editconflict` → `conflict`; `edit.captcha` → `captcha` then resend with `captchaid`/`captchaword`; `abusefilter-warning` → `warning` then resend; other errors → `error` with API message (contracts/api-calls.md request 6 table)
+- [ ] T040 [P] [US4] Extend `tests/save.test.js`: `editconflict` → `conflict`; `edit.captcha` → `captcha` then resend with `captchaid`/`captchaword`; `abusefilter-warning` → `warning` then resend; other errors → `error` with API message (contracts/api-calls.md request 6 table)
 
 ### Implementation for User Story 4
 
-- [ ] T040 [US4] Add `preview( api, state, callText, newText )` to `src/wizz-save.js`: parallel `action=parse` (edited call only) and `action=compare` (contracts/api-calls.md request 5)
-- [ ] T041 [US4] Implement result handling of T039 in `src/wizz-save.js`
-- [ ] T042 [US4] Add preview step to `src/wizz-App.vue`: show parsed infobox and diff (core HTML via `v-html`, the only allowed use) before confirming save
-- [ ] T043 [US4] Handle `conflict` in `src/wizz-form.js`: reload page, rebuild state on the new revision, re-apply dirty values, tell the user (FR-006)
-- [ ] T044 [US4] Add CAPTCHA (`CdxTextInput` plus image or question) and AbuseFilter warning confirmation to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
+- [ ] T041 [US4] Add `preview( api, state, callText, newText )` to `src/wizz-save.js`: parallel `action=parse` (edited call only) and `action=compare` (contracts/api-calls.md request 5)
+- [ ] T042 [US4] Implement result handling of T040 in `src/wizz-save.js`
+- [ ] T043 [US4] Add preview step to `src/wizz-App.vue`: show parsed infobox and diff (core HTML via `v-html`, the only allowed use) before confirming save
+- [ ] T044 [US4] Handle `conflict` in `src/wizz-form.js`: reload page, rebuild state on the new revision, re-apply dirty values, tell the user (FR-006)
+- [ ] T045 [US4] Add CAPTCHA (`CdxTextInput` plus image or question) and AbuseFilter warning confirmation to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
 
 **Checkpoint**: safe for real wikis
 
@@ -156,9 +157,9 @@ later increments.
 
 **Independent Test**: on a page with two calls, choose the second, edit, save; only the second changes (quickstart scenario 12)
 
-- [ ] T045 [P] [US5] Add tests to `tests/editor.test.js` and `tests/tokenizer.test.js`: per-template `index`, instance summary from the first two mapped field values (data-model.md TemplateCall.summary), editing instance 1 leaves instance 0 untouched
-- [ ] T046 [US5] Add `instances` and `instance` to state in `src/wizz-form.js`; honour `wizzinstance=<n>` URL parameter; one call → open directly
-- [ ] T047 [US5] Add instance picker (`CdxRadio` list) to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
+- [ ] T046 [P] [US5] Add tests to `tests/editor.test.js` and `tests/tokenizer.test.js`: per-template `index`, instance summary from the first two mapped field values (data-model.md TemplateCall.summary), editing instance 1 leaves instance 0 untouched
+- [ ] T047 [US5] Add data-model.md FormState.instances (each with TemplateCall.summary) and FormState.instance to the state in `src/wizz-form.js`; honour the `wizzinstance=<n>` URL parameter; with only one call, open it directly
+- [ ] T048 [US5] Add instance picker (`CdxRadio` list) to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
 
 ---
 
@@ -168,20 +169,20 @@ later increments.
 
 **Independent Test**: tab appears only when enabled and the page has a form-backed infobox; form usable on Minerva, Citizen, Vector 2022, dark, RTL (quickstart scenario 13)
 
-- [ ] T048 [US6] Add the tab to `src/wizz.js`: when `editTab` is true, request `prop=templates` plus the existence part of contracts/api-calls.md request 2, then `mw.util.addPortletLink` (`p-views`; Minerva `page-actions-overflow`) with `tabLabel` from `wizz-config.json`, linking to `?wizz=1` (FR-023)
-- [ ] T049 [US6] Replace the PAGE input in `src/wizz-Field.vue` with `CdxLookup` backed by `list=prefixsearch` limited by FieldDefinition.namespaces and filtered by FieldDefinition.category (data-model.md; contracts/api-calls.md request 4; FR-021)
-- [ ] T050 [US6] Mobile and theme pass on `src/wizz.less` and `src/wizz-App.vue`: one column, sticky save bar on Minerva, check dark mode on Citizen and Vector 2022, `uselang=ar` (FR-024, SC-003)
+- [ ] T049 [US6] Add the tab to `src/wizz.js`: when `editTab` is true, request `prop=templates` plus the existence part of contracts/api-calls.md request 2, then `mw.util.addPortletLink` (`p-views`; Minerva `page-actions-overflow`) with `tabLabel` from `wizz-config.json`, linking to `?wizz=1` (FR-023)
+- [ ] T050 [US6] Replace the PAGE input in `src/wizz-Field.vue` with `CdxLookup` backed by `list=prefixsearch` limited by FieldDefinition.namespaces and filtered by FieldDefinition.category (data-model.md; contracts/api-calls.md request 4; FR-021)
+- [ ] T051 [US6] Mobile and theme pass on `src/wizz.less` and `src/wizz-App.vue`: one column, sticky save bar on Minerva, check dark mode on Citizen and Vector 2022, `uselang=ar` (FR-024, SC-003)
 
 ---
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-- [ ] T051 [P] Write `README.md`: install steps (enable Gadgets, Bucket, Scribunto; run `npm run build`; create the pages of contracts/wiki-interface.md; set the gadget default; create tag `wizz`), definition reference (contracts/form-definition.schema.json with examples), scope limit of Constitution III and a recommended Lua validation pattern for templates
-- [ ] T052 [P] Add `CHANGELOG.md` with the first release entry
-- [ ] T053 Accessibility review of `src/wizz-App.vue` and `src/wizz-Field.vue`: labels, keyboard order, errors announced (`aria-live` via `CdxField`), contrast
-- [ ] T054 Run quickstart.md scenarios 1–14 on the Cloud VPS test wiki and record results in `specs/001-initialization/checklists/quickstart-run.md`
-- [ ] T055 Verify the **verify** items of research.md (CSP `blob:` workers, ConfirmEdit payload, Citizen tokens) on Miraheze and WikiOasis test wikis; update research.md R6/R8/R10 and code if needed
-- [ ] T056 Run the SC-005 user test (5 newcomers on phones) and record the outcome in `specs/001-initialization/checklists/sc-005.md`
+- [ ] T052 [P] Write `README.md`: install steps (enable Gadgets, Bucket, Scribunto; run `npm run build`; create the pages of contracts/wiki-interface.md; set the gadget default; create tag `wizz`), definition reference (contracts/form-definition.schema.json with examples), scope limit of Constitution III and a recommended Lua validation pattern for templates
+- [ ] T053 [P] Add `CHANGELOG.md` with the first release entry
+- [ ] T054 Accessibility review of `src/wizz-App.vue` and `src/wizz-Field.vue`: labels, keyboard order, errors announced (`aria-live` via `CdxField`), contrast
+- [ ] T055 Run quickstart.md scenarios 1–14 on the Cloud VPS test wiki and record results in `specs/001-initialization/checklists/quickstart-run.md`
+- [ ] T056 Verify the **verify** items of research.md (CSP `blob:` workers, ConfirmEdit payload, Citizen tokens) on Miraheze and WikiOasis test wikis; update research.md R6/R8/R10 and code if needed
+- [ ] T057 Run the SC-005 user test (5 newcomers on phones) and record the outcome in `specs/001-initialization/checklists/sc-005.md`
 
 ---
 
@@ -190,13 +191,13 @@ later increments.
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: none
-- **Foundational (Phase 2)**: after Setup; blocks all stories
+- **Foundational (Phase 2)**: after Setup; blocks all stories; T009 (`fetch-parsetree`) needs the test wiki from T007
 - **US1 (Phase 3)**: after Foundational
-- **US2 (Phase 4)**: after Foundational; T032 edits `wizz-App.vue`/`wizz-Field.vue` from US1
-- **US3 (Phase 5)**: after Foundational; T036 edits `wizz-form.js` from US1
+- **US2 (Phase 4)**: after Foundational; T033 edits `wizz-App.vue`/`wizz-Field.vue` from US1
+- **US3 (Phase 5)**: after Foundational; T037 edits `wizz-form.js` from US1
 - **US4 (Phase 6)**: after US1
 - **US5 (Phase 7)**: after US1
-- **US6 (Phase 8)**: T048 after Foundational; T049–T050 after US1 UI exists
+- **US6 (Phase 8)**: T049 after Foundational; T050–T051 after US1 UI exists
 - **Polish (Phase 9)**: after the desired stories
 
 ### Within Each Story
@@ -206,9 +207,9 @@ Tests first (must fail) → pure modules → API calls → Vue components → me
 ### Parallel Opportunities
 
 - Setup: T002–T006 in parallel after T001
-- Foundational: T008, T009, T010, T014 in parallel; T011 and T012 can proceed in parallel once their tests exist
-- US1: T017, T018, T019, T025 in parallel
-- US2: T027, T028 in parallel
+- Foundational: T009, T010, T011, T015 in parallel; T012 and T013 can proceed in parallel once their tests exist
+- US1: T018, T019, T020, T026 in parallel
+- US2: T028, T029 in parallel
 - After US1: US2, US3, US4, US5 can proceed in parallel, coordinating on `wizz-App.vue` and `wizz-form.js`
 
 ---

@@ -26,8 +26,8 @@ marked **verify**.
 
 - **Decision**: One package gadget `wizz`, loaded on every page view (`default`), with
   `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`. Its pages:
-  `MediaWiki:Gadget-wizz.js` (entry, tiny) and `wizz-config.json` (config plus the `wizz-tab`
-  label in `en`/`vi`, the only message the entry needs). The entry checks the URL and page, then
+  `MediaWiki:Gadget-wizz.js` (entry, tiny) and `wizz-config.json` (config plus the tab label
+  `tabLabel` in `en`/`vi`, the only message the entry needs). The entry checks the URL and page, then
   loads the form lazily with `mw.loader.using` on a second, hidden package gadget `wizz-form`
   (`dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`,
   `codexIcons=…`): logic modules `wizz-*.js`, components `wizz-*.vue`, message bundles
@@ -172,7 +172,7 @@ marked **verify**.
 ## R11. i18n (FR-025)
 
 - **Decision**: message bundles `wizz-i18n-en.json`, `wizz-i18n-vi.json` and `qqq.json` (repo
-  only) checked by banana-checker, shipped in `wizz-form`; the entry carries only `wizz-tab`.
+  only) checked by banana-checker, shipped in `wizz-form`; the entry carries only `tabLabel` from the config.
   When the form starts it loads the bundle for `wgUserLanguage` with
   fallback to `en` into `mw.messages` with `mw.messages.set`. On-wiki message overrides are
   not supported in the MVP.
