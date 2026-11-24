@@ -63,17 +63,17 @@ Khi biên tập viên nhập giá trị sai kiểu hoặc sai luật, form chặ
 
 Quản trị viên tạo một trang định nghĩa form, gắn nó với một template infobox và một bucket, khai nhãn, thứ tự và luật cho từng ô.
 
-**Why this priority**: Không có định nghĩa form thì biên tập viên không có form để dùng. Định nghĩa sai có thể ghi dữ liệu sai vào Bucket, nên phải được kiểm tra ngay khi lưu.
+**Why this priority**: Không có định nghĩa form thì biên tập viên không có form để dùng. Định nghĩa sai có thể ghi dữ liệu sai vào Bucket, nên phải được kiểm tra trước khi form dùng nó, và chỉ được tin khi trang đã khóa.
 
-**Independent Test**: Tạo một trang định nghĩa form hợp lệ và một trang không hợp lệ; trang hợp lệ được lưu và form hiện ra trên trang có template đó, trang không hợp lệ bị từ chối kèm thông báo lỗi.
+**Independent Test**: Tạo một định nghĩa hợp lệ (đã khóa) và một định nghĩa không hợp lệ; định nghĩa hợp lệ cho form hiện ra trên trang có template đó, định nghĩa không hợp lệ làm form không mở và liệt kê lỗi.
 
 **Acceptance Scenarios**:
 
-1. **Given** quản trị viên có quyền sửa định nghĩa form, **When** lưu một định nghĩa hợp lệ, **Then** form có hiệu lực ngay cho mọi trang dùng template đó.
+1. **Given** trang định nghĩa hợp lệ và đã khóa ở mức quản trị viên, **When** biên tập viên mở form trên một trang dùng template đó, **Then** form dùng định nghĩa đó ngay.
 2. **Given** tên tham số template trùng tên trường trong bucket, **When** định nghĩa form không khai ánh xạ, **Then** tham số và trường được ghép theo tên.
 3. **Given** tên tham số khác tên trường (ví dụ có dấu hoặc có khoảng trắng), **When** định nghĩa khai ánh xạ đè, **Then** form dùng ánh xạ đã khai.
-4. **Given** định nghĩa sai cấu trúc, trỏ tới bucket không tồn tại, hoặc khai trường không có trong bucket, **When** quản trị viên lưu, **Then** việc lưu bị từ chối và thông báo nêu rõ lỗi.
-5. **Given** người dùng không có quyền sửa định nghĩa form, **When** họ cố sửa trang định nghĩa, **Then** việc sửa bị từ chối.
+4. **Given** định nghĩa sai cấu trúc, trỏ tới bucket không tồn tại hoặc khai trường không có trong bucket, **When** mở form, **Then** form không mở và thông báo nêu rõ từng lỗi.
+5. **Given** trang định nghĩa chưa khóa ở mức quản trị viên, **When** mở form, **Then** form không mở và báo định nghĩa chưa được tin cậy.
 
 ---
 
@@ -166,9 +166,9 @@ Biên tập viên mở form từ trang đặc biệt, hoặc từ tab "Sửa inf
 
 **Định nghĩa form**
 
-- **FR-017**: Quản trị viên MUST định nghĩa được form trên một trang wiki riêng, gắn với đúng một template và một bucket; một template chỉ gắn với một form.
+- **FR-017**: Quản trị viên MUST định nghĩa được form trên trang con `Template:<Tên>/wizz.json` (JSON) của template đó, trỏ tới đúng một bucket; vị trí trang tự bảo đảm mỗi template chỉ có một form.
 - **FR-018**: Hệ thống MUST ghép tham số template với trường bucket theo tên mặc định, và cho khai ánh xạ đè khi tên khác nhau.
-- **FR-019**: Hệ thống MUST kiểm tra định nghĩa form khi lưu và từ chối định nghĩa sai cấu trúc, trỏ tới bucket không tồn tại hoặc khai trường không có trong bucket.
+- **FR-019**: Hệ thống MUST kiểm tra định nghĩa form khi nạp; nếu sai cấu trúc, trỏ tới bucket không tồn tại hoặc khai trường không có trong bucket thì form MUST NOT mở và MUST liệt kê lỗi cho mọi người dùng.
 - **FR-020**: Định nghĩa form MUST cho khai nhãn hiển thị, thứ tự các ô và các luật ở FR-012.
 
 **Gợi ý**
@@ -186,7 +186,7 @@ Biên tập viên mở form từ trang đặc biệt, hoặc từ tab "Sửa inf
 **Quyền**
 
 - **FR-027**: Dùng form MUST cần quyền sửa trang và một quyền riêng của Wizz, mặc định cấp cho người dùng đã đăng nhập; quản trị viên wiki có thể cấp cho người không đăng nhập (không khuyến khích).
-- **FR-028**: Sửa trang định nghĩa form MUST cần một quyền riêng, mặc định cấp cho quản trị viên và quản trị viên giao diện.
+- **FR-028**: Hệ thống MUST chỉ dùng định nghĩa form khi trang của nó bị khóa sửa ở mức quản trị viên (khóa trực tiếp hoặc khóa lan) hoặc nằm trong namespace MediaWiki; nếu không, form MUST NOT mở và báo định nghĩa chưa được tin cậy.
 
 ### Key Entities
 
