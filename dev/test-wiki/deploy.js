@@ -1,7 +1,10 @@
 #!/usr/bin/env node
-// Upload dist/ to the test wiki: every file -> MediaWiki:Gadget-<filename>;
-// dist/gadgets-definition.txt (if present) -> MediaWiki:Gadgets-definition.
+/* eslint-disable no-console */
+// Upload dist/ to the test wiki as listed in dist/deploy.json (Litmus format:
+// pages[{file,title,createOnly?}]; definition.file -> MediaWiki:Gadgets-definition, overwritten).
 // Env: WIZZ_TEST_API, WIZZ_TEST_USER (Admin@wizz), WIZZ_TEST_PASS. Usage: node deploy.js [distDir]
+'use strict';
+
 const fs = require( 'fs' );
 const path = require( 'path' );
 
@@ -15,6 +18,7 @@ const jar = {};
 
 async function call( params, post ) {
 	const body = new URLSearchParams( { format: 'json', ...params } );
+	// eslint-disable-next-line n/no-unsupported-features/node-builtins
 	const res = await fetch( post ? api : api + '?' + body, {
 		method: post ? 'POST' : 'GET',
 		body: post ? body : undefined,
@@ -26,26 +30,42 @@ async function call( params, post ) {
 		jar[ k ] = v;
 	}
 	const json = await res.json();
-	if ( json.error ) { throw new Error( JSON.stringify( json.error ) ); }
+	if ( json.error ) {
+		throw new Error( JSON.stringify( json.error ) );
+	}
 	return json;
 }
 
 ( async () => {
 	const lt = ( await call( { action: 'query', meta: 'tokens', type: 'login' } ) ).query.tokens.logintoken;
 	const login = ( await call( { action: 'login', lgname: user, lgpassword: pass, lgtoken: lt }, true ) ).login;
-	if ( login.result !== 'Success' ) { throw new Error( 'Login failed: ' + login.reason ); }
+	if ( login.result !== 'Success' ) {
+		throw new Error( 'Login failed: ' + login.reason );
+	}
 	const token = ( await call( { action: 'query', meta: 'tokens' } ) ).query.tokens.csrftoken;
 
-	const pages = {};
-	for ( const f of fs.readdirSync( dist ) ) {
-		pages[ f === 'gadgets-definition.txt' ? 'MediaWiki:Gadgets-definition' : 'MediaWiki:Gadget-' + f ] = f;
-	}
-	for ( const [ title, f ] of Object.entries( pages ) ) {
+	const manifest = JSON.parse( fs.readFileSync( path.join( dist, 'deploy.json' ), 'utf8' ) );
+	const pages = [ ...manifest.pages, { file: manifest.definition.file, title: 'MediaWiki:Gadgets-definition' } ];
+	for ( const { file, title, createOnly } of pages ) {
 		const p = { action: 'edit', title, token, summary: 'Wizz deploy',
-			text: fs.readFileSync( path.join( dist, f ), 'utf8' ) };
-		const model = models[ path.extname( f ) ];
-		if ( model && title.startsWith( 'MediaWiki:Gadget-' ) ) { p.contentmodel = model; }
-		const r = ( await call( p, true ) ).edit;
-		console.log( title, r.nochange !== undefined ? 'unchanged' : 'saved' );
+			text: fs.readFileSync( path.join( dist, file ), 'utf8' ) };
+		const model = models[ path.extname( file ) ];
+		if ( model ) {
+			p.contentmodel = model;
+		}
+		if ( createOnly ) {
+			p.createonly = 1;
+		}
+		try {
+			const r = ( await call( p, true ) ).edit;
+			console.log( title, r.nochange !== undefined ? 'unchanged' : 'saved' );
+		} catch ( e ) {
+			if ( !createOnly || !e.message.includes( 'articleexists' ) ) {
+				throw e;
+			}
+		}
 	}
-} )().catch( ( e ) => { console.error( e.message ); process.exit( 1 ); } );
+} )().catch( ( e ) => {
+	console.error( e.message );
+	process.exitCode = 1;
+} );

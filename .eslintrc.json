@@ -7,7 +7,7 @@
 	],
 	"overrides": [
 		{
-			"files": [ "tests/**", "build/**" ],
+			"files": [ "tests/**", "build/**", "dev/**" ],
 			"extends": "wikimedia/server"
 		}
 	]

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Idempotent: builds the Wizz test wiki and its self-made data. MW_VERSION=1.45 (default) or 1.46.
+# Idempotent: builds the Wizz test wiki and its self-made data. MW_VERSION=1.45 (default), 1.43 or 1.46.
 set -euo pipefail
 cd "$(dirname "$0")"
 export MW_VERSION=${MW_VERSION:-1.45}
@@ -22,7 +22,7 @@ fi
 if ! dc exec -T web grep -q WIZZ-SETTINGS /conf/LocalSettings.php; then
   dc exec -T web sh -c 'cat >> /conf/LocalSettings.php' <<'EOF'
 # WIZZ-SETTINGS
-wfLoadExtensions( [ 'Gadgets', 'Scribunto', 'Bucket', 'AbuseFilter', 'ConfirmEdit', 'ConfirmEdit/QuestyCaptcha', 'Cite' ] );
+wfLoadExtensions( [ 'Gadgets', 'Scribunto', 'AbuseFilter', 'ConfirmEdit', 'ConfirmEdit/QuestyCaptcha', 'Cite', 'Bucket' ] );
 $wgScribuntoDefaultEngine = 'luastandalone';
 $wgBucketDBuser = 'bucket';
 $wgBucketDBpassword = 'bucket-test-pass';
@@ -34,14 +34,14 @@ $wgCaptchaTriggers['create'] = false;
 $wgGroupPermissions['*']['edit'] = true;
 $wgCapitalLinkOverrides[ 9592 ] = false; // Bucket names are lower-case
 $wgShowExceptionDetails = true;
-// Definition pages are JSON; in Template: they need an explicit model.
-$wgHooks['ContentHandlerDefaultModelFor'][] = static function ( $title, &$model ) {
-	if ( str_ends_with( $title->getText(), '/wizz.json' ) ) { $model = 'json'; return false; }
-};
 EOF
 fi
 
-mw update --quick >/dev/null
+# Bucket REL1_43 re-creates its existing index on every update and fails; it is loaded last so the other
+# extensions' tables are made first, and that one error is tolerated.
+out=$( mw update --quick 2>&1 ) || {
+	[[ $MW_VERSION == 1.43 && $out == *"Duplicate key name 'bucket_name'"* ]] || { echo "$out"; exit 1; }
+}
 dc exec -T db mariadb -uroot -proot -e \
   "CREATE USER IF NOT EXISTS 'bucket'@'%' IDENTIFIED BY 'bucket-test-pass'"
 mw Bucket:SetupDBPermission >/dev/null
@@ -84,12 +84,12 @@ end
 return p
 EOF
 put 'Template:Infobox nhân vật' <<'EOF'
-<includeonly>{{#invoke:Infobox nhân vật|main}}</includeonly><noinclude>Self-made test infobox. See [[/wizz.json]].</noinclude>
+<includeonly>{{#invoke:Infobox nhân vật|main}}</includeonly><noinclude>Self-made test infobox. See [[Module:Infobox nhân vật/wizz.json]].</noinclude>
 EOF
 put 'Template:Infobox_nv' <<'EOF'
 #REDIRECT [[Template:Infobox nhân vật]]
 EOF
-put 'Template:Infobox nhân vật/wizz.json' <<'EOF'
+put 'Module:Infobox nhân vật/wizz.json' <<'EOF'
 {
 	"bucket": "nhan_vat",
 	"fields": [
@@ -101,7 +101,7 @@ put 'Template:Infobox nhân vật/wizz.json' <<'EOF'
 	]
 }
 EOF
-mw protect -u Admin -r "Wizz test data" 'Template:Infobox nhân vật/wizz.json' >/dev/null
+mw protect -u Admin -r "Wizz test data" 'Module:Infobox nhân vật/wizz.json' >/dev/null
 echo 'MediaWiki\MediaWikiServices::getInstance()->getChangeTagsStore()->defineTag( "wizz" );' | mw eval >/dev/null
 put 'Song Ngư (nhân vật)' <<'EOF'
 {{Infobox nhân vật
