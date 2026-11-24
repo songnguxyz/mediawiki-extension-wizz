@@ -182,7 +182,7 @@ later increments.
 
 - [X] T052 [P] Write `README.md`: supported MediaWiki versions (research R13), install steps (enable Gadgets, Bucket, Scribunto; then one of the three routes of research R12: copy a release's `dist/` pages, Litmus `gadget-deploy`, or jsDelivr mode with `cdn: true`; set the gadget default; create tag `wizz`), definition reference (`Module:<Name>/wizz.json`, contracts/form-definition.schema.json with examples), scope limit of Constitution III and a recommended Lua validation pattern for templates that reads the same definition with `mw.loadJsonData`
 - [X] T053 [P] Add `CHANGELOG.md` with the first release entry
-- [ ] T054 Accessibility review of `src/wizz-App.vue` and `src/wizz-Field.vue`: labels, keyboard order, errors announced (`aria-live` via `CdxField`), contrast
+- [X] T054 Accessibility review of `src/wizz-App.vue` and `src/wizz-Field.vue`: labels, keyboard order, errors announced (`aria-live` via `CdxField`), contrast
 - [ ] T055 Run quickstart.md scenarios 1–14 on the Docker test wiki (T007, deployed with `deploy.js`) with `MW_VERSION=1.43`, `1.45` and `1.46`, also once in jsDelivr mode (`cdn: true`) against a pushed tag, and record results in `specs/001-initialization/checklists/quickstart-run.md`
 - [ ] T056 Verify the **verify** items of research.md (CSP `blob:` workers and `cdn.jsdelivr.net`, ConfirmEdit payload, Citizen tokens; jsDelivr mode loads the form) on Miraheze and WikiOasis test wikis; update research.md R6/R8/R10 and code if needed
 - [ ] T057 Run the SC-005 user test (5 newcomers on phones) and record the outcome in `specs/001-initialization/checklists/sc-005.md`

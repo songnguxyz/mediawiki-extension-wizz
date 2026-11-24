@@ -64,7 +64,9 @@
 			class="wizz-review"
 			@submit.prevent="onSave"
 		>
-			<h3>{{ $i18n( 'wizz-ui-preview-heading' ).text() }}</h3>
+			<h3 tabindex="-1">
+				{{ $i18n( 'wizz-ui-preview-heading' ).text() }}
+			</h3>
 			<!-- Core-parsed HTML of action=parse, the only v-html besides the diff. -->
 			<!-- eslint-disable-next-line vue/no-v-html -->
 			<div class="wizz-review__box" v-html="review.html"></div>
@@ -180,6 +182,7 @@ export default {
 				this.cur = fresh;
 				this.fields = fresh.fields;
 				this.warnExisting();
+				this.$nextTick( this.focusStep );
 			}, ( e ) => {
 				this.notice = { type: 'error', text: mw.msg( 'wizz-error-save', e.message || e ) };
 			} ).then( () => {
@@ -240,6 +243,7 @@ export default {
 				this.review = null;
 				this.captcha = null;
 				this.notice = null;
+				this.$nextTick( this.focusStep );
 			} else {
 				this.open = false;
 			}
@@ -293,8 +297,8 @@ export default {
 				} ).then( () => {
 					this.saving = false;
 					// After the button is enabled again, or it would take the focus back.
-					if ( blocked ) {
-						this.$nextTick( () => this.focusFirstError() );
+					if ( blocked || this.review ) {
+						this.$nextTick( () => ( blocked ? this.focusFirstError() : this.focusStep() ) );
 					}
 				} );
 		},
@@ -347,6 +351,13 @@ export default {
 				} );
 			}
 			return null;
+		},
+		// A step change removes or disables the focused button; put focus in the new step.
+		focusStep() {
+			const el = document.querySelector( '.wizz-dialog .wizz-review h3, .wizz-dialog .wizz-form input, .wizz-dialog .wizz-form textarea' );
+			if ( el ) {
+				el.focus();
+			}
 		},
 		focusFirstError() {
 			// The dialog is teleported, so it is not under this.$el.
