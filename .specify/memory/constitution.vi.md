@@ -115,8 +115,8 @@ Lý do: codebase nhỏ dễ duyệt, dễ giữ không hồi quy và dễ đư�
 - Bảo mật: thao tác ghi dùng `mw.Api` `postWithEditToken`; giá trị được hiển thị qua cơ chế
   escape của Vue/`mw.message`, không bao giờ chèn như HTML thô; chỉ đọc phiên bản mới nhất mà
   người dùng được xem.
-- Nguồn chuẩn là repo git; wiki chỉ nhận các bản phát hành có tag, không bao giờ sửa trực tiếp
-  trên wiki.
+- Nguồn chuẩn là repo git; wiki thật chỉ nhận các bản phát hành có tag, không bao giờ sửa trực
+  tiếp trên wiki. Wiki test cục bộ được chạy bản chưa gắn tag.
 - Tài liệu: hướng dẫn cài (định nghĩa gadget, các trang cần tạo, extension bắt buộc), tài liệu
   tham chiếu định nghĩa form, và một mẫu validate bằng Lua khuyến nghị cho template.
 
@@ -132,8 +132,8 @@ liệu là thứ giúp có được sự tin tưởng đó.
 - Test: QUnit trên Node cho các module logic; test mức trình duyệt chỉ thêm khi spec yêu cầu.
 - Phụ thuộc: Gadgets, Bucket và Scribunto trên wiki. Không có phụ thuộc npm lúc chạy; gói npm
   chỉ dùng khi phát triển không cần giải trình ngoài plan.
-- Môi trường test: một wiki MediaWiki chạy bằng Docker, dựng lại từ script trong repo, dùng dữ liệu tự tạo theo cấu trúc infobox
-  thật; MUST NOT chép nội dung wiki thật.
+- Môi trường test: một wiki MediaWiki chạy bằng Docker, dựng lại từ script trong repo, dùng dữ
+  liệu tự tạo theo cấu trúc infobox thật; MUST NOT chép nội dung wiki thật.
 
 ## Quy trình phát triển
 
@@ -155,4 +155,4 @@ liệu là thứ giúp có được sự tin tưởng đó.
 - Việc tuân thủ được kiểm tra khi lập plan (Constitution Check) và khi review. Ngoại lệ MUST
   được ghi lại kèm lý do ở mục Complexity Tracking của plan.
 
-**Phiên bản**: 2.1.2 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24
+**Phiên bản**: 2.1.3 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24

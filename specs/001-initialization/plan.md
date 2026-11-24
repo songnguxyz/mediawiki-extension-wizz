@@ -109,7 +109,13 @@ src/
 ├── wizz-config.json
 └── i18n/  en.json  vi.json  qqq.json
 build/
-└── build.js              # src → dist with on-wiki names + gadget definitions (R12)
+├── build.js              # src → dist with on-wiki names + gadget definitions (R12)
+└── fetch-parsetree.js    # fixtures → *.parsetree.xml from the test wiki (R3)
+dev/test-wiki/
+├── docker-compose.yml    # local MediaWiki (MW_VERSION, default 1.45)
+├── setup.sh              # extensions, bot password, self-made test data
+└── deploy.js             # dist/ → test wiki (untagged builds, test wiki only)
+.github/workflows/ci.yml  # lint + tests
 tests/
 ├── *.test.js             # QUnit under Node
 └── fixtures/roundtrip/   # *.wikitext, *.edits.json, *.parsetree.xml

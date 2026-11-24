@@ -37,7 +37,9 @@ Hướng đi: Wizz là **gadget** (không phải extension), Vue 3 + Codex, gi�
 
 1. Checklist `requirements.md`: đã đánh dấu "testable and unambiguous", sửa Notes.
 2. Wiki test: thay Cloud VPS bằng wiki Docker cục bộ (`dev/test-wiki/`, T007). Hiến pháp lên
-   2.1.2. Test parse tree chạy với wiki Docker, không cần bỏ qua.
+   2.1.2.
+3. `/speckit-analyze` lần 4: sửa cả 10 mục (hiến pháp 2.1.3: chỉ wiki thật mới bắt buộc bản có
+   tag; thêm `deploy.js` và chạy 1.46 vào T007/T055; T058 là bản phát hành đầu tiên). Test parse tree chạy với wiki Docker, không cần bỏ qua.
 
 ## Việc tiếp theo
 

@@ -7,7 +7,9 @@ description: "Task list for Wizz — infobox form editing gadget (001-initializa
 
 **Input**: Design documents from `/specs/001-initialization/`
 
-**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
+**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md.
+T056 also needs an account with interface-admin rights on a Miraheze and a WikiOasis test wiki
+(requests use the User-Agent in `$MIRAHEZE_UA`).
 
 **Tests**: Included. Constitution Principle II requires test-first QUnit tests under Node for
 the tokenizer, editor and validation; SC-001/SC-002 are measured by these suites. Within each
@@ -34,7 +36,7 @@ later increments.
 - [ ] T004 [P] Create `src/i18n/en.json`, `src/i18n/vi.json`, `src/i18n/qqq.json` with `@metadata` and the key families of contracts/wiki-interface.md (Messages), starting with `wizz-summary`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-noeditright`
 - [ ] T005 [P] Create `.github/workflows/ci.yml` running `npm ci` and `npm test` on Node LTS for pushes and pull requests
 - [ ] T006 [P] Create `src/wizz-config.json` with `{ "namespaces": [0], "editTab": true, "tabLabel": { "en": "Edit infobox", "vi": "Sửa infobox" } }` (contracts/wiki-interface.md Configuration; research R2 entry message)
-- [ ] T007 Create `dev/test-wiki/` (`docker-compose.yml` + `setup.sh`) that builds a local MediaWiki 1.45 at `http://localhost:8080` with Gadgets, Scribunto, Bucket, AbuseFilter and ConfirmEdit; an interface-admin bot password for `WIZZ_TEST_API`; create the test data of quickstart.md "Test data (self-made)" steps 1 to 5
+- [ ] T007 Create `dev/test-wiki/` (`docker-compose.yml` + `setup.sh`) that builds a local MediaWiki at `http://localhost:8080` (version from env `MW_VERSION`, default 1.45; 1.46 also supported) with Gadgets, Scribunto, Bucket, AbuseFilter and ConfirmEdit; an interface-admin bot password for `WIZZ_TEST_API`; create the test data of quickstart.md "Test data (self-made)" steps 1 to 5; and `dev/test-wiki/deploy.js` that writes the `dist/` pages and gadget definitions from T017 to the test wiki through `WIZZ_TEST_API` (untagged builds allowed on the test wiki only, Constitution VIII)
 
 ---
 
@@ -51,8 +53,8 @@ later increments.
 - [ ] T012 Implement `src/wizz-tokenizer.js` (pure CommonJS, no `mw`/DOM): `parse( text ) → { calls: TemplateCall[] }` or throws `{ code: 'wizz-parseerror', line }` per data-model.md TemplateCall (`index`, `start`, `end`, `nameText`, `params`) and TemplateParam (`name`, `nameSpan`, `valueSpan`, `rawValue`, `value`) until T010 passes
 - [ ] T013 Implement `src/wizz-editor.js` (pure): `applyEdits( text, call, changes ) → newText` and `matchesTemplate( nameText, templateTitle, redirects, nsIds )` (data-model.md TemplateCall normalisation rules) until T011 passes
 - [ ] T014 Implement `src/wizz-load.js`: `loadPage( api, title )` (contracts/api-calls.md request 1, incl. `intestactions=edit`), `loadDefinitions( api, templates )` (request 2 incl. protection and redirects; each result carries data-model.md FormDefinition.template, the parent template of the subpage), `loadSchema( api, bucket )` (request 3) returning plain objects; Bucket defaults `index: true`, `repeated: false` (research R1); the schema result follows data-model.md BucketSchema.fields
-- [ ] T015 [P] Write `tests/load.test.js` with a fake `api` object returning recorded responses: user cannot edit → `wizz-noeditright`; protection `sysop` direct and cascading → trusted; `autoconfirmed` or none → `wizz-definition-untrusted` (research R5, FR-028)
-- [ ] T016 Create `src/wizz.js` (entry gadget): exit unless `wgAction === 'view'`, latest revision and namespace in `wizz-config.json` `namespaces`; on `?wizz=1` call `mw.loader.using( 'ext.gadget.wizz-form' )` and call `start()` exported by `wizz-form.js` (written in T025; until then the entry only logs that the form gadget is missing); expose `mw.libs.wizz = { version }` (research R2, R9)
+- [ ] T015 [P] Write `tests/load.test.js` with a fake `api` object returning recorded responses: user cannot edit → `wizz-noeditright`; protection `sysop` direct and cascading → trusted; `autoconfirmed` or none → `wizz-definition-untrusted` (research R5, FR-028); opening a form makes ≤ 3 API requests (plan Performance Goals, research R5)
+- [ ] T016 Create `src/wizz.js` (entry gadget): exit unless `wgAction === 'view'`, latest revision and namespace in `wizz-config.json` `namespaces` (the namespace check does not apply to `Template:*/wizz.json`, see T038); on `?wizz=1` call `mw.loader.using( 'ext.gadget.wizz-form' )` and call `start()` exported by `wizz-form.js` (written in T025; until then the entry only logs that the form gadget is missing); expose `mw.libs.wizz = { version }` (research R2, R9)
 - [ ] T017 Create `build/build.js`: copy `src/*` to `dist/` with on-wiki names (`i18n/en.json` → `wizz-i18n-en.json`), print `MediaWiki:Gadgets-definition` lines and `Gadget definition:` JSON for gadgets `wizz` (default, `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`, pages `wizz.js`, `wizz-config.json`) and `wizz-form` (hidden, `package`, `dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`, `codexIcons`, all other pages) (research R2, R12); fail the build if the entry gadget (`wizz.js` + `wizz-config.json`) exceeds 3 KB
 
 **Checkpoint**: tokenizer and editor proven on the corpus (SC-001 suite green); data can be loaded
@@ -180,7 +182,7 @@ later increments.
 - [ ] T052 [P] Write `README.md`: install steps (enable Gadgets, Bucket, Scribunto; run `npm run build`; create the pages of contracts/wiki-interface.md; set the gadget default; create tag `wizz`), definition reference (contracts/form-definition.schema.json with examples), scope limit of Constitution III and a recommended Lua validation pattern for templates
 - [ ] T053 [P] Add `CHANGELOG.md` with the first release entry
 - [ ] T054 Accessibility review of `src/wizz-App.vue` and `src/wizz-Field.vue`: labels, keyboard order, errors announced (`aria-live` via `CdxField`), contrast
-- [ ] T055 Run quickstart.md scenarios 1–14 on the Docker test wiki (T007) and record results in `specs/001-initialization/checklists/quickstart-run.md`
+- [ ] T055 Run quickstart.md scenarios 1–14 on the Docker test wiki (T007, deployed with `deploy.js`) with `MW_VERSION=1.45`, then once with `MW_VERSION=1.46`, and record results in `specs/001-initialization/checklists/quickstart-run.md`
 - [ ] T056 Verify the **verify** items of research.md (CSP `blob:` workers, ConfirmEdit payload, Citizen tokens) on Miraheze and WikiOasis test wikis; update research.md R6/R8/R10 and code if needed
 - [ ] T057 Run the SC-005 user test (5 newcomers on phones) and record the outcome in `specs/001-initialization/checklists/sc-005.md`
 - [ ] T058 Tag the first release `v0.1.0` in git with the CHANGELOG entry and attach the `dist/` pages built from that tag (Constitution VIII)
@@ -246,5 +248,6 @@ Task: "Write tests/regex.test.js"
 
 ### Incremental Delivery
 
-US4 → first tagged release for real wikis → US5 → US6 → Polish. Each story is tagged and
-released as its own minor version (Constitution VIII: wikis receive tagged releases only).
+US4 → US5 → US6 → Polish → first tagged release `v0.1.0` (T058). Real wikis get only tagged
+releases; later changes ship as tagged versions (Constitution VIII). Before T058, builds run
+only on the local test wiki.

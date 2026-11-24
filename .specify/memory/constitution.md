@@ -113,8 +113,8 @@ Rationale: a small codebase is easier to review, keep regression-free and trust.
   the DOM, so it can be tested under Node; Vue components only present it.
 - Security: write actions use `mw.Api` `postWithEditToken`; values are rendered through Vue/
   `mw.message` escaping, never inserted as raw HTML; only the latest visible revision is read.
-- Source of truth is the git repository; wikis receive tagged releases only, never edits made
-  directly on a wiki.
+- Source of truth is the git repository; production wikis receive tagged releases only, never
+  edits made directly on a wiki. The local test wiki may run untagged builds.
 - Documentation: install steps (gadget definition, pages to create, required extensions),
   form-definition reference, and a recommended Lua validation pattern for templates.
 
@@ -131,8 +131,8 @@ self-contained, documented code is what earns that trust.
   them.
 - Dependencies: Gadgets, Bucket and Scribunto on the wiki. No runtime npm dependency; dev-only
   npm packages need no justification beyond the plan.
-- Test environment: a local Docker MediaWiki wiki, rebuilt from a script in the repo, using self-made data modelled on real infobox
-  structures; real wiki content MUST NOT be copied.
+- Test environment: a local Docker MediaWiki wiki, rebuilt from a script in the repo, using
+  self-made data modelled on real infobox structures; real wiki content MUST NOT be copied.
 
 ## Development Workflow
 
@@ -154,4 +154,4 @@ self-contained, documented code is what earns that trust.
 - Compliance is checked at plan time (Constitution Check) and at review. Exceptions MUST be
   documented with rationale in the plan's Complexity Tracking.
 
-**Version**: 2.1.2 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24
+**Version**: 2.1.3 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24

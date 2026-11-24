@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-initialization`
 **Created**: 2026-11-19
-**Status**: Draft
+**Status**: Ready for implementation
 **Input**: Mô tả của người dùng: "Viết một extension MediaWiki mới thay cho Page Forms, cho phép sửa infobox qua form có validate chặt, dữ liệu gắn với Bucket, chống regression; MVP chỉ sửa infobox trên trang đã có."
 
 **Bối cảnh**: Page Forms có input OOUI/VEForAll hiển thị lỗi, không hỗ trợ Bucket (chỉ SMW và Cargo), hay regression giữa các phiên bản, và Miraheze đã ngừng cho bật Page Forms trên wiki mới. Wizz mượn ý tưởng của Page Forms nhưng không dùng lại code.
