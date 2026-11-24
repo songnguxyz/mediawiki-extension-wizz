@@ -44,7 +44,7 @@ Một biên tập viên mở form cho một trang đã có infobox, thấy các 
 
 Khi biên tập viên nhập giá trị sai kiểu hoặc sai luật, form chặn việc lưu, chỉ rõ ô nào sai và vì sao, và giữ nguyên những gì đã nhập.
 
-**Why this priority**: Infobox ghi dữ liệu vào Bucket; dữ liệu sai làm hỏng mọi truy vấn dựa trên bucket. Validate chặt là lý do chính để làm Wizz thay vì sửa wikitext trực tiếp.
+**Why this priority**: Infobox ghi dữ liệu vào Bucket; dữ liệu sai làm hỏng mọi truy vấn dựa trên bucket. Validate chặt là lý do chính để làm Wizz thay vì sửa wikitext trực tiếp. Wizz chỉ bảo vệ các sửa đổi đi qua form; dữ liệu nhập bằng sửa wikitext do template/Lua của wiki kiểm tra.
 
 **Independent Test**: Với một form khai đủ các loại luật, gửi lần lượt từng giá trị sai và kiểm tra rằng không có sửa đổi nào được lưu và đúng ô bị đánh dấu.
 
@@ -54,7 +54,7 @@ Khi biên tập viên nhập giá trị sai kiểu hoặc sai luật, form chặ
 2. **Given** một ô có luật bắt buộc, min/max, regex hoặc danh sách cho phép, **When** giá trị vi phạm luật, **Then** form không lưu và nêu luật bị vi phạm.
 3. **Given** một ô kiểu PAGE có yêu cầu trang phải tồn tại, **When** biên tập viên nhập tên trang chưa có, **Then** form không lưu và báo trang không tồn tại.
 4. **Given** một ô nhiều giá trị (repeated), **When** một trong các giá trị sai luật, **Then** form báo đúng giá trị sai đó.
-5. **Given** một yêu cầu lưu bỏ qua kiểm tra phía trình duyệt, **When** máy chủ nhận giá trị sai, **Then** máy chủ vẫn từ chối lưu.
+5. **Given** còn ít nhất một ô sai, **When** biên tập viên bấm lưu, **Then** Wizz không gửi yêu cầu lưu nào tới wiki.
 6. **Given** trang cũ có giá trị không hợp lệ ở một ô, **When** biên tập viên mở form, **Then** ô đó hiện giá trị cũ kèm cảnh báo; form vẫn lưu được nếu biên tập viên không sửa ô đó, và chỉ validate ô đó khi nó bị sửa.
 
 ---
@@ -155,14 +155,14 @@ Biên tập viên mở form từ trang đặc biệt, hoặc từ tab "Sửa inf
 
 **Validate**
 
-- **FR-009**: Hệ thống MUST kiểm tra mọi luật ở phía máy chủ khi lưu; kiểm tra ở trình duyệt chỉ để báo lỗi sớm và MUST NOT là lớp duy nhất.
+- **FR-009**: Hệ thống MUST kiểm tra mọi luật trước khi gửi yêu cầu lưu, dùng cùng một bộ luật cho cả lúc báo lỗi khi nhập và lúc lưu; nếu còn lỗi thì MUST NOT gửi yêu cầu lưu.
 - **FR-010**: Hệ thống MUST lấy kiểu của mỗi ô (PAGE, TEXT, INTEGER, DOUBLE, BOOLEAN) và thuộc tính nhiều giá trị từ schema của bucket đã khai.
 - **FR-011**: Ô INTEGER và DOUBLE MUST chỉ nhận số, không nhận wikitext; nguồn trích dẫn hoặc ghi chú cho ô số đặt ở một tham số TEXT riêng.
 - **FR-012**: Hệ thống MUST hỗ trợ các luật khai trong định nghĩa form: bắt buộc; min/max (giá trị với ô số, độ dài với ô TEXT); regex (ô TEXT); danh sách cho phép (ô TEXT và PAGE); trang phải tồn tại, giới hạn theo namespace (ô PAGE).
 - **FR-013**: Với ô nhiều giá trị, hệ thống MUST tách theo ký tự phân tách khai trong định nghĩa form và áp dụng luật cho từng giá trị.
 - **FR-014**: Khi một luật bị vi phạm, hệ thống MUST không lưu, giữ nguyên mọi giá trị đã nhập và đánh dấu đúng ô lỗi kèm lý do.
 - **FR-015**: Giá trị cũ không hợp lệ MUST được hiển thị kèm cảnh báo và chỉ bị validate khi người dùng sửa ô đó.
-- **FR-016**: Hệ thống MUST giới hạn thời gian chạy của regex để một mẫu xấu không làm treo máy chủ.
+- **FR-016**: Hệ thống MUST giới hạn thời gian chạy của regex để một mẫu xấu không làm treo trình duyệt; quá giới hạn thì báo lỗi ở ô đó.
 
 **Định nghĩa form**
 
@@ -201,7 +201,7 @@ Biên tập viên mở form từ trang đặc biệt, hoặc từ tab "Sửa inf
 ### Measurable Outcomes
 
 - **SC-001**: 100% các ca trong bộ mẫu round-trip giữ nguyên wikitext từng byte khi lưu không sửa, và chỉ thay đổi đúng tham số được sửa khi có sửa.
-- **SC-002**: 0 giá trị vi phạm luật được ghi vào trang qua Wizz trong toàn bộ bộ test validate, kể cả khi bỏ qua kiểm tra phía trình duyệt.
+- **SC-002**: 0 giá trị vi phạm luật được Wizz gửi đi lưu trong toàn bộ bộ test validate.
 - **SC-003**: Mọi loại ô hiển thị và lưu được trên Minerva, Citizen và Vector 2022, ở cả chế độ sáng và tối.
 - **SC-004**: Mỗi lỗi được báo về làm hỏng wikitext có một ca round-trip tương ứng trong bộ test trước khi được sửa, và không tái diễn ở phiên bản sau.
 - **SC-005**: Trong buổi thử với 5 người đóng góp mới chưa từng sửa wikitext, ít nhất 4/5 người hoàn thành một lần sửa infobox trên điện thoại mà không cần đọc hướng dẫn, mỗi lần dưới 3 phút.
@@ -213,6 +213,6 @@ Biên tập viên mở form từ trang đặc biệt, hoặc từ tab "Sửa inf
 - **Đích triển khai**: Miraheze và WikiOasis, qua quy trình duyệt extension của từng nơi; vì vậy MVP không tạo bảng cơ sở dữ liệu riêng và không tải tài nguyên từ bên ngoài.
 - **Môi trường test**: một wiki trên Wikimedia Cloud VPS, dùng dữ liệu tự tạo theo cấu trúc infobox thật, không chép nội dung wiki thật; wiki này cũng dùng để test gadget.
 - **Phụ thuộc**: dữ liệu vào Bucket qua template và module Lua của wiki; Wizz chỉ sửa tham số template, không ghi trực tiếp vào Bucket. API Bucket cho bên thứ ba chưa ổn định nên MVP không phụ thuộc vào nó.
-- **Ngoài phạm vi MVP**: tạo trang mới bằng form, form truy vấn kiểu RunQuery, sửa nhiều template khác nhau trong một form, sửa hàng loạt, nút sửa đặt ngay trên infobox, chế độ chạy không cần Bucket, gợi ý giá trị từ dữ liệu Bucket.
+- **Ngoài phạm vi MVP**: tạo trang mới bằng form, form truy vấn kiểu RunQuery, sửa nhiều template khác nhau trong một form, sửa hàng loạt, nút sửa đặt ngay trên infobox, chặn dữ liệu sai nhập bằng sửa wikitext hoặc gọi API trực tiếp (thuộc trách nhiệm của template/Lua), chế độ chạy không cần Bucket, gợi ý giá trị từ dữ liệu Bucket.
 - **Giấy phép**: GPL-2.0-or-later.
 - **Quan hệ với Page Forms**: Wizz là extension mới, không dùng lại code Page Forms, và có thể cài song song mà không xung đột tên.

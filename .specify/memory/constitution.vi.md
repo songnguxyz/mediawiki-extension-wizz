@@ -37,8 +37,8 @@ Lý do: hồi quy giữa các phiên bản là phàn nàn lớn thứ hai về P
   chung; chỉ dựa vào thuộc tính của ô nhập HTML MUST NOT được coi là validate.
 - Kiểu ô (PAGE, TEXT, INTEGER, DOUBLE, BOOLEAN) và thuộc tính nhiều giá trị MUST lấy từ schema
   Bucket; định nghĩa form MUST NOT khai lại.
-- Độ dài mẫu regex và độ dài giá trị MUST bị giới hạn để regex do người dùng khai không làm treo
-  trình duyệt của biên tập viên.
+- Regex do người dùng khai MUST chạy dưới giới hạn thời gian; quá giới hạn MUST báo lỗi ở ô đó
+  thay vì làm treo trình duyệt của biên tập viên.
 - Giá trị cũ không hợp lệ MUST được hiển thị kèm cảnh báo và MUST NOT bị đổi hay bỏ đi trừ khi
   người dùng sửa ô đó.
 - Định nghĩa form MUST được kiểm tra khi nạp; định nghĩa không hợp lệ MUST chặn form mở ra và
@@ -155,4 +155,4 @@ liệu là thứ giúp có được sự tin tưởng đó.
 - Việc tuân thủ được kiểm tra khi lập plan (Constitution Check) và khi review. Ngoại lệ MUST
   được ghi lại kèm lý do ở mục Complexity Tracking của plan.
 
-**Phiên bản**: 2.0.0 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24
+**Phiên bản**: 2.0.1 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24

@@ -37,8 +37,8 @@ Rationale: regressions between releases are the second main complaint about Page
   module; HTML input attributes alone MUST NOT count as validation.
 - Field types (PAGE, TEXT, INTEGER, DOUBLE, BOOLEAN) and repeated-ness MUST come from the
   Bucket schema; form definitions MUST NOT redeclare them.
-- Pattern length and value length MUST be capped so a user-supplied regular expression cannot
-  freeze the editor's browser.
+- User-supplied regular expressions MUST run under a time limit; a limit hit MUST fail that
+  field with an error instead of freezing the editor's browser.
 - Pre-existing invalid values MUST be shown with a warning and MUST NOT be altered or dropped
   unless the user edits that field.
 - Form definitions MUST be validated when loaded; an invalid definition MUST stop the form from
@@ -154,4 +154,4 @@ self-contained, documented code is what earns that trust.
 - Compliance is checked at plan time (Constitution Check) and at review. Exceptions MUST be
   documented with rationale in the plan's Complexity Tracking.
 
-**Version**: 2.0.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24
+**Version**: 2.0.1 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24
