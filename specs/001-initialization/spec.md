@@ -61,7 +61,7 @@ Khi biên tập viên nhập giá trị sai kiểu hoặc sai luật, form chặ
 
 ### User Story 3 - Quản trị viên định nghĩa form cho một template (Priority: P1)
 
-Quản trị viên tạo một trang định nghĩa form, gắn nó với một template infobox và một bucket, khai nhãn, thứ tự và luật cho từng ô.
+Quản trị viên tạo một trang định nghĩa form, gắn nó với một template infobox và một bucket, khai nhãn, thứ tự và luật cho từng ô. Định nghĩa được viết bằng JSON; MVP không có trình soạn định nghĩa dạng đồ họa.
 
 **Why this priority**: Không có định nghĩa form thì biên tập viên không có form để dùng. Định nghĩa sai có thể ghi dữ liệu sai vào Bucket, nên phải được kiểm tra trước khi form dùng nó, và chỉ được tin khi trang đã khóa.
 
@@ -74,6 +74,7 @@ Quản trị viên tạo một trang định nghĩa form, gắn nó với một 
 3. **Given** tên tham số khác tên trường (ví dụ có dấu hoặc có khoảng trắng), **When** định nghĩa khai ánh xạ đè, **Then** form dùng ánh xạ đã khai.
 4. **Given** định nghĩa sai cấu trúc, trỏ tới bucket không tồn tại hoặc khai trường không có trong bucket, **When** mở form, **Then** form không mở và thông báo nêu rõ từng lỗi.
 5. **Given** trang định nghĩa chưa khóa ở mức quản trị viên, **When** mở form, **Then** form không mở và báo định nghĩa chưa được tin cậy.
+6. **Given** quản trị viên vừa lưu trang định nghĩa, **When** xem trang đó, **Then** thấy ngay định nghĩa hợp lệ hay không kèm từng lỗi, và mở được bản xem thử form mà không cần tìm bài viết dùng template.
 
 ---
 
@@ -187,6 +188,7 @@ Biên tập viên mở form từ trang đặc biệt, hoặc từ tab "Sửa inf
 
 - **FR-027**: Dùng form MUST cần quyền sửa trang và một quyền riêng của Wizz, mặc định cấp cho người dùng đã đăng nhập; quản trị viên wiki có thể cấp cho người không đăng nhập (không khuyến khích).
 - **FR-028**: Hệ thống MUST chỉ dùng định nghĩa form khi trang của nó bị khóa sửa ở mức quản trị viên (khóa trực tiếp hoặc khóa lan) hoặc nằm trong namespace MediaWiki; nếu không, form MUST NOT mở và báo định nghĩa chưa được tin cậy.
+- **FR-029**: Khi xem trang `Template:<Tên>/wizz.json`, hệ thống MUST chạy bước kiểm tra của FR-019 và FR-028 và hiện kết quả (hợp lệ hoặc danh sách lỗi), kèm nút xem thử form với giá trị trống; xem thử MUST NOT lưu gì.
 
 ### Key Entities
 
@@ -213,6 +215,6 @@ Biên tập viên mở form từ trang đặc biệt, hoặc từ tab "Sửa inf
 - **Đích triển khai**: Miraheze và WikiOasis, qua quy trình duyệt extension của từng nơi; vì vậy MVP không tạo bảng cơ sở dữ liệu riêng và không tải tài nguyên từ bên ngoài.
 - **Môi trường test**: một wiki trên Wikimedia Cloud VPS, dùng dữ liệu tự tạo theo cấu trúc infobox thật, không chép nội dung wiki thật; wiki này cũng dùng để test gadget.
 - **Phụ thuộc**: dữ liệu vào Bucket qua template và module Lua của wiki; Wizz chỉ sửa tham số template, không ghi trực tiếp vào Bucket. API Bucket cho bên thứ ba chưa ổn định nên MVP không phụ thuộc vào nó.
-- **Ngoài phạm vi MVP**: tạo trang mới bằng form, form truy vấn kiểu RunQuery, sửa nhiều template khác nhau trong một form, sửa hàng loạt, nút sửa đặt ngay trên infobox, chặn dữ liệu sai nhập bằng sửa wikitext hoặc gọi API trực tiếp (thuộc trách nhiệm của template/Lua), chế độ chạy không cần Bucket, gợi ý giá trị từ dữ liệu Bucket.
+- **Ngoài phạm vi MVP**: tạo trang mới bằng form, form truy vấn kiểu RunQuery, sửa nhiều template khác nhau trong một form, sửa hàng loạt, nút sửa đặt ngay trên infobox, trình soạn định nghĩa form dạng đồ họa (GUI), chặn dữ liệu sai nhập bằng sửa wikitext hoặc gọi API trực tiếp (thuộc trách nhiệm của template/Lua), chế độ chạy không cần Bucket, gợi ý giá trị từ dữ liệu Bucket.
 - **Giấy phép**: GPL-2.0-or-later.
 - **Quan hệ với Page Forms**: Wizz là extension mới, không dùng lại code Page Forms, và có thể cài song song mà không xung đột tên.
