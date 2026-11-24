@@ -3,6 +3,7 @@
 // below runs at top level and exports nothing.
 import { createMwApp } from 'vue';
 import App from './wizz-App.vue';
+import regexWorker from './wizz-regex-worker.js?raw';
 import css from './wizz.less?inline';
 import en from './i18n/en.json';
 import vi from './i18n/vi.json';
@@ -28,7 +29,7 @@ async function load() {
 	// The summary is in the wiki's content language, not the user's.
 	const content = messages( mw.config.get( 'wgContentLanguage' ) );
 	const summaryMsg = ( key, ...params ) => params.reduce( ( s, p, i ) => s.replace( '$' + ( i + 1 ), p ), content[ key ] );
-	const props = { api, summaryMsg };
+	const props = { api, summaryMsg, regex: { source: regexWorker } };
 	try {
 		props.state = await load();
 	} catch ( e ) {

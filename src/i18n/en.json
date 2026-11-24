@@ -14,5 +14,20 @@
 	"wizz-ui-editsource": "Edit the page source",
 	"wizz-ui-nochange": "You have not changed anything.",
 	"wizz-unsafevalue": "A value cannot be saved as written because it would break the infobox, for example a lone | or unbalanced braces.",
-	"wizz-error-save": "Saving failed: $1"
+	"wizz-error-save": "Saving failed: $1",
+	"wizz-error-blocked": "Some values are not valid. Fix the marked fields and try again.",
+	"wizz-error-required": "This field is required.",
+	"wizz-error-integer": "“$1” is not a whole number.",
+	"wizz-error-number": "“$1” is not a number.",
+	"wizz-error-min-value": "“$1” is less than the minimum, $2.",
+	"wizz-error-max-value": "“$1” is greater than the maximum, $2.",
+	"wizz-error-min-length": "“$1” is shorter than the minimum length, $2 characters.",
+	"wizz-error-max-length": "“$1” is longer than the maximum length, $2 characters.",
+	"wizz-error-pattern": "“$1” does not have the required format.",
+	"wizz-error-allowed": "“$1” is not one of the allowed values.",
+	"wizz-error-namespace": "“$1” is not in an allowed namespace.",
+	"wizz-error-mustexist": "The page “$1” does not exist.",
+	"wizz-error-regex-timeout": "Checking “$1” took too long and was stopped. Ask an administrator to simplify the pattern of this field.",
+	"wizz-error-regex-unavailable": "“$1” could not be checked against the pattern of this field in this browser.",
+	"wizz-warning-invalid-existing": "This value was already not valid on the page. It is kept as it is until you change it."
 }

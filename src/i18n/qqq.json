@@ -14,5 +14,20 @@
 	"wizz-ui-editsource": "Link text shown with a refusal message; leads to the normal wikitext editor of the page.",
 	"wizz-ui-nochange": "Shown when the user presses save but no value differs from the page; no edit is made.",
 	"wizz-unsafevalue": "Shown when a value typed in the form cannot be written into the template call without changing its structure; nothing is saved.",
-	"wizz-error-save": "Shown when the edit API refuses the save. Parameters:\n* $1 - the error message returned by the API"
+	"wizz-error-save": "Shown when the edit API refuses the save. Parameters:\n* $1 - the error message returned by the API",
+	"wizz-error-blocked": "Shown above the buttons when saving is refused because at least one field has an error; nothing is sent.",
+	"wizz-error-required": "Field error: a required field is empty.",
+	"wizz-error-integer": "Field error for a whole-number field. Parameters:\n* $1 - the value that failed (one item of a multi-value field)",
+	"wizz-error-number": "Field error for a decimal-number field. Parameters:\n* $1 - the value that failed (one item of a multi-value field)",
+	"wizz-error-min-value": "Field error for a number below the minimum. Parameters:\n* $1 - the value that failed\n* $2 - the minimum",
+	"wizz-error-max-value": "Field error for a number above the maximum. Parameters:\n* $1 - the value that failed\n* $2 - the maximum",
+	"wizz-error-min-length": "Field error for text that is too short. Parameters:\n* $1 - the value that failed\n* $2 - the minimum length in characters",
+	"wizz-error-max-length": "Field error for text that is too long. Parameters:\n* $1 - the value that failed\n* $2 - the maximum length in characters",
+	"wizz-error-pattern": "Field error when a value does not match the regular expression of the field. Parameters:\n* $1 - the value that failed",
+	"wizz-error-allowed": "Field error when a value is not in the list of allowed values. Parameters:\n* $1 - the value that failed",
+	"wizz-error-namespace": "Field error when a page title is in a namespace the field does not allow. Parameters:\n* $1 - the title that failed",
+	"wizz-error-mustexist": "Field error when a page the field must link to does not exist. Parameters:\n* $1 - the title that failed",
+	"wizz-error-regex-timeout": "Field error when the regular expression of the field ran over the time limit (about 0.2 seconds). Parameters:\n* $1 - the value being checked",
+	"wizz-error-regex-unavailable": "Field error when the pattern could not be run safely, for example because the browser blocks background workers. Parameters:\n* $1 - the value being checked",
+	"wizz-warning-invalid-existing": "Field warning for a value that was already invalid when the form opened and that the user has not edited."
 }

@@ -14,5 +14,20 @@
 	"wizz-ui-editsource": "Sửa mã nguồn trang",
 	"wizz-ui-nochange": "Bạn chưa thay đổi gì.",
 	"wizz-unsafevalue": "Không thể lưu một giá trị đúng như đã nhập vì nó sẽ làm hỏng infobox, ví dụ dấu | đơn lẻ hoặc dấu ngoặc nhọn không cân.",
-	"wizz-error-save": "Lưu không thành công: $1"
+	"wizz-error-save": "Lưu không thành công: $1",
+	"wizz-error-blocked": "Một số giá trị không hợp lệ. Hãy sửa các ô được đánh dấu rồi thử lại.",
+	"wizz-error-required": "Ô này là bắt buộc.",
+	"wizz-error-integer": "“$1” không phải số nguyên.",
+	"wizz-error-number": "“$1” không phải là số.",
+	"wizz-error-min-value": "“$1” nhỏ hơn mức tối thiểu, $2.",
+	"wizz-error-max-value": "“$1” lớn hơn mức tối đa, $2.",
+	"wizz-error-min-length": "“$1” ngắn hơn độ dài tối thiểu, $2 ký tự.",
+	"wizz-error-max-length": "“$1” dài hơn độ dài tối đa, $2 ký tự.",
+	"wizz-error-pattern": "“$1” không đúng định dạng yêu cầu.",
+	"wizz-error-allowed": "“$1” không nằm trong các giá trị được phép.",
+	"wizz-error-namespace": "“$1” không thuộc không gian tên được phép.",
+	"wizz-error-mustexist": "Trang “$1” không tồn tại.",
+	"wizz-error-regex-timeout": "Việc kiểm tra “$1” quá lâu nên đã bị dừng. Hãy nhờ quản trị viên đơn giản hóa mẫu của ô này.",
+	"wizz-error-regex-unavailable": "Không thể kiểm tra “$1” theo mẫu của ô này trong trình duyệt này.",
+	"wizz-warning-invalid-existing": "Giá trị này đã không hợp lệ sẵn trên trang. Nó được giữ nguyên cho đến khi bạn sửa."
 }

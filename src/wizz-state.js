@@ -59,7 +59,10 @@ function buildState( page, definition, schema, call ) {
 			booleanValues,
 			value,
 			initial: value,
-			dirty: false
+			dirty: false,
+			rules: f,
+			errors: [],
+			warnings: []
 		};
 	} );
 	return {

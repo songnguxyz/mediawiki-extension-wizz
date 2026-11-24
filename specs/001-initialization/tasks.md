@@ -96,16 +96,16 @@ later increments.
 
 ### Tests for User Story 2
 
-- [ ] T028 [P] [US2] Write `tests/validate.test.js`: types INTEGER/DOUBLE reject text, wikitext and `~150` (FR-011); data-model.md FieldDefinition.required, FieldDefinition.min / FieldDefinition.max (value for numbers, length for TEXT), FieldDefinition.allowed, FieldDefinition.namespaces; repeated values split on FieldDefinition.separator and checked per item with the failing item reported (FR-013); untouched invalid existing value → warning only (FR-015)
-- [ ] T029 [P] [US2] Write `tests/regex.test.js` (passes a Node `worker_threads` `createWorker` to `testPattern`): FieldDefinition.pattern applied with flag `u`; `(a+)+$` on a long `a…!` value fails with `wizz-error-regex-timeout` within ~200 ms (FR-016, research R6)
+- [X] T028 [P] [US2] Write `tests/validate.test.js`: types INTEGER/DOUBLE reject text, wikitext and `~150` (FR-011); data-model.md FieldDefinition.required, FieldDefinition.min / FieldDefinition.max (value for numbers, length for TEXT), FieldDefinition.allowed, FieldDefinition.namespaces; repeated values split on FieldDefinition.separator and checked per item with the failing item reported (FR-013); untouched invalid existing value → warning only (FR-015)
+- [X] T029 [P] [US2] Write `tests/regex.test.js` (passes a Node `worker_threads` `createWorker` to `testPattern`): FieldDefinition.pattern applied with flag `u`; `(a+)+$` on a long `a…!` value fails with `wizz-error-regex-timeout` within ~200 ms (FR-016, research R6)
 
 ### Implementation for User Story 2
 
-- [ ] T030 [US2] Implement `src/wizz-validate.js` (pure): `validateField( field, value, opts ) → { errors, warnings }` for data-model.md FieldDefinition.required, FieldDefinition.min, FieldDefinition.max, FieldDefinition.allowed, FieldDefinition.namespaces and FieldDefinition.separator, with type and repeated-ness from data-model.md BucketSchema.fields only (Constitution III), until T028 passes
-- [ ] T031 [US2] Implement `src/wizz-regex-worker.js` (worker source) and a `testPattern( pattern, value )` runner in `src/wizz-validate.js` that starts the Worker from a Blob URL, terminates and recreates it after 200 ms, and uses the fallback of research R6 when `Worker` cannot start; `testPattern` takes a `createWorker( source )` function so tests can pass a Node `worker_threads` version, the browser default uses a Blob URL; until T029 passes
-- [ ] T032 [US2] Add FieldDefinition.mustExist check to `src/wizz-save.js`: one batched `action=query&titles=` before save (contracts/api-calls.md request 4), missing titles become field errors
-- [ ] T033 [US2] Wire validation in `src/wizz-App.vue` and `src/wizz-Field.vue`: validate dirty fields on input and blur, show `CdxField` status `error`/`warning` with message tied to the field, block save and send nothing while any error remains (FR-009, FR-014); keep typed values
-- [ ] T034 [US2] Add messages `wizz-error-*` and `wizz-warning-invalid-existing` to `src/i18n/en.json`, `vi.json`, `qqq.json`
+- [X] T030 [US2] Implement `src/wizz-validate.js` (pure): `validateField( field, value, opts ) → { errors, warnings }` for data-model.md FieldDefinition.required, FieldDefinition.min, FieldDefinition.max, FieldDefinition.allowed, FieldDefinition.namespaces and FieldDefinition.separator, with type and repeated-ness from data-model.md BucketSchema.fields only (Constitution III), until T028 passes
+- [X] T031 [US2] Implement `src/wizz-regex-worker.js` (worker source) and a `testPattern( pattern, value )` runner in `src/wizz-validate.js` that starts the Worker from a Blob URL, terminates and recreates it after 200 ms, and uses the fallback of research R6 when `Worker` cannot start; `testPattern` takes a `createWorker( source )` function so tests can pass a Node `worker_threads` version, the browser default uses a Blob URL; until T029 passes
+- [X] T032 [US2] Add FieldDefinition.mustExist check to `src/wizz-save.js`: one batched `action=query&titles=` before save (contracts/api-calls.md request 4), missing titles become field errors
+- [X] T033 [US2] Wire validation in `src/wizz-App.vue` and `src/wizz-Field.vue`: validate dirty fields on input and blur, show `CdxField` status `error`/`warning` with message tied to the field, block save and send nothing while any error remains (FR-009, FR-014); keep typed values
+- [X] T034 [US2] Add messages `wizz-error-*` and `wizz-warning-invalid-existing` to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
 **Checkpoint**: SC-002 suite green; US1 and US2 work together
 

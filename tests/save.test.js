@@ -1,6 +1,6 @@
 'use strict';
 
-const { save } = require( '../src/wizz-save.js' );
+const { save, findMissing } = require( '../src/wizz-save.js' );
 
 const state = ( over ) => Object.assign( {
 	page: 'Song Ngư (nhân vật)',
@@ -65,4 +65,26 @@ QUnit.test( 'server-side nochange', async ( assert ) => {
 QUnit.test( 'API error rejects with its code and info', async ( assert ) => {
 	const api = { postWithEditToken: () => ( { then: ( ok, fail ) => Promise.resolve( fail( 'protectedpage', { error: { info: 'Protected' } } ) ) } ) };
 	await assert.rejects( save( api, state(), 'new', 's' ), ( e ) => e.code === 'protectedpage' && e.message === 'Protected' );
+} );
+
+QUnit.module( 'wizz-save findMissing' );
+
+QUnit.test( 'one batched query; missing titles come back by input spelling; a | is missing without asking', async ( assert ) => {
+	const calls = [];
+	const api = { get: ( p ) => {
+		calls.push( p );
+		return Promise.resolve( { query: {
+			normalized: [ { from: 'bạch dương', to: 'Bạch dương' } ],
+			pages: [ { title: 'Bạch dương', missing: true }, { title: 'Kim Ngưu', pageid: 3 } ]
+		} } );
+	} };
+	const missing = await findMissing( api, [ 'bạch dương', 'Kim Ngưu', 'bạch dương', 'a|b' ] );
+	assert.deepEqual( [ ...missing ].sort(), [ 'a|b', 'bạch dương' ] );
+	assert.strictEqual( calls.length, 1 );
+	assert.deepEqual( calls[ 0 ], { action: 'query', formatversion: 2, titles: 'bạch dương|Kim Ngưu' } );
+} );
+
+QUnit.test( 'no titles: no API call', async ( assert ) => {
+	const api = { get: () => assert.true( false, 'called' ) };
+	assert.strictEqual( ( await findMissing( api, [] ) ).size, 0 );
 } );
