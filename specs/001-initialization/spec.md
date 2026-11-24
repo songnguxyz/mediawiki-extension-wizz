@@ -213,7 +213,7 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 - **Người dùng mục tiêu**: biên tập viên của các wiki fan (bao gồm người mới ngại sửa wikitext) và quản trị viên wiki định nghĩa form.
 - **Môi trường**: MediaWiki 1.45 trở lên, theo bản stable mới nhất mà các wiki farm chạy; Gadgets, Bucket và Scribunto đã cài. MVP bắt buộc có Bucket.
 - **Đích triển khai**: Miraheze và WikiOasis; Wizz được quản trị viên giao diện cài như một gadget, không cần farm duyệt; không tải tài nguyên từ bên ngoài.
-- **Môi trường test**: một wiki trên Wikimedia Cloud VPS, dùng dữ liệu tự tạo theo cấu trúc infobox thật, không chép nội dung wiki thật; wiki này cũng dùng để test gadget.
+- **Môi trường test**: một wiki MediaWiki chạy bằng Docker (`dev/test-wiki/`), dùng dữ liệu tự tạo theo cấu trúc infobox thật, không chép nội dung wiki thật; wiki này cũng dùng để test gadget.
 - **Phụ thuộc**: dữ liệu vào Bucket qua template và module Lua của wiki; Wizz chỉ sửa tham số template, không ghi trực tiếp vào Bucket. API Bucket cho bên thứ ba chưa ổn định nên MVP không phụ thuộc vào nó.
 - **Ngoài phạm vi MVP**: tạo trang mới bằng form, form truy vấn kiểu RunQuery, sửa nhiều template khác nhau trong một form, sửa hàng loạt, nút sửa đặt ngay trên infobox, trình soạn định nghĩa form dạng đồ họa (GUI), chặn dữ liệu sai nhập bằng sửa wikitext hoặc gọi API trực tiếp (thuộc trách nhiệm của template/Lua), chế độ chạy không cần Bucket, gợi ý giá trị từ dữ liệu Bucket.
 - **Giấy phép**: MIT.
