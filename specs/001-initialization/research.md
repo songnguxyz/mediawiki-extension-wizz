@@ -111,7 +111,8 @@ marked **verify**.
 - **Decision**: One pure module `wizz-validate.js` used both while typing and before save.
   Rules: required, min/max (value for numbers, length for TEXT), pattern, allowed list,
   namespaces and must-exist for PAGE, per item for repeated fields. Must-exist is checked with
-  one batched `action=query&titles=` just before save (and on blur, debounced).
+  one batched `action=query&titles=` just before save and on blur. An untouched existing value
+  gets only the rules that need no worker or network (it is only warned about, FR-015).
 - **Regex**: patterns are ECMAScript regular expressions with the `u` flag. They run in a Web
   Worker created from a Blob URL of the worker's source, bundled as a string (no external
   URL). Each test has a

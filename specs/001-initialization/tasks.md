@@ -102,7 +102,7 @@ later increments.
 ### Implementation for User Story 2
 
 - [X] T030 [US2] Implement `src/wizz-validate.js` (pure): `validateField( field, value, opts ) → { errors, warnings }` for data-model.md FieldDefinition.required, FieldDefinition.min, FieldDefinition.max, FieldDefinition.allowed, FieldDefinition.namespaces and FieldDefinition.separator, with type and repeated-ness from data-model.md BucketSchema.fields only (Constitution III), until T028 passes
-- [X] T031 [US2] Implement `src/wizz-regex-worker.js` (worker source) and a `testPattern( pattern, value )` runner in `src/wizz-validate.js` that starts the Worker from a Blob URL, terminates and recreates it after 200 ms, and uses the fallback of research R6 when `Worker` cannot start; `testPattern` takes a `createWorker( source )` function so tests can pass a Node `worker_threads` version, the browser default uses a Blob URL; until T029 passes
+- [X] T031 [US2] Implement `src/wizz-regex-worker.js` (worker source) and a `testPattern( pattern, value, { source, createWorker? } )` runner in `src/wizz-validate.js` that starts the Worker from a Blob URL, terminates and recreates it after 200 ms, and uses the fallback of research R6 when `Worker` cannot start; `testPattern` takes a `createWorker( source )` function so tests can pass a Node `worker_threads` version, the browser default uses a Blob URL; until T029 passes
 - [X] T032 [US2] Add FieldDefinition.mustExist check to `src/wizz-save.js`: one batched `action=query&titles=` before save (contracts/api-calls.md request 4), missing titles become field errors
 - [X] T033 [US2] Wire validation in `src/wizz-App.vue` and `src/wizz-Field.vue`: validate dirty fields on input and blur, show `CdxField` status `error`/`warning` with message tied to the field, block save and send nothing while any error remains (FR-009, FR-014); keep typed values
 - [X] T034 [US2] Add messages `wizz-error-*` and `wizz-warning-invalid-existing` to `src/i18n/en.json`, `vi.json`, `qqq.json`
@@ -113,7 +113,7 @@ later increments.
 
 ## Phase 5: User Story 3 - Quản trị viên định nghĩa form cho một template (Priority: P1)
 
-**Goal**: JSON definition on a protected subpage, checked on load and on view, with field mapping and a preview
+**Goal**: JSON definition on a protected `Module:<Name>/wizz.json` page, checked on load and on view, with field mapping and a preview
 
 **Independent Test**: one valid protected definition opens the form; an invalid one lists errors; an unprotected one is refused; viewing the definition page shows the check and a preview button (quickstart scenarios 6–8)
 
