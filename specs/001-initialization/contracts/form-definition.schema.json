@@ -1,8 +1,8 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://github.com/songnguxyz/mediawiki-extension-wizz/form-definition.schema.json",
-	"title": "Wizz form definition (content of a Wizz:<Template> page)",
-	"description": "Structural contract. Cross-checks against the bucket schema (field exists, rule fits type) are done in PHP on save; see data-model.md.",
+	"title": "Wizz form definition (content of a Template:<Name>/wizz.json page)",
+	"description": "Structural contract. Cross-checks against the bucket schema (field exists, rule fits type) are done by the gadget when the form loads and when the page is viewed; see data-model.md. pattern is an ECMAScript regular expression (flag u).",
 	"type": "object",
 	"additionalProperties": false,
 	"required": [ "bucket", "fields" ],

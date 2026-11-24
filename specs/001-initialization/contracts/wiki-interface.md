@@ -1,54 +1,60 @@
-# Contract: wiki-facing interface (URLs, rights, configuration, messages)
+# Contract: wiki-facing interface (URLs, pages, configuration, messages)
 
-## Special page
+## URLs
 
-- `Special:EditInfobox/<Page>` — always available (FR-022). Optional `?instance=<n>`.
-- Alias file `Wizz.alias.php` provides `EditInfobox` (en) and `SửaInfobox` (vi).
-- Without JavaScript: notice `wizz-nojs` plus a link to `action=edit` of the page
-  (clarification Q1).
-- No form for the page: notice `wizz-noinfobox` plus an edit link. Malformed call: notice
-  `wizz-parseerror` with line number plus an edit link.
-- No permission: core permission error page (`wizz-edit` / `edit` missing); anonymous users get
-  the standard login prompt.
+- `<Page>?wizz=1` opens the form (FR-022). Optional `&wizzinstance=<n>` selects an instance.
+  Works only on a normal view of the latest revision in an allowed namespace.
+- Page has no call of a template with a definition: message `wizz-noinfobox` plus a link to
+  `action=edit`. Malformed call: `wizz-parseerror` with line number plus an edit link.
+- Definition invalid: `wizz-definition-invalid` with the list of errors (FR-019). Not
+  protected: `wizz-definition-untrusted` (FR-028).
+- No edit right: the save fails with core's permission error, shown in the form; the form
+  itself opens for anyone (FR-027, edge case for logged-out users).
+- No JavaScript: the gadget does not run; the page shows normally.
 
-## Namespace
+## Tab
 
-| ID | Name | Content model | Protection |
-|----|------|---------------|------------|
-| 9620 (provisional) | `Wizz` | `json` | `wizz-editdefinition` |
-| 9621 (provisional) | `Wizz_talk` | wikitext | — |
+"Edit infobox" (`wizz-tab`) in the page actions, only on pages that transclude a template with
+an existing `/wizz.json` subpage. On by default; `editTab: false` in the config hides it
+(FR-023).
 
-IDs MUST be registered on mediawiki.org before release and declared in the farms' ManageWiki
-`install.namespaces` entry.
+## Definition pages
 
-## Rights
+`Template:<Name>/wizz.json`, schema [form-definition.schema.json](form-definition.schema.json).
+Must be edit-protected at `sysop` level. Viewing it shows the check result and a "Preview
+form" button that opens the form with empty values and no save button (FR-029).
 
-| Right | Default groups | Purpose |
-|-------|----------------|---------|
-| `wizz-edit` | `user` | Use forms (FR-027). Wikis may grant `*` (not recommended). |
-| `wizz-editdefinition` | `sysop`, `interface-admin` | Edit `Wizz:` pages (FR-028). |
+## Gadget pages (installed by an interface admin)
 
-## Configuration (`extension.json` `config`, most-used first)
+| Page | Purpose |
+|------|---------|
+| `MediaWiki:Gadgets-definition` lines or `Gadget definition:wizz.json` / `wizz-form.json` | `wizz` (default, entry) and `wizz-form` (hidden, loaded on demand) |
+| `MediaWiki:Gadget-wizz.js` | Entry |
+| `MediaWiki:Gadget-wizz-*.js`, `-*.vue`, `wizz.less` | Form code |
+| `MediaWiki:Gadget-wizz-config.json` | Config |
+| `MediaWiki:Gadget-wizz-i18n-en.json`, `-vi.json` | Messages |
+| `MediaWiki:Gadget-wizz` | Gadget description in Special:Preferences |
 
-| Variable | Default | Meaning |
-|----------|---------|---------|
-| `$wgWizzNamespaces` | `[0]` | Namespaces whose pages may be edited by forms (FR-026). |
-| `$wgWizzEditTab` | `false` | Show an "Edit infobox" tab on pages with a form-backed infobox (FR-023). |
-| `$wgWizzChangeTag` | `true` | Tag edits with `wizz` (FR-007). |
+The exact definition lines are produced by `npm run build` (research R12).
 
-## Hooks used (no new hooks provided in MVP)
+## Configuration (`MediaWiki:Gadget-wizz-config.json`)
 
-`JsonValidateSave` (definition validation), `ListDefinedTags`, `ChangeTagsListActive`,
-`SkinTemplateNavigation::Universal` (tab).
-`getUserPermissionsErrors` is not needed (namespace protection covers definitions).
+| Key | Default | Meaning |
+|-----|---------|---------|
+| `namespaces` | `[0]` | Namespaces where the form can open (FR-026). |
+| `editTab` | `true` | Show the "Edit infobox" tab (FR-023). |
 
-## Logging
+## Change tag
 
-PSR-3 channel `Wizz`: `warning` for regex limit hits, schema/definition mismatches;
-`info` for refused saves due to parse errors; `error` for unexpected internal API failures.
+An admin creates the tag `wizz` at Special:Tags (optional). Wizz sends it only when it is active
+and the user has `applychangetags` (FR-007).
+
+## Global and names
+
+Only global: `mw.libs.wizz` (exposes `version`). CSS classes and message keys start with
+`wizz-`.
 
 ## Messages
 
-Prefix `wizz-`; `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`; API messages in
-`i18n/api/`. Key families: `wizz-summary`, `wizz-error-*`, `wizz-warning-*`, `wizz-ui-*`,
-`right-wizz-*`, `action-wizz-*`, `tag-wizz*`, `editinfobox` (special page title).
+Bundles `en`, `vi`, documentation `qqq` (repo only). Key families: `wizz-summary`,
+`wizz-error-*`, `wizz-warning-*`, `wizz-ui-*`, `wizz-tab`, `wizz-definition-*`.
