@@ -21,64 +21,71 @@ that silently rewrites pages costs editors more than it saves.
 
 ### II. Regression-Proof Testing
 
-- The template parser/serializer and validation logic MUST be developed test-first with
-  PHPUnit; tests MUST fail before the implementation makes them pass.
+- The template parser/serializer and validation logic MUST be developed test-first with QUnit
+  run under Node (`npm test`); tests MUST fail before the implementation makes them pass.
 - A round-trip fixture corpus (real-world infobox shapes, built from self-made data) is a
   permanent project asset; fixtures MAY be added but MUST NOT be removed to make tests pass.
 - Every reported wikitext-corruption bug MUST get a failing round-trip fixture before the fix
   is merged.
-- CI (lint + unit + integration tests) MUST pass before merge. Tests MUST NOT be skipped or
-  disabled to get green.
+- CI (lint + tests) MUST pass before merge. Tests MUST NOT be skipped or disabled to get green.
 
 Rationale: regressions between releases are the second main complaint about Page Forms.
 
-### III. Server-Side Validation Is the Authority
+### III. Validate Before Saving
 
-- Every validation rule MUST be enforced on the server at save time. Client-side checks exist
-  only for early feedback and MUST NOT be the only layer.
+- Every validation rule MUST run before Wizz calls `action=edit`, from one shared validation
+  module; HTML input attributes alone MUST NOT count as validation.
 - Field types (PAGE, TEXT, INTEGER, DOUBLE, BOOLEAN) and repeated-ness MUST come from the
   Bucket schema; form definitions MUST NOT redeclare them.
-- User-supplied regular expressions MUST run under a time/backtrack limit; a limit hit MUST
-  fail validation with an error, never hang the request.
+- Pattern length and value length MUST be capped so a user-supplied regular expression cannot
+  freeze the editor's browser.
 - Pre-existing invalid values MUST be shown with a warning and MUST NOT be altered or dropped
   unless the user edits that field.
-- Form definitions MUST be validated when saved; invalid definitions MUST be rejected.
+- Form definitions MUST be validated when loaded; an invalid definition MUST stop the form from
+  opening and list its errors.
+- Scope limit: Wizz only guards edits made through Wizz. Rejecting bad data entered by editing
+  wikitext is the job of the wiki's own templates/Lua modules, and documentation MUST say so.
 
 Rationale: data flows from templates into Bucket; one bad value breaks every query built on it.
+A gadget has no server side, so the guarantee is stated honestly instead of overstated.
 
 ### IV. No Privilege Bypass
 
-- Edits MUST be saved through MediaWiki core's standard edit path, as the acting user, so page
+- Edits MUST be saved through the Action API (`action=edit`) in the user's own session, so page
   protection, AbuseFilter, CAPTCHA, rate limits, blocks and edit-conflict detection apply exactly
   as for a normal wikitext edit.
-- Wizz MUST define its own user rights for using forms and for editing form definitions, with
-  narrow defaults (logged-in users; administrators and interface administrators respectively).
-- Optional entry points and behaviours (edit tab, in-infobox button, anonymous access) MUST be
-  off by default and enabled per wiki by configuration.
+- Using a form requires exactly the right to edit the page; Wizz adds no rights of its own.
+- A form definition MUST be used only if its page is edit-protected at administrator level (or
+  lives in the MediaWiki namespace); Wizz MUST check the protection before trusting it.
+- Optional entry points (edit tab) MUST be off by default and enabled per wiki.
 
-Rationale: a form must never become a way around a wiki's anti-vandalism defences.
+Rationale: a form must never become a way around a wiki's anti-vandalism defences, and an
+unprotected definition page would let anyone change the rules the form enforces.
 
-### V. Wiki-Farm Compatibility
+### V. Portable Gadget
 
-- Wizz MUST be deployable on Miraheze and WikiOasis and pass their extension review.
-- Target MediaWiki 1.45+ (current stable used by those farms). Use only stable, public core
-  APIs and hooks; deprecated APIs MUST NOT be introduced.
-- Wizz MUST NOT create its own database tables and MUST NOT load resources from external hosts.
-- Wizz MUST NOT depend on Bucket's unstable third-party API; it edits template parameters and
-  lets the wiki's templates/Lua modules write to Bucket.
-- Wizz MUST NOT reuse Page Forms code and MUST be installable alongside Page Forms without name
-  collisions (special pages, rights, hooks, message keys, ResourceLoader modules, config vars).
-- License: GPL-2.0-or-later for all code; dependencies MUST be GPL-compatible.
+- Wizz is a ResourceLoader gadget: installing it MUST need only interface-administrator rights
+  on the wiki, with no server-side code.
+- Target MediaWiki 1.45+ with the Gadgets, Bucket and Scribunto extensions. Use only stable,
+  public front-end APIs (`mw.Api`, `mw.util`, `mw.config`, `mw.messages`, ResourceLoader
+  modules, Codex); deprecated APIs MUST NOT be introduced.
+- Wizz MUST NOT load resources from external hosts.
+- Wizz MUST NOT depend on Bucket's unstable third-party API; it reads `Bucket:` schema pages and
+  edits template parameters, letting the wiki's templates/Lua modules write to Bucket.
+- Wizz MUST NOT reuse Page Forms code and MUST coexist with Page Forms: its only global is
+  `mw.libs.wizz`, and its CSS classes and message keys use the `wizz-` prefix.
+- License: MIT for all code; dependencies MUST be MIT-compatible.
 
-Rationale: farm deployment is the reason Wizz exists; anything a farm reviewer rejects is a
-blocker.
+Rationale: a gadget reaches every wiki that has the required extensions without waiting for a
+farm review, which is the reason Wizz exists.
 
 ### VI. Usable by Newcomers on Any Device
 
 - UI MUST be built with Codex (MediaWiki's design system) and designed mobile-first.
-- Every form MUST work on Minerva, Citizen and Vector 2022, in both light and dark mode.
-- All user-facing strings MUST go through MediaWiki i18n, shipping `en`, `vi` and `qqq`
-  documentation; no hard-coded UI text.
+- Every form MUST work on Minerva, Citizen and Vector 2022, in both light and dark mode, and in
+  right-to-left languages.
+- All user-facing strings MUST come from message bundles loaded into `mw.messages`, shipping
+  `en`, `vi` and `qqq` documentation; no hard-coded UI text.
 - UI MUST meet basic accessibility: labelled inputs, keyboard operability, errors announced and
   tied to their field, sufficient contrast.
 
@@ -92,61 +99,38 @@ Rationale: the target users are newcomers who avoid wikitext, increasingly on ph
   added complexity MUST be justified in the plan's Complexity Tracking.
 - Prefer core/Codex facilities over custom code.
 
-Rationale: a small codebase is easier to review, keep regression-free and get approved by farms.
+Rationale: a small codebase is easier to review, keep regression-free and trust.
 
-### VIII. MediaWiki Extension Best Practices
+### VIII. Gadget Best Practices
 
-Wizz MUST comply with every MUST item of
-[Best practices for extensions](https://www.mediawiki.org/wiki/Best_practices_for_extensions)
-and SHOULD comply with its SHOULD items; a SHOULD item may be skipped only with a reason
-recorded in the plan. Items that matter most for Wizz:
-
-- Architecture: business logic lives in DI service classes registered in service wiring and is
-  shared by thin Special page and Action API bindings, so the same capabilities (read form,
-  validate, preview/diff, save) are available through both. No global state, singletons or
-  static calls beyond stateless utilities. Exceptions only for conditions callers should not
-  handle.
-- Logging: structured logging (PSR-3) on a dedicated `Wizz` channel with appropriate severity
-  levels.
+- Follow the MediaWiki JavaScript coding conventions and lint with `eslint-config-wikimedia`
+  and `stylelint-config-wikimedia`.
+- Ship as a package gadget that declares every ResourceLoader dependency (`vue`,
+  `@wikimedia/codex`, `mediawiki.api`, …); load nothing at runtime by URL.
 - No hard-coded wikitext or template assumptions: everything wiki-specific comes from form
-  definitions or configuration.
-- Don't reinvent MediaWiki: use `WebRequest`, hooks, `Html`/`Sanitizer`, ContentHandler where an
-  abstraction exists, Composer for third-party PHP libraries, extension.json test
-  auto-discovery; respect read-only mode; never disable the parser cache or `OutputPage`; never
-  assume the extension lives under `/extensions`.
-- Security: every write action is CSRF-protected with MediaWiki's standard token system;
-  sanitized HTML is never modified afterwards; revision/log deletion and suppression are
-  respected (deleted content is never exposed via preview, diff or form values).
-- Language: all messages use the `wizz-` prefix, have `qqq.json` documentation, are linted by
-  banana-checker in CI and synchronised with translatewiki.net; message parameters are escaped
-  as close to output as possible. UI MUST work in right-to-left languages.
-- File layout: the standard layout (`src/` with PSR-4 via `AutoloadNamespaces`, one class per
-  file, `modules/`, `i18n/`, `tests/phpunit/unit/`, `tests/phpunit/integration/`,
-  `tests/qunit/`, `LICENSE`, `README`); root kept uncluttered.
-- Documentation: `Extension:Wizz` and `Help:Extension:Wizz` pages on mediawiki.org, listing
-  dependencies (Bucket, Scribunto) with install/config steps, all configuration settings in one
-  place, a compatibility policy and any hooks Wizz provides.
-- New user rights are announced to and discussed with the target wiki communities before a
-  release that introduces them.
-- Accepted exception: issues and code review use GitHub Issues and pull requests instead of
-  Phabricator and Gerrit, because the target farms accept GitHub-hosted extensions. A
-  Phabricator project MUST still exist so MediaWiki users can report bugs there; those reports
-  are mirrored to GitHub.
+  definitions.
+- Logic (tokenizer, validation, wikitext editing) MUST be plain modules independent of Vue and
+  the DOM, so it can be tested under Node; Vue components only present it.
+- Security: write actions use `mw.Api` `postWithEditToken`; values are rendered through Vue/
+  `mw.message` escaping, never inserted as raw HTML; only the latest visible revision is read.
+- Source of truth is the git repository; wikis receive tagged releases only, never edits made
+  directly on a wiki.
+- Documentation: install steps (gadget definition, pages to create, required extensions),
+  form-definition reference, and a recommended Lua validation pattern for templates.
 
-Rationale: farm reviewers and the wider MediaWiki community judge extensions by these
-practices; following them keeps Wizz maintainable beyond its original authors.
+Rationale: gadgets are judged by the interface administrators who install them; clean,
+self-contained, documented code is what earns that trust.
 
 ## Technical Constraints
 
-- Language and layout: PHP (version per MediaWiki 1.45 requirements) with `extension.json`,
-  PSR-4 namespace `MediaWiki\Extension\Wizz`, services via the service container; frontend via
-  ResourceLoader and Codex.
-- Code style: `mediawiki/mediawiki-codesniffer` and `phan` for PHP; `eslint-config-wikimedia`
-  and `stylelint-config-wikimedia` for JS/CSS/LESS. Lint errors block merge.
-- Tests: PHPUnit (unit tests with no DB; integration tests where core services are needed)
-  and QUnit for frontend logic. Browser-level tests are added only where a spec requires them.
-- Dependencies: Bucket and Scribunto are required at runtime for the MVP. No new runtime
-  Composer/npm dependency without plan-level justification.
+- Language and layout: JavaScript (ES2017+), Vue 3 and Codex as shipped by MediaWiki, LESS with
+  Codex design tokens.
+- Code style: `eslint-config-wikimedia` and `stylelint-config-wikimedia`; message bundles
+  checked by banana-checker. Lint errors block merge.
+- Tests: QUnit under Node for logic modules; browser-level tests only where a spec requires
+  them.
+- Dependencies: Gadgets, Bucket and Scribunto on the wiki. No runtime npm dependency; dev-only
+  npm packages need no justification beyond the plan.
 - Test environment: a Wikimedia Cloud VPS wiki using self-made data modelled on real infobox
   structures; real wiki content MUST NOT be copied.
 
@@ -154,8 +138,9 @@ practices; following them keeps Wizz maintainable beyond its original authors.
 
 - Work follows Spec Kit: spec → (clarify) → plan → tasks → implement. Each plan MUST include a
   Constitution Check against Principles I–VIII and record any justified exception.
-- Changes land via GitHub pull request (see the exception in Principle VIII). Reviewers MUST verify: constitution compliance, tests added
-  for new behaviour, round-trip fixtures for any parser/serializer change, i18n for new strings.
+- Changes land via GitHub pull request. Reviewers MUST verify: constitution compliance, tests
+  added for new behaviour, round-trip fixtures for any parser/serializer change, messages for
+  new strings.
 - Releases follow semantic versioning; user-visible changes are recorded in a changelog.
 
 ## Governance
@@ -169,4 +154,4 @@ practices; following them keeps Wizz maintainable beyond its original authors.
 - Compliance is checked at plan time (Constitution Check) and at review. Exceptions MUST be
   documented with rationale in the plan's Complexity Tracking.
 
-**Version**: 1.1.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-19
+**Version**: 2.0.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24

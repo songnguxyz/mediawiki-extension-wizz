@@ -22,65 +22,71 @@ gây hại cho biên tập viên nhiều hơn lợi ích nó mang lại.
 ### II. Chống hồi quy bằng test
 
 - Parser/serializer template và logic validate MUST được phát triển theo hướng test trước với
-  PHPUnit; test MUST thất bại trước khi phần cài đặt làm nó chạy qua.
+  QUnit chạy trên Node (`npm test`); test MUST thất bại trước khi phần cài đặt làm nó chạy qua.
 - Bộ mẫu round-trip (các dạng infobox thực tế, dựng từ dữ liệu tự tạo) là tài sản lâu dài của
   dự án; MAY thêm mẫu nhưng MUST NOT xóa mẫu để test chạy qua.
 - Mỗi lỗi làm hỏng wikitext được báo về MUST có một mẫu round-trip tái hiện lỗi (đang thất bại)
   trước khi bản sửa được merge.
-- CI (lint + unit test + integration test) MUST xanh trước khi merge. MUST NOT bỏ qua hay tắt
-  test để có màu xanh.
+- CI (lint + test) MUST xanh trước khi merge. MUST NOT bỏ qua hay tắt test để có màu xanh.
 
 Lý do: hồi quy giữa các phiên bản là phàn nàn lớn thứ hai về Page Forms.
 
-### III. Validate phía máy chủ là thẩm quyền cuối
+### III. Validate trước khi lưu
 
-- Mọi luật validate MUST được áp dụng phía máy chủ khi lưu. Kiểm tra phía trình duyệt chỉ để
-  báo lỗi sớm và MUST NOT là lớp duy nhất.
+- Mọi luật validate MUST chạy trước khi Wizz gọi `action=edit`, từ một module validate dùng
+  chung; chỉ dựa vào thuộc tính của ô nhập HTML MUST NOT được coi là validate.
 - Kiểu ô (PAGE, TEXT, INTEGER, DOUBLE, BOOLEAN) và thuộc tính nhiều giá trị MUST lấy từ schema
   Bucket; định nghĩa form MUST NOT khai lại.
-- Regex do người dùng khai MUST chạy dưới giới hạn thời gian/backtrack; khi chạm giới hạn MUST
-  báo lỗi validate, không bao giờ làm treo request.
+- Độ dài mẫu regex và độ dài giá trị MUST bị giới hạn để regex do người dùng khai không làm treo
+  trình duyệt của biên tập viên.
 - Giá trị cũ không hợp lệ MUST được hiển thị kèm cảnh báo và MUST NOT bị đổi hay bỏ đi trừ khi
   người dùng sửa ô đó.
-- Định nghĩa form MUST được kiểm tra khi lưu; định nghĩa không hợp lệ MUST bị từ chối.
+- Định nghĩa form MUST được kiểm tra khi nạp; định nghĩa không hợp lệ MUST chặn form mở ra và
+  liệt kê lỗi.
+- Giới hạn phạm vi: Wizz chỉ bảo vệ các sửa đổi đi qua Wizz. Chặn dữ liệu sai nhập bằng cách
+  sửa wikitext là việc của template/module Lua của wiki, và tài liệu MUST nói rõ điều này.
 
 Lý do: dữ liệu chảy từ template vào Bucket; một giá trị sai làm hỏng mọi truy vấn dựa trên nó.
+Gadget không có phía máy chủ, nên cam kết được nói thẳng thay vì nói quá.
 
 ### IV. Không vượt quyền
 
-- Sửa đổi MUST được lưu qua đường sửa chuẩn của MediaWiki core, dưới danh nghĩa người dùng đang
-  thao tác, để khóa trang, AbuseFilter, CAPTCHA, giới hạn tốc độ, cấm sửa và phát hiện xung đột
-  sửa áp dụng y như khi sửa wikitext thông thường.
-- Wizz MUST khai quyền riêng cho việc dùng form và việc sửa định nghĩa form, với mặc định hẹp
-  (lần lượt: người dùng đã đăng nhập; quản trị viên và quản trị viên giao diện).
-- Các lối vào và hành vi tùy chọn (tab sửa, nút trên infobox, cho người không đăng nhập dùng)
-  MUST mặc định tắt và được bật theo từng wiki qua cấu hình.
+- Sửa đổi MUST được lưu qua Action API (`action=edit`) trong phiên của chính người dùng, để khóa
+  trang, AbuseFilter, CAPTCHA, giới hạn tốc độ, cấm sửa và phát hiện xung đột sửa áp dụng y như
+  khi sửa wikitext thông thường.
+- Dùng form chỉ cần đúng quyền sửa trang đó; Wizz không thêm quyền riêng nào.
+- Một định nghĩa form MUST chỉ được dùng khi trang của nó bị khóa sửa ở mức quản trị viên (hoặc
+  nằm trong namespace MediaWiki); Wizz MUST kiểm tra trạng thái khóa trước khi tin định nghĩa.
+- Lối vào tùy chọn (tab sửa) MUST mặc định tắt và được bật theo từng wiki.
 
-Lý do: form không bao giờ được trở thành đường vòng qua các lớp chống phá hoại của wiki.
+Lý do: form không bao giờ được trở thành đường vòng qua các lớp chống phá hoại của wiki, và một
+trang định nghĩa không bị khóa sẽ cho bất kỳ ai đổi luật mà form áp dụng.
 
-### V. Tương thích wiki farm
+### V. Gadget di động
 
-- Wizz MUST triển khai được trên Miraheze và WikiOasis và qua được quy trình duyệt extension
-  của họ.
-- Nhắm MediaWiki 1.45 trở lên (bản stable các farm đang dùng). Chỉ dùng API và hook công khai,
-  ổn định của core; MUST NOT đưa vào API đã bị deprecate.
-- Wizz MUST NOT tạo bảng cơ sở dữ liệu riêng và MUST NOT tải tài nguyên từ máy chủ bên ngoài.
-- Wizz MUST NOT phụ thuộc API bên thứ ba chưa ổn định của Bucket; Wizz sửa tham số template và
-  để template/module Lua của wiki ghi vào Bucket.
-- Wizz MUST NOT dùng lại code Page Forms và MUST cài được song song với Page Forms mà không xung
-  đột tên (trang đặc biệt, quyền, hook, khóa thông điệp, module ResourceLoader, biến cấu hình).
-- Giấy phép: GPL-2.0-or-later cho toàn bộ code; các phụ thuộc MUST tương thích GPL.
+- Wizz là một gadget ResourceLoader: cài đặt MUST chỉ cần quyền quản trị viên giao diện trên
+  wiki, không có code chạy phía máy chủ.
+- Nhắm MediaWiki 1.45 trở lên có các extension Gadgets, Bucket và Scribunto. Chỉ dùng API
+  front-end công khai, ổn định (`mw.Api`, `mw.util`, `mw.config`, `mw.messages`, module
+  ResourceLoader, Codex); MUST NOT đưa vào API đã bị deprecate.
+- Wizz MUST NOT tải tài nguyên từ máy chủ bên ngoài.
+- Wizz MUST NOT phụ thuộc API bên thứ ba chưa ổn định của Bucket; Wizz đọc trang schema
+  `Bucket:` và sửa tham số template, để template/module Lua của wiki ghi vào Bucket.
+- Wizz MUST NOT dùng lại code Page Forms và MUST cùng tồn tại được với Page Forms: biến toàn cục
+  duy nhất là `mw.libs.wizz`, class CSS và khóa thông điệp dùng tiền tố `wizz-`.
+- Giấy phép: MIT cho toàn bộ code; các phụ thuộc MUST tương thích MIT.
 
-Lý do: triển khai trên farm là lý do Wizz ra đời; mọi thứ người duyệt của farm từ chối đều là
-vật cản.
+Lý do: gadget đến được mọi wiki có đủ các extension cần thiết mà không phải chờ farm duyệt, và
+đó là lý do Wizz ra đời.
 
 ### VI. Người mới dùng được trên mọi thiết bị
 
 - Giao diện MUST dựng bằng Codex (hệ thống thiết kế của MediaWiki) và thiết kế cho điện thoại
   trước.
-- Mọi form MUST dùng được trên Minerva, Citizen và Vector 2022, ở cả chế độ sáng và tối.
-- Mọi chuỗi hiển thị cho người dùng MUST đi qua hệ thống i18n của MediaWiki, có sẵn `en`, `vi`
-  và tài liệu `qqq`; không viết cứng chữ trong giao diện.
+- Mọi form MUST dùng được trên Minerva, Citizen và Vector 2022, ở cả chế độ sáng và tối, và với
+  ngôn ngữ viết từ phải sang trái.
+- Mọi chuỗi hiển thị cho người dùng MUST lấy từ các gói thông điệp nạp vào `mw.messages`, có sẵn
+  `en`, `vi` và tài liệu `qqq`; không viết cứng chữ trong giao diện.
 - Giao diện MUST đạt mức trợ năng cơ bản: ô nhập có nhãn, thao tác được bằng bàn phím, lỗi được
   thông báo và gắn với đúng ô, độ tương phản đủ.
 
@@ -94,60 +100,38 @@ Lý do: người dùng mục tiêu là người mới ngại wikitext, và ngày
   độ phức tạp thêm vào MUST được giải trình ở mục Complexity Tracking của plan.
 - Ưu tiên dùng sẵn của core/Codex thay vì code tự viết.
 
-Lý do: codebase nhỏ dễ duyệt, dễ giữ không hồi quy và dễ được farm chấp thuận.
+Lý do: codebase nhỏ dễ duyệt, dễ giữ không hồi quy và dễ được tin tưởng.
 
-### VIII. Thông lệ tốt cho extension MediaWiki
+### VIII. Thông lệ tốt cho gadget
 
-Wizz MUST tuân thủ mọi mục MUST của
-[Best practices for extensions](https://www.mediawiki.org/wiki/Best_practices_for_extensions)
-và SHOULD tuân thủ các mục SHOULD; chỉ được bỏ một mục SHOULD khi có lý do ghi trong plan. Những
-mục quan trọng nhất với Wizz:
-
-- Kiến trúc: logic nghiệp vụ nằm trong các service class dùng DI, đăng ký trong service wiring,
-  dùng chung cho lớp mỏng Special page và Action API, để cùng một năng lực (đọc form, validate,
-  xem trước/diff, lưu) có ở cả hai. Không dùng trạng thái toàn cục, singleton hay gọi static
-  ngoài các tiện ích không trạng thái. Chỉ ném exception cho tình huống mà bên gọi không nên xử
-  lý.
-- Logging: structured logging (PSR-3) trên kênh riêng `Wizz`, dùng mức độ nghiêm trọng phù hợp.
+- Theo quy chuẩn JavaScript của MediaWiki, kiểm tra bằng `eslint-config-wikimedia` và
+  `stylelint-config-wikimedia`.
+- Phát hành dạng package gadget, khai đủ mọi dependency ResourceLoader (`vue`,
+  `@wikimedia/codex`, `mediawiki.api`, …); không tải gì bằng URL lúc chạy.
 - Không viết cứng wikitext hay giả định về template: mọi thứ riêng của từng wiki lấy từ định
-  nghĩa form hoặc cấu hình.
-- Không làm lại những gì MediaWiki đã có: dùng `WebRequest`, hook, `Html`/`Sanitizer`,
-  ContentHandler khi đã có abstraction, Composer cho thư viện PHP bên thứ ba, tự động phát hiện
-  test của extension.json; tôn trọng chế độ chỉ đọc; không tắt parser cache hay `OutputPage`;
-  không giả định extension nằm trong `/extensions`.
-- Bảo mật: mọi thao tác ghi được chống CSRF bằng hệ thống token chuẩn của MediaWiki; không sửa
-  HTML sau khi đã sanitize; tôn trọng việc xóa/ẩn phiên bản và nhật trình (nội dung đã bị ẩn
-  không bao giờ lộ ra qua xem trước, diff hay giá trị trong form).
-- Ngôn ngữ: mọi thông điệp dùng tiền tố `wizz-`, có tài liệu `qqq.json`, được banana-checker
-  kiểm tra trong CI và đồng bộ với translatewiki.net; tham số thông điệp được escape càng gần
-  chỗ xuất ra càng tốt. Giao diện MUST dùng được với ngôn ngữ viết từ phải sang trái.
-- Cấu trúc thư mục: theo bố cục chuẩn (`src/` dùng PSR-4 qua `AutoloadNamespaces`, mỗi file một
-  class, `modules/`, `i18n/`, `tests/phpunit/unit/`, `tests/phpunit/integration/`,
-  `tests/qunit/`, `LICENSE`, `README`); giữ thư mục gốc gọn.
-- Tài liệu: trang `Extension:Wizz` và `Help:Extension:Wizz` trên mediawiki.org, liệt kê phụ
-  thuộc (Bucket, Scribunto) kèm cách cài và cấu hình, mọi thiết lập cấu hình ở một chỗ, chính
-  sách tương thích và các hook Wizz cung cấp.
-- Quyền người dùng mới được thông báo và thảo luận với cộng đồng các wiki mục tiêu trước khi
-  phát hành phiên bản đưa quyền đó vào.
-- Ngoại lệ được chấp nhận: theo dõi lỗi và duyệt code dùng GitHub Issues và pull request thay
-  vì Phabricator và Gerrit, vì các farm mục tiêu chấp nhận extension đặt trên GitHub. Vẫn MUST
-  có một project Phabricator để người dùng MediaWiki báo lỗi; các báo cáo đó được chép sang
-  GitHub.
+  nghĩa form.
+- Logic (bộ phân tích template, validate, sửa wikitext) MUST là các module thuần, không phụ
+  thuộc Vue hay DOM, để test được trên Node; component Vue chỉ lo phần hiển thị.
+- Bảo mật: thao tác ghi dùng `mw.Api` `postWithEditToken`; giá trị được hiển thị qua cơ chế
+  escape của Vue/`mw.message`, không bao giờ chèn như HTML thô; chỉ đọc phiên bản mới nhất mà
+  người dùng được xem.
+- Nguồn chuẩn là repo git; wiki chỉ nhận các bản phát hành có tag, không bao giờ sửa trực tiếp
+  trên wiki.
+- Tài liệu: hướng dẫn cài (định nghĩa gadget, các trang cần tạo, extension bắt buộc), tài liệu
+  tham chiếu định nghĩa form, và một mẫu validate bằng Lua khuyến nghị cho template.
 
-Lý do: người duyệt của farm và cộng đồng MediaWiki đánh giá extension theo các thông lệ này;
-tuân thủ chúng giúp Wizz duy trì được cả khi không còn nhóm tác giả ban đầu.
+Lý do: gadget được đánh giá bởi quản trị viên giao diện, người cài nó; code gọn, tự chứa, có tài
+liệu là thứ giúp có được sự tin tưởng đó.
 
 ## Ràng buộc kỹ thuật
 
-- Ngôn ngữ và cấu trúc: PHP (phiên bản theo yêu cầu của MediaWiki 1.45) với `extension.json`,
-  namespace PSR-4 `MediaWiki\Extension\Wizz`, service qua service container; frontend qua
-  ResourceLoader và Codex.
-- Quy chuẩn code: `mediawiki/mediawiki-codesniffer` và `phan` cho PHP; `eslint-config-wikimedia`
-  và `stylelint-config-wikimedia` cho JS/CSS/LESS. Lỗi lint chặn merge.
-- Test: PHPUnit (unit test không dùng DB; integration test khi cần service của core) và QUnit
-  cho logic frontend. Test mức trình duyệt chỉ thêm khi spec yêu cầu.
-- Phụ thuộc: Bucket và Scribunto là bắt buộc lúc chạy cho MVP. Không thêm phụ thuộc
-  Composer/npm lúc chạy nếu không có giải trình ở mức plan.
+- Ngôn ngữ và cấu trúc: JavaScript (ES2017+), Vue 3 và Codex theo bản MediaWiki cung cấp, LESS
+  với design token của Codex.
+- Quy chuẩn code: `eslint-config-wikimedia` và `stylelint-config-wikimedia`; gói thông điệp
+  được banana-checker kiểm tra. Lỗi lint chặn merge.
+- Test: QUnit trên Node cho các module logic; test mức trình duyệt chỉ thêm khi spec yêu cầu.
+- Phụ thuộc: Gadgets, Bucket và Scribunto trên wiki. Không có phụ thuộc npm lúc chạy; gói npm
+  chỉ dùng khi phát triển không cần giải trình ngoài plan.
 - Môi trường test: một wiki trên Wikimedia Cloud VPS dùng dữ liệu tự tạo theo cấu trúc infobox
   thật; MUST NOT chép nội dung wiki thật.
 
@@ -155,8 +139,9 @@ tuân thủ chúng giúp Wizz duy trì được cả khi không còn nhóm tác 
 
 - Công việc theo Spec Kit: spec → (clarify) → plan → tasks → implement. Mỗi plan MUST có mục
   Constitution Check đối chiếu Nguyên tắc I–VIII và ghi lại mọi ngoại lệ có giải trình.
-- Thay đổi vào qua pull request trên GitHub (xem ngoại lệ ở Nguyên tắc VIII). Người duyệt MUST kiểm tra: tuân thủ hiến pháp, có test cho
-  hành vi mới, có mẫu round-trip cho mọi thay đổi parser/serializer, có i18n cho chuỗi mới.
+- Thay đổi vào qua pull request trên GitHub. Người duyệt MUST kiểm tra: tuân thủ hiến pháp, có
+  test cho hành vi mới, có mẫu round-trip cho mọi thay đổi parser/serializer, có thông điệp cho
+  chuỗi mới.
 - Phát hành theo semantic versioning; thay đổi người dùng thấy được ghi vào changelog.
 
 ## Quản trị
@@ -170,4 +155,4 @@ tuân thủ chúng giúp Wizz duy trì được cả khi không còn nhóm tác 
 - Việc tuân thủ được kiểm tra khi lập plan (Constitution Check) và khi review. Ngoại lệ MUST
   được ghi lại kèm lý do ở mục Complexity Tracking của plan.
 
-**Phiên bản**: 1.1.0 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-19
+**Phiên bản**: 2.0.0 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24
