@@ -1,0 +1,117 @@
+name: Release
+
+# Run by hand with a version. Test, build, tag a detached commit that holds dist/,
+# create the GitHub Release, then ask Litmus for a gadget-deploy dry run. All in one
+# workflow: a release created with GITHUB_TOKEN does not trigger other workflows.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version without the leading v (semver, e.g. 0.1.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VERSION: ${{ inputs.version }}
+      LITMUS_URL: https://litmus.songngu.xyz
+    steps:
+      - name: Validate version and ref
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          # Inputs reach the shell only through env, never by ${{ }} in the script.
+          if ! [[ "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::version must be semver without a leading v"
+            exit 1
+          fi
+          if [ "$REF" != refs/heads/main ]; then
+            echo "::error::run this workflow from main"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Fail if the tag exists
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null 2>&1; then
+            echo "::error::tag v$VERSION already exists"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Set version, test, build
+        run: |
+          set -euo pipefail
+          npm version --no-git-tag-version --allow-same-version "$VERSION"
+          npm ci
+          npm test
+          npm run build
+
+      - name: Tag a detached commit with dist/
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch --detach
+          git add -f dist package.json package-lock.json
+          git commit -m "Release v$VERSION"
+          git tag "v$VERSION"
+          git push origin "refs/tags/v$VERSION"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Notes: the CHANGELOG section of this version, if there is one.
+          awk -v v="$VERSION" '
+            /^## \[/ { on = (index($0, "[" v "]") == 4) ; next }
+            /^\[[^]]+\]: / { on = 0 }
+            on' CHANGELOG.md > notes.md
+          [ -s notes.md ] || echo "Release v$VERSION" > notes.md
+          flags=()
+          case "$VERSION" in *-*) flags+=(--prerelease) ;; esac
+          gh release create "v$VERSION" dist/* \
+            --verify-tag --title "v$VERSION" --notes-file notes.md "${flags[@]}"
+
+      - name: Create Litmus dry-run job
+        env:
+          LITMUS_CLIENT_ID: ${{ secrets.LITMUS_CLIENT_ID }}
+          LITMUS_CLIENT_SECRET: ${{ secrets.LITMUS_CLIENT_SECRET }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          body=$(jq -n --arg repo "$REPO" --arg tag "v$VERSION" '{repo: $repo, tag: $tag}')
+          # Service-token headers go through stdin (-H @-), not argv. Do not send
+          # Origin or Sec-Fetch-Site: Litmus refuses agent requests that carry them.
+          rc=0
+          status=$(
+            printf 'CF-Access-Client-Id: %s\nCF-Access-Client-Secret: %s\n' \
+              "$LITMUS_CLIENT_ID" "$LITMUS_CLIENT_SECRET" |
+            curl -sS --fail-with-body --max-redirs 0 \
+              -o response.json -w '%{http_code}' \
+              -X POST "$LITMUS_URL/c2c/api/gadget-releases" \
+              -H @- \
+              -H 'Content-Type: application/json' \
+              --data "$body"
+          ) || rc=$?
+          jq . response.json 2>/dev/null || cat response.json 2>/dev/null || true
+          # 302 = Access rejected the token (curl does not treat it as an error);
+          # 409 = an eligible wiki failed to get a job, see `failed` above.
+          if [ "$rc" -ne 0 ] || [ "$status" != 200 ]; then
+            echo "::error::Litmus returned HTTP $status (curl exit $rc)"
+            exit 1
+          fi
