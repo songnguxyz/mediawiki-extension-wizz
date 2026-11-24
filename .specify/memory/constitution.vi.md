@@ -57,7 +57,7 @@ Gadget không có phía máy chủ, nên cam kết được nói thẳng thay v�
 - Dùng form chỉ cần đúng quyền sửa trang đó; Wizz không thêm quyền riêng nào.
 - Một định nghĩa form MUST chỉ được dùng khi trang của nó bị khóa sửa ở mức quản trị viên (hoặc
   nằm trong namespace MediaWiki); Wizz MUST kiểm tra trạng thái khóa trước khi tin định nghĩa.
-- Lối vào tùy chọn (tab sửa) MUST mặc định tắt và được bật theo từng wiki.
+- Tab "Sửa infobox" mặc định bật; mỗi wiki MUST tắt được.
 
 Lý do: form không bao giờ được trở thành đường vòng qua các lớp chống phá hoại của wiki, và một
 trang định nghĩa không bị khóa sẽ cho bất kỳ ai đổi luật mà form áp dụng.
@@ -155,4 +155,4 @@ liệu là thứ giúp có được sự tin tưởng đó.
 - Việc tuân thủ được kiểm tra khi lập plan (Constitution Check) và khi review. Ngoại lệ MUST
   được ghi lại kèm lý do ở mục Complexity Tracking của plan.
 
-**Phiên bản**: 2.0.1 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24
+**Phiên bản**: 2.1.0 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24
