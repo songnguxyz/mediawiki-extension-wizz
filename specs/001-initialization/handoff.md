@@ -33,16 +33,12 @@ Hướng đi: Wizz là **gadget** (không phải extension), Vue 3 + Codex, gi�
 
 ## Việc chờ quyết
 
-1. **Checklist `checklists/requirements.md`** còn mục "Requirements are testable and unambiguous"
-   chưa đánh dấu. Lý do ghi trong Notes của checklist (các edge case từng là câu hỏi bỏ ngỏ) nay
-   đã hết: cả 9 edge case đều có hành vi mong đợi, và 3 lần analyze không còn báo mơ hồ. Notes
-   của checklist còn nhắc Special:EditInfobox (cũ). Song Ngư có thể tự đánh dấu và sửa Notes,
-   hoặc chạy `/speckit-clarify` để cập nhật.
-2. **Đề xuất cho `/speckit-implement`** (chưa được trả lời): T007 (wiki test Cloud VPS), T009
-   (lấy parse tree), T055–T058 cần wiki thật hoặc người thật. Đề xuất: vẫn viết
-   `build/fetch-parsetree.js`, test so với parse tree tự bỏ qua khi chưa có `*.parsetree.xml`
-   (ghi rõ là tạm thời, lệch nhẹ hiến pháp II), các task đó để chưa đánh dấu; làm tuần tự các
-   phase còn lại, commit sau mỗi phase.
+Đã giải quyết 2026-11-24 (Song Ngư duyệt):
+
+1. Checklist `requirements.md`: đã đánh dấu "testable and unambiguous", sửa Notes.
+2. Wiki test: thay Cloud VPS bằng wiki Docker cục bộ (`dev/test-wiki/`, T007). Hiến pháp lên
+   2.1.2. Test parse tree chạy với wiki Docker, không cần bỏ qua. Còn sót `spec.md:216` nhắc
+   Cloud VPS (chưa duyệt sửa).
 
 ## Việc tiếp theo
 
@@ -68,3 +64,10 @@ Hướng đi: Wizz là **gadget** (không phải extension), Vue 3 + Codex, gi�
   `.specify/feature.json` bị gitignore, nên môi trường mới phải tạo lại với nội dung
   `{"feature_directory": "specs/001-initialization"}` (hoặc đặt biến `SPECIFY_FEATURE`) trước khi
   chạy các lệnh `/speckit-*`.
+- Docker có sẵn nhưng daemon không tự chạy: bật `dockerd` (chạy nền) trước. Image
+  `mediawiki:1.45` kéo được; wiki chạy ở `http://localhost:8080` (MCP mediawiki đã cấu hình sẵn
+  key `localhost:8080`).
+- Miraheze/WikiOasis (`meta.miraheze.org`, `*.wikioasis.org`) chỉ vào được với User-Agent
+  `$MIRAHEZE_UA`; Song Ngư đã cho phép gửi UA này. `wikioasis.org` gốc không phải wiki.
+- Wikimedia (test.wikipedia, mediawiki.org) trả 429 do giới hạn tốc độ: tôn trọng `Retry-After`,
+  tối đa 3 request đồng thời, dùng UA có liên hệ (xem mediawiki.org/wiki/Wikimedia_APIs/Rate_limits).

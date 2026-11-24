@@ -34,7 +34,7 @@ later increments.
 - [ ] T004 [P] Create `src/i18n/en.json`, `src/i18n/vi.json`, `src/i18n/qqq.json` with `@metadata` and the key families of contracts/wiki-interface.md (Messages), starting with `wizz-summary`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-noeditright`
 - [ ] T005 [P] Create `.github/workflows/ci.yml` running `npm ci` and `npm test` on Node LTS for pushes and pull requests
 - [ ] T006 [P] Create `src/wizz-config.json` with `{ "namespaces": [0], "editTab": true, "tabLabel": { "en": "Edit infobox", "vi": "Sửa infobox" } }` (contracts/wiki-interface.md Configuration; research R2 entry message)
-- [ ] T007 Set up the Cloud VPS test wiki: MediaWiki 1.45 with Gadgets, Scribunto, Bucket, AbuseFilter and ConfirmEdit; an interface-admin bot password for `WIZZ_TEST_API`; create the test data of quickstart.md "Test data (self-made)" steps 1 to 5
+- [ ] T007 Create `dev/test-wiki/` (`docker-compose.yml` + `setup.sh`) that builds a local MediaWiki 1.45 at `http://localhost:8080` with Gadgets, Scribunto, Bucket, AbuseFilter and ConfirmEdit; an interface-admin bot password for `WIZZ_TEST_API`; create the test data of quickstart.md "Test data (self-made)" steps 1 to 5
 
 ---
 
@@ -180,7 +180,7 @@ later increments.
 - [ ] T052 [P] Write `README.md`: install steps (enable Gadgets, Bucket, Scribunto; run `npm run build`; create the pages of contracts/wiki-interface.md; set the gadget default; create tag `wizz`), definition reference (contracts/form-definition.schema.json with examples), scope limit of Constitution III and a recommended Lua validation pattern for templates
 - [ ] T053 [P] Add `CHANGELOG.md` with the first release entry
 - [ ] T054 Accessibility review of `src/wizz-App.vue` and `src/wizz-Field.vue`: labels, keyboard order, errors announced (`aria-live` via `CdxField`), contrast
-- [ ] T055 Run quickstart.md scenarios 1–14 on the Cloud VPS test wiki and record results in `specs/001-initialization/checklists/quickstart-run.md`
+- [ ] T055 Run quickstart.md scenarios 1–14 on the Docker test wiki (T007) and record results in `specs/001-initialization/checklists/quickstart-run.md`
 - [ ] T056 Verify the **verify** items of research.md (CSP `blob:` workers, ConfirmEdit payload, Citizen tokens) on Miraheze and WikiOasis test wikis; update research.md R6/R8/R10 and code if needed
 - [ ] T057 Run the SC-005 user test (5 newcomers on phones) and record the outcome in `specs/001-initialization/checklists/sc-005.md`
 - [ ] T058 Tag the first release `v0.1.0` in git with the CHANGELOG entry and attach the `dist/` pages built from that tag (Constitution VIII)
@@ -241,7 +241,7 @@ Task: "Write tests/regex.test.js"
 2. US1 → quickstart scenarios 1–2
 3. US2 → scenarios 3–5 (SC-002)
 4. US3 → scenarios 6–8
-5. **STOP and VALIDATE** on the Cloud VPS test wiki; not on farm wikis before US4 (conflicts and
+5. **STOP and VALIDATE** on the Docker test wiki; not on farm wikis before US4 (conflicts and
    CAPTCHA are needed for real use, spec US4 rationale)
 
 ### Incremental Delivery

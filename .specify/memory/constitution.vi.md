@@ -132,7 +132,7 @@ liệu là thứ giúp có được sự tin tưởng đó.
 - Test: QUnit trên Node cho các module logic; test mức trình duyệt chỉ thêm khi spec yêu cầu.
 - Phụ thuộc: Gadgets, Bucket và Scribunto trên wiki. Không có phụ thuộc npm lúc chạy; gói npm
   chỉ dùng khi phát triển không cần giải trình ngoài plan.
-- Môi trường test: một wiki trên Wikimedia Cloud VPS dùng dữ liệu tự tạo theo cấu trúc infobox
+- Môi trường test: một wiki MediaWiki chạy bằng Docker, dựng lại từ script trong repo, dùng dữ liệu tự tạo theo cấu trúc infobox
   thật; MUST NOT chép nội dung wiki thật.
 
 ## Quy trình phát triển
@@ -155,4 +155,4 @@ liệu là thứ giúp có được sự tin tưởng đó.
 - Việc tuân thủ được kiểm tra khi lập plan (Constitution Check) và khi review. Ngoại lệ MUST
   được ghi lại kèm lý do ở mục Complexity Tracking của plan.
 
-**Phiên bản**: 2.1.1 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24
+**Phiên bản**: 2.1.2 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24

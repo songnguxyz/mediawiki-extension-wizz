@@ -8,7 +8,7 @@ Run guide for proving the feature works. Calls are in
 ## Prerequisites
 
 - Node.js LTS and `npm install` in the repo.
-- A test wiki (Wikimedia Cloud VPS) on MediaWiki 1.45 (also run once on 1.46) with Gadgets,
+- A test wiki (Docker, `dev/test-wiki/setup.sh`) on MediaWiki 1.45 (also run once on 1.46) with Gadgets,
   Scribunto and Bucket; an interface-admin account; optionally AbuseFilter and ConfirmEdit.
 
 ## Static checks and unit tests

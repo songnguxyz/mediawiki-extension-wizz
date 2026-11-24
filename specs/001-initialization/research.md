@@ -190,4 +190,4 @@ marked **verify**.
 
 - Miraheze and WikiOasis run MediaWiki 1.46 stable; Wizz targets 1.45+. Gadgets, Scribunto and
   Bucket are available through ManageWiki on both farms. A gadget needs no farm review.
-- Test wiki: Wikimedia Cloud VPS with self-made data (Constitution, Technical Constraints).
+- Test wiki: local Docker MediaWiki (`dev/test-wiki/`) with self-made data (Constitution, Technical Constraints).

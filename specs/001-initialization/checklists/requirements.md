@@ -14,7 +14,7 @@
 ## Requirement Completeness
 
 - [x] No [NEEDS CLARIFICATION] markers remain
-- [ ] Requirements are testable and unambiguous
+- [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
@@ -35,9 +35,7 @@
   `001-initialization`), so failing items were not auto-fixed.
 - Resolved 2026-11-19: no-JS → notice + link to wikitext editing; SC-005 → 5 testers,
   ≥4/5 complete, <3 minutes each.
-- "Testable and unambiguous" fails because most Edge Cases are open questions without an
-  expected behaviour (no infobox, malformed template call, nested markup in TEXT, Bucket schema
-  change, redirects/name variants, separator inside a value, anonymous user without rights).
-- Mentions of Bucket field types, Special:EditInfobox, skins and MediaWiki permissions are
+- Resolved 2026-11-24: all 9 Edge Cases now have an expected behaviour; three
+  /speckit-analyze runs report no ambiguity.
+- Mentions of Bucket field types, the ?wizz=1 entry and "Sửa infobox" tab, skins and MediaWiki permissions are
   product-domain constraints, not implementation choices, and are accepted.
-- Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`

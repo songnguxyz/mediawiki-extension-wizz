@@ -131,7 +131,7 @@ self-contained, documented code is what earns that trust.
   them.
 - Dependencies: Gadgets, Bucket and Scribunto on the wiki. No runtime npm dependency; dev-only
   npm packages need no justification beyond the plan.
-- Test environment: a Wikimedia Cloud VPS wiki using self-made data modelled on real infobox
+- Test environment: a local Docker MediaWiki wiki, rebuilt from a script in the repo, using self-made data modelled on real infobox
   structures; real wiki content MUST NOT be copied.
 
 ## Development Workflow
@@ -154,4 +154,4 @@ self-contained, documented code is what earns that trust.
 - Compliance is checked at plan time (Constitution Check) and at review. Exceptions MUST be
   documented with rationale in the plan's Complexity Tracking.
 
-**Version**: 2.1.1 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24
+**Version**: 2.1.2 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24
