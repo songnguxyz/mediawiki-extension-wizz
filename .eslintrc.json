@@ -11,8 +11,8 @@
 			"extends": "wikimedia/server"
 		},
 		{
-			"files": [ "src/wizz-form.js" ],
-			"parserOptions": { "sourceType": "module" }
+			"files": [ "src/wizz-form.js", "src/*.vue" ],
+			"parserOptions": { "sourceType": "module", "ecmaVersion": 2018 }
 		},
 		{
 			"files": [ "tests/**" ],

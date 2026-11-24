@@ -1,9 +1,18 @@
 {
 	"@metadata": {
-		"authors": [ "Wizz contributors" ]
+		"authors": [
+			"Wizz contributors"
+		]
 	},
 	"wizz-summary": "Edit infobox: $1",
 	"wizz-noinfobox": "This page has no infobox that Wizz can edit.",
 	"wizz-parseerror": "Wizz could not read the infobox on line $1.",
-	"wizz-noeditright": "You do not have permission to edit this page."
+	"wizz-noeditright": "You do not have permission to edit this page.",
+	"wizz-ui-title": "Edit infobox",
+	"wizz-ui-save": "Save",
+	"wizz-ui-cancel": "Cancel",
+	"wizz-ui-editsource": "Edit the page source",
+	"wizz-ui-nochange": "You have not changed anything.",
+	"wizz-unsafevalue": "A value cannot be saved as written because it would break the infobox, for example a lone | or unbalanced braces.",
+	"wizz-error-save": "Saving failed: $1"
 }

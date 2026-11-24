@@ -124,4 +124,15 @@ function matchesTemplate( nameText, templateTitle, redirects, nsIds ) {
 	return [ templateTitle ].concat( redirects ).some( ( t ) => normalizeName( t, nsIds ) === n );
 }
 
-module.exports = { applyEdits, matchesTemplate };
+/**
+ * Edit summary for the changed parameters (FR-007).
+ *
+ * @param {string[]} changedParams Parameter names, in display order
+ * @param {Function} msg Message function like mw.msg: ( key, ...params ) => string
+ * @return {string} Empty when nothing changed
+ */
+function buildSummary( changedParams, msg ) {
+	return changedParams.length ? msg( 'wizz-summary', changedParams.join( ', ' ) ) : '';
+}
+
+module.exports = { applyEdits, matchesTemplate, buildSummary };

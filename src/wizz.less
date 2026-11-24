@@ -1,0 +1,14 @@
+// Codex custom properties with fallbacks follow the skin's light and dark mode; logical
+// properties keep right-to-left languages correct without flipping.
+.wizz-form__links {
+	margin-block-start: var( --spacing-75, 12px );
+}
+
+.skin-minerva .wizz-dialog {
+	// Phones: use the whole screen.
+	max-inline-size: none;
+	inline-size: 100%;
+	block-size: 100%;
+	max-block-size: none;
+	border-radius: 0;
+}

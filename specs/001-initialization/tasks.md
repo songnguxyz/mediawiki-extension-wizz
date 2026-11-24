@@ -70,19 +70,19 @@ later increments.
 
 ### Tests for User Story 1
 
-- [ ] T018 [P] [US1] Write `tests/summary.test.js`: summary lists changed params in order; no change → no summary
-- [ ] T019 [P] [US1] Write `tests/save.test.js` with a fake `api`: identical text → `nochange` with no `postWithEditToken` call (FR-003); `tags=wizz` sent only when tag active and user has `applychangetags` (data-model.md FormState.canTag); success returns `newrevid`
+- [X] T018 [P] [US1] Write `tests/summary.test.js`: summary lists changed params in order; no change → no summary
+- [X] T019 [P] [US1] Write `tests/save.test.js` with a fake `api`: identical text → `nochange` with no `postWithEditToken` call (FR-003); `tags=wizz` sent only when tag active and user has `applychangetags` (data-model.md FormState.canTag); success returns `newrevid`
 
 ### Implementation for User Story 1
 
-- [ ] T020 [P] [US1] Add `buildSummary( changedParams, msg )` to `src/wizz-editor.js` using message `wizz-summary` (FR-007)
-- [ ] T021 [US1] Implement `src/wizz-save.js` `save( api, state, newText )` per contracts/api-calls.md request 6 (`baserevid`, `basetimestamp`, `starttimestamp`, `nocreate`, optional `tags`), mapping `Success` → `success` until T019 passes
-- [ ] T022 [US1] Implement form state building in `src/wizz-form.js`: from loaded page, definition and schema produce data-model.md FormState (`page`, `revid`, `basetimestamp`, `starttimestamp`, `instance`, `fields[].value`, `fields[].dirty`, `canTag`); refuse with `wizz-noinfobox` (and `action=edit` link) when no call matches; refuse with `wizz-parseerror` and line on malformed call
-- [ ] T023 [US1] Create `src/wizz-Field.vue`: Codex input per type (TEXT → `CdxTextArea` when the raw value contains markup, else `CdxTextInput`; INTEGER/DOUBLE → `CdxTextInput` `inputmode="decimal"`; BOOLEAN → `CdxCheckbox` writing data-model.md FieldDefinition.booleanValues; PAGE → `CdxTextInput` for now) inside `CdxField` with label/help from FieldDefinition.label and FieldDefinition.help; marks `dirty` on input
-- [ ] T024 [US1] Create `src/wizz-App.vue`: `CdxDialog` (full screen on Minerva) rendering fields in definition order, save and cancel buttons, refusal messages; on save build text with `applyEdits` and call `save`; on success reload the page view without `wizz`
-- [ ] T025 [US1] Add `start()` to `src/wizz-form.js` that loads data (T014), builds state (T022), loads the bundled `src/i18n/<lang>.json` for `wgUserLanguage` into `mw.messages` with `en` fallback (research R11), adds the inlined LESS with `mw.util.addCSS`, runs as the bundle's top-level code (the build wraps the bundle in `mw.libs.wizz.form = function ( require ) {…}`, so the module exports nothing) and mounts `wizz-App.vue` with `Vue.createMwApp`
-- [ ] T026 [P] [US1] Create `src/wizz.less` using only Codex CSS custom properties and logical properties (`margin-inline-start`, …) for dark mode and RTL (research R10)
-- [ ] T027 [US1] Add US1 messages (`wizz-ui-save`, `wizz-ui-cancel`, `wizz-ui-title`, `wizz-summary`, `wizz-unsafevalue`) to `src/i18n/en.json`, `vi.json`, `qqq.json`
+- [X] T020 [P] [US1] Add `buildSummary( changedParams, msg )` to `src/wizz-editor.js` using message `wizz-summary` (FR-007)
+- [X] T021 [US1] Implement `src/wizz-save.js` `save( api, state, newText )` per contracts/api-calls.md request 6 (`baserevid`, `basetimestamp`, `starttimestamp`, `nocreate`, optional `tags`), mapping `Success` → `success` until T019 passes
+- [X] T022 [US1] Implement form state building in `src/wizz-form.js`: from loaded page, definition and schema produce data-model.md FormState (`page`, `revid`, `basetimestamp`, `starttimestamp`, `instance`, `fields[].value`, `fields[].dirty`, `canTag`); refuse with `wizz-noinfobox` (and `action=edit` link) when no call matches; refuse with `wizz-parseerror` and line on malformed call
+- [X] T023 [US1] Create `src/wizz-Field.vue`: Codex input per type (TEXT → `CdxTextArea` when the raw value contains markup, else `CdxTextInput`; INTEGER/DOUBLE → `CdxTextInput` `inputmode="decimal"`; BOOLEAN → `CdxCheckbox` writing data-model.md FieldDefinition.booleanValues; PAGE → `CdxTextInput` for now) inside `CdxField` with label/help from FieldDefinition.label and FieldDefinition.help; marks `dirty` on input
+- [X] T024 [US1] Create `src/wizz-App.vue`: `CdxDialog` (full screen on Minerva) rendering fields in definition order, save and cancel buttons, refusal messages; on save build text with `applyEdits` and call `save`; on success reload the page view without `wizz`
+- [X] T025 [US1] Add `start()` to `src/wizz-form.js` that loads data (T014), builds state (T022), loads the bundled `src/i18n/<lang>.json` for `wgUserLanguage` into `mw.messages` with `en` fallback (research R11), adds the inlined LESS with `mw.util.addCSS`, runs as the bundle's top-level code (the build wraps the bundle in `mw.libs.wizz.form = function ( require ) {…}`, so the module exports nothing) and mounts `wizz-App.vue` with `Vue.createMwApp`
+- [X] T026 [P] [US1] Create `src/wizz.less` using only Codex CSS custom properties and logical properties (`margin-inline-start`, …) for dark mode and RTL (research R10)
+- [X] T027 [US1] Add US1 messages (`wizz-ui-save`, `wizz-ui-cancel`, `wizz-ui-title`, `wizz-summary`, `wizz-unsafevalue`) to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
 **Checkpoint**: US1 works end to end on the test wiki
 

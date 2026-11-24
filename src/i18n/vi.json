@@ -1,9 +1,18 @@
 {
 	"@metadata": {
-		"authors": [ "Wizz contributors" ]
+		"authors": [
+			"Wizz contributors"
+		]
 	},
 	"wizz-summary": "Sửa infobox: $1",
 	"wizz-noinfobox": "Trang này không có infobox nào mà Wizz có thể sửa.",
 	"wizz-parseerror": "Wizz không đọc được infobox ở dòng $1.",
-	"wizz-noeditright": "Bạn không có quyền sửa trang này."
+	"wizz-noeditright": "Bạn không có quyền sửa trang này.",
+	"wizz-ui-title": "Sửa infobox",
+	"wizz-ui-save": "Lưu",
+	"wizz-ui-cancel": "Hủy",
+	"wizz-ui-editsource": "Sửa mã nguồn trang",
+	"wizz-ui-nochange": "Bạn chưa thay đổi gì.",
+	"wizz-unsafevalue": "Không thể lưu một giá trị đúng như đã nhập vì nó sẽ làm hỏng infobox, ví dụ dấu | đơn lẻ hoặc dấu ngoặc nhọn không cân.",
+	"wizz-error-save": "Lưu không thành công: $1"
 }

@@ -1,9 +1,18 @@
 {
 	"@metadata": {
-		"authors": [ "Wizz contributors" ]
+		"authors": [
+			"Wizz contributors"
+		]
 	},
 	"wizz-summary": "Automatic edit summary when saving through the Wizz infobox form. Parameters:\n* $1 - comma-separated list of the changed template parameter names",
 	"wizz-noinfobox": "Shown when the page has no call of a template that has a Wizz form definition.",
 	"wizz-parseerror": "Shown when a template call on the page is malformed and cannot be parsed. Parameters:\n* $1 - line number in the wikitext where the problem was found",
-	"wizz-noeditright": "Shown instead of the form when the current user may not edit the page, including logged-out users on wikis that forbid it."
+	"wizz-noeditright": "Shown instead of the form when the current user may not edit the page, including logged-out users on wikis that forbid it.",
+	"wizz-ui-title": "Title of the infobox form dialog.",
+	"wizz-ui-save": "Label of the button that saves the infobox form.",
+	"wizz-ui-cancel": "Label of the button that closes the infobox form without saving.",
+	"wizz-ui-editsource": "Link text shown with a refusal message; leads to the normal wikitext editor of the page.",
+	"wizz-ui-nochange": "Shown when the user presses save but no value differs from the page; no edit is made.",
+	"wizz-unsafevalue": "Shown when a value typed in the form cannot be written into the template call without changing its structure; nothing is saved.",
+	"wizz-error-save": "Shown when the edit API refuses the save. Parameters:\n* $1 - the error message returned by the API"
 }
