@@ -1,6 +1,6 @@
 ---
 
-description: "Task list for Wizz — infobox form editing (001-initialization)"
+description: "Task list for Wizz — infobox form editing gadget (001-initialization)"
 ---
 
 # Tasks: Wizz — Form sửa infobox gắn với Bucket
@@ -9,225 +9,179 @@ description: "Task list for Wizz — infobox form editing (001-initialization)"
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
-**Tests**: Included. Constitution Principle II requires test-first for the tokenizer/serializer
-and validation, and SC-001/SC-002 are measured by test suites. Within each phase, write the
-test tasks first and confirm they fail before implementing.
+**Tests**: Included. Constitution Principle II requires test-first QUnit tests under Node for
+the tokenizer, editor and validation; SC-001/SC-002 are measured by these suites. Within each
+phase write the test tasks first and confirm they fail before implementing.
 
-**Organization**: Tasks are grouped by user story. US1–US3 are all P1 and together form the
-MVP; US4–US6 are later increments.
+**Organization**: Tasks are grouped by user story. US1–US3 (all P1) form the MVP; US4–US6 are
+later increments.
 
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies on incomplete tasks)
 - **[Story]**: User story from spec.md (US1–US6)
-- Paths are relative to the repository root (standard MediaWiki extension layout, see plan.md)
+- Paths are relative to the repository root (flat gadget layout, see plan.md)
 
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Extension skeleton, tooling and CI
+**Purpose**: Repository tooling and CI for a package gadget
 
-- [ ] T001 Create `extension.json`: name `Wizz`, license `GPL-2.0-or-later`, `requires` MediaWiki `>= 1.45.0` and extensions `Bucket`, `Scribunto`; `AutoloadNamespaces` `MediaWiki\\Extension\\Wizz\\` → `src/`; `ServiceWiringFiles` `src/ServiceWiring.php`; `MessagesDirs` (`i18n`, `i18n/api`); `ExtensionMessagesFiles` for `Wizz.alias.php` and `Wizz.namespaces.php`; `namespaces` `Wizz` (9620, `defaultcontentmodel` `json`, `protection` `wizz-editdefinition`) and `Wizz_talk` (9621); `AvailableRights` and `GroupPermissions` for `wizz-edit` (`user`) and `wizz-editdefinition` (`sysop`, `interface-admin`); `config` `WizzNamespaces` `[0]`, `WizzEditTab` `false`, `WizzChangeTag` `true` (per contracts/wiki-interface.md)
-- [ ] T002 [P] Create `composer.json` with dev dependencies `mediawiki/mediawiki-codesniffer`, `mediawiki/mediawiki-phan-config`, `php-parallel-lint/php-parallel-lint`, `mediawiki/minus-x` and scripts `test` (parallel-lint, phpcs, minus-x) and `fix`; add `.phpcs.xml`
-- [ ] T003 [P] Create `package.json`, `Gruntfile.js`, `.eslintrc.json`, `.stylelintrc.json` using `eslint-config-wikimedia`, `stylelint-config-wikimedia`, `grunt-banana-checker`; `npm test` runs all three
-- [ ] T004 [P] Create `.phan/config.php` from `mediawiki-phan-config` with Bucket/Scribunto not required for analysis
-- [ ] T005 [P] Create `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`, `i18n/api/en.json`, `i18n/api/vi.json`, `i18n/api/qqq.json` with `@metadata` and the `right-wizz-*`, `action-wizz-*` rights messages and the `editinfobox` special page title
-- [ ] T006 [P] Create `Wizz.alias.php` (`EditInfobox` en, `SửaInfobox` vi) and `Wizz.namespaces.php` (`Wizz`, `Wizz_talk`, with vi aliases)
-- [ ] T007 [P] Create `.github/workflows/ci.yml`: job 1 `composer test` + `npm test`; job 2 installs MediaWiki 1.45 and 1.46 with MariaDB, Scribunto and Bucket (REL1_45), loads Wizz and runs `tests/phpunit/unit` and `tests/phpunit/integration`
-- [ ] T008 [P] Replace `README.md` with summary, requirements (MW ≥ 1.45, Bucket, Scribunto), install steps (`wfLoadExtension`), configuration table and link to the spec
+- [ ] T001 Create `package.json` (license `MIT`, private, dev dependencies `qunit`, `eslint-config-wikimedia`, `stylelint-config-wikimedia`, `grunt-banana-checker` (its `banana-checker` CLI, no Grunt); scripts `test` = lint + banana + `qunit tests/`, `build` = `node build/build.js`, `fixtures:parsetree` = `node build/fetch-parsetree.js`)
+- [ ] T002 [P] Create `.eslintrc.json` (root, `wikimedia/client`, `wikimedia/vue3-es6`, `wikimedia/mediawiki`; override `tests/` and `build/` for `wikimedia/server` Node env) and `.eslintignore` for `dist/`
+- [ ] T003 [P] Create `.stylelintrc.json` extending `stylelint-config-wikimedia` and `.gitignore` (`node_modules/`, `dist/`)
+- [ ] T004 [P] Create `src/i18n/en.json`, `src/i18n/vi.json`, `src/i18n/qqq.json` with `@metadata` and the key families of contracts/wiki-interface.md (Messages), starting with `wizz-tab`, `wizz-summary`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-noeditright`
+- [ ] T005 [P] Create `.github/workflows/ci.yml` running `npm ci` and `npm test` on Node LTS for pushes and pull requests
+- [ ] T006 [P] Create `src/wizz-config.json` with `{ "namespaces": [0], "editTab": true, "tabLabel": { "en": "Edit infobox", "vi": "Sửa infobox" } }` (contracts/wiki-interface.md Configuration; research R2 entry message)
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Tokenizer, Bucket schema reading, definition loading and template matching — used
-by every story
+**Purpose**: Tokenizer, wikitext editor and API loader that every story uses
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-### Tests (write first, must fail)
+- [ ] T007 Create round-trip fixture corpus in `tests/fixtures/roundtrip/` (≥ 20 self-made `*.wikitext` files covering: one-per-line and inline params, comments, `<ref>`, `<nowiki>`, `<pre>`, nested templates, `{{{ }}}`, `[[ ]]` with `|`, duplicate params, positional params, redirect/variant names, two calls of one template, malformed calls) each with a `*.edits.json` describing an edit and its exact expected output (research R3, R4)
+- [ ] T008 [P] Create `build/fetch-parsetree.js`: for each fixture, POST `action=parse&prop=parsetree&contentmodel=wikitext` to a wiki URL given by env `WIZZ_TEST_API`, write `*.parsetree.xml` beside it; commit the generated files
+- [ ] T009 [P] Write `tests/tokenizer.test.js`: offsets of call/name/param spans per fixture; agreement with `*.parsetree.xml` (template names, param names, values); malformed fixtures produce a parse error with line number; calls named `#…`, `subst:`, `safesubst:`, `:` are not template calls (data-model.md TemplateCall, TemplateParam)
+- [ ] T010 [P] Write `tests/editor.test.js`: unchanged edit returns identical string for every fixture; each `*.edits.json` gives byte-identical expected output; rules of research R4 (whitespace kept, append in last param's layout, cleared field keeps `|a=`, last duplicate edited, positional untouched)
+- [ ] T011 Implement `src/wizz-tokenizer.js` (pure CommonJS, no `mw`/DOM): `parse( text ) → { calls: TemplateCall[] }` or throws `{ code: 'wizz-parseerror', line }` per data-model.md TemplateCall (`index`, `start`, `end`, `nameText`, `params`) and TemplateParam (`name`, `nameSpan`, `valueSpan`, `rawValue`, `value`) until T009 passes
+- [ ] T012 Implement `src/wizz-editor.js` (pure): `applyEdits( text, call, changes ) → newText` and `matchesTemplate( nameText, templateTitle, redirects, nsIds )` (data-model.md TemplateCall normalisation rules) until T010 passes
+- [ ] T013 Implement `src/wizz-load.js`: `loadPage( api, title )` (contracts/api-calls.md request 1, incl. `intestactions=edit`), `loadDefinitions( api, templates )` (request 2 incl. protection and redirects), `loadSchema( api, bucket )` (request 3) returning plain objects; Bucket defaults `index: true`, `repeated: false` (research R1)
+- [ ] T014 [P] Write `tests/load.test.js` with a fake `api` object returning recorded responses: user cannot edit → `wizz-noeditright`; protection `sysop` direct and cascading → trusted; `autoconfirmed` or none → `wizz-definition-untrusted` (research R5, FR-028)
+- [ ] T015 Create `src/wizz.js` (entry gadget): exit unless `wgAction === 'view'`, latest revision and namespace in `wizz-config.json` `namespaces`; on `?wizz=1` call `mw.loader.using( 'ext.gadget.wizz-form' )` and start the form; expose `mw.libs.wizz = { version }` (research R2, R9)
+- [ ] T016 Create `build/build.js`: copy `src/*` to `dist/` with on-wiki names (`i18n/en.json` → `wizz-i18n-en.json`), print `MediaWiki:Gadgets-definition` lines and `Gadget definition:` JSON for gadgets `wizz` (default, `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`, pages `wizz.js`, `wizz-config.json`) and `wizz-form` (hidden, `package`, `dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`, `codexIcons`, all other pages) (research R2, R12)
 
-- [ ] T009 [P] Create round-trip fixture corpus `tests/phpunit/data/roundtrip/*.wikitext` (≥ 20 files, self-made data): inline and one-per-line calls, comments, `<ref>`/`<nowiki>`/`<pre>`, nested templates, `{{{param}}}`, piped links, positional params, duplicate params, CRLF, trailing spaces, Unicode names, two calls of the same template, plus `malformed/*.wikitext` (missing `}}`, unclosed tag)
-- [ ] T010 [P] Write `tests/phpunit/unit/Wikitext/TemplateTokenizerTest.php`: for every fixture, offsets of each call and each `TemplateParam.nameSpan`/`valueSpan` reproduce the source exactly (data-model.md `TemplateCall.start`, `TemplateCall.end`, `TemplateParam.nameSpan`, `TemplateParam.valueSpan`, `TemplateParam.rawValue`); `TemplateParam.value` is trimmed; duplicate params keep last-wins semantics (data-model.md `TemplateParam.name`); malformed fixtures throw `TemplateParseError` with offset
-- [ ] T011 [P] Write `tests/phpunit/unit/Bucket/BucketSchemaLookupTest.php`: parses Bucket page JSON with defaults `index=true`, `repeated=false`; returns null for missing page or invalid JSON (data-model.md `BucketSchema.fields`)
-- [ ] T012 [P] Write `tests/phpunit/unit/Definition/DefinitionParserTest.php`: structural parsing against contracts/form-definition.schema.json, defaults for `FieldDefinition.param`, `FieldDefinition.label`, `FieldDefinition.namespaces`, `FieldDefinition.separator`, `FieldDefinition.booleanValues`; rejects duplicate `FieldDefinition.field`/`FieldDefinition.param` and missing `FormDefinition.bucket`/empty `FormDefinition.fields` (data-model.md)
-- [ ] T013 [P] Write `tests/phpunit/integration/Edit/TemplateMatcherTest.php`: matches first-letter case, `_`/space, `Template:` prefix and localised alias, redirects to the template; never matches `#`, `subst:`, `safesubst:`, `:` names (data-model.md `TemplateCall.nameText`)
-- [ ] T014 [P] Write `tests/phpunit/integration/Wikitext/PreprocessorParityTest.php`: for every round-trip fixture, the calls and parameter boundaries found by `TemplateTokenizer` equal those in core `Parser::preprocessToDom()` (research.md R3)
-
-### Implementation
-
-- [ ] T015 [P] Create value objects `src/Wikitext/TemplateParam.php`, `src/Wikitext/TemplateCall.php`, `src/Wikitext/TemplateParseError.php` (data-model.md `TemplateCall.*`, `TemplateParam.*`)
-- [ ] T016 Implement `src/Wikitext/TemplateTokenizer.php` (comments, nowiki/pre/extension tags, nested `{{ }}`, `{{{ }}}`, `[[ ]]`, byte offsets, linear time) until T010 and T014 pass
-- [ ] T017 [P] Implement `src/Bucket/BucketSchema.php` and `src/Bucket/BucketSchemaLookup.php` reading `Bucket:<name>` via `RevisionLookup` (research.md R1) until T011 passes
-- [ ] T018 [P] Implement `src/Definition/FieldDefinition.php`, `src/Definition/FormDefinition.php`, `src/Definition/DefinitionParser.php` with defaults from data-model.md `FieldDefinition.*` until T012 passes
-- [ ] T019 Implement `src/Definition/DefinitionLookup.php`: load and parse `Wizz:<Template>` for a template title; derive `FieldDefinition.type`/`FieldDefinition.repeated`/`FieldDefinition.state` from `BucketSchemaLookup` (data-model.md)
-- [ ] T020 Implement `src/Edit/TemplateMatcher.php` (title normalisation + `RedirectLookup`) until T013 passes
-- [ ] T021 Register all services and a `Wizz` PSR-3 logger in `src/ServiceWiring.php`
-
-**Checkpoint**: Tokenizer proven on the corpus; definitions and schemas load
+**Checkpoint**: tokenizer and editor proven on the corpus (SC-001 suite green); data can be loaded
 
 ---
 
 ## Phase 3: User Story 1 - Biên tập viên sửa infobox qua form (Priority: P1) 🎯 MVP
 
-**Goal**: Open a form for a page with one infobox, see current values, change some, save; only
-changed parameters change; no-op saves create no revision; summary + `wizz` tag
+**Goal**: open a form with current values, edit, save only the changed parameters
 
-**Independent Test**: With a definition and a page, open `Special:EditInfobox/<Page>`, change
-one field, save, inspect the diff (quickstart.md scenarios 1–2)
+**Independent Test**: on the test wiki open `<Page>?wizz=1`, change one field, save, check the diff (quickstart scenarios 1–2)
 
-### Tests (write first, must fail)
+### Tests for User Story 1
 
-- [ ] T022 [P] [US1] Write `tests/phpunit/unit/Wikitext/TemplateEditorTest.php` against `tests/phpunit/data/roundtrip/` expected-edit files: no changes → byte-identical; one change → only that value span differs, surrounding whitespace kept; new param appended in the last param's layout; cleared field keeps `|a=`; unmapped and positional params untouched (research.md R11)
-- [ ] T023 [P] [US1] Write `tests/phpunit/integration/Api/ApiWizzLoadTest.php`: returns `FormState` fields with current values (data-model.md `FormState.fields`), `revid`, `timestamp`; errors `wizz-noinfobox`, `wizz-parseerror` (with `offset`/`line`), `wizz-namespace-disabled`, permission denied without `wizz-edit`
-- [ ] T024 [P] [US1] Write `tests/phpunit/integration/Api/ApiWizzSaveTest.php`: `success` diff touches only changed params; `nochange` creates no revision; summary lists changed params; tag `wizz` applied when `$wgWizzChangeTag` true and absent when false; requires CSRF token
+- [ ] T017 [P] [US1] Write `tests/summary.test.js`: summary lists changed params in order; no change → no summary
+- [ ] T018 [P] [US1] Write `tests/save.test.js` with a fake `api`: identical text → `nochange` with no `postWithEditToken` call (FR-003); `tags=wizz` sent only when tag active and user has `applychangetags` (data-model.md FormState.canTag); success returns `newrevid`
 
-### Implementation
+### Implementation for User Story 1
 
-- [ ] T025 [US1] Implement `src/Wikitext/TemplateEditor.php` (apply changed values to a `TemplateCall`, repeated values joined with `FieldDefinition.separator` per research.md R11, BOOLEAN written with `FieldDefinition.booleanValues`) until T022 passes
-- [ ] T026 [P] [US1] Implement `src/Edit/SummaryBuilder.php` using message `wizz-summary` in content language (contracts/action-api.md)
-- [ ] T027 [P] [US1] Implement `src/Edit/EditSaver.php`: internal `ApiMain` + `DerivativeRequest` `action=edit` as the user with `text`, `baserevid`, `basetimestamp`, `starttimestamp`, `summary`, `nocreate=1`; map result to `EditResult.status` (data-model.md `EditResult.status`)
-- [ ] T028 [P] [US1] Implement `src/Hooks/ChangeTagHooks.php` (`ListDefinedTags`, `ChangeTagsListActive` gated by `WizzChangeTag`) and add tag after save via `ChangeTagsStore::addTags()` in `EditSaver` (research.md R5); register hooks in `extension.json`; add `tag-wizz` and `tag-wizz-description` messages
-- [ ] T029 [US1] Implement `src/Edit/InfoboxEditor.php` `load()` (namespace check against `WizzNamespaces`, tokenizer + matcher, first matching call, `FormState`) and `save()` (reload latest, apply `TemplateEditor`, byte-compare for `nochange`, `EditSaver`) per data-model.md `EditRequest` processing order (conflict and validation branches added in US4/US2)
-- [ ] T030 [US1] Implement `src/Api/ApiWizzLoad.php` and `src/Api/ApiWizzSave.php` (`mustBePosted`, `needsToken` `csrf`, rights `edit` + `wizz-edit`) per contracts/action-api.md; register in `extension.json` `APIModules`; add `i18n/api/*` help messages until T023–T024 pass
-- [ ] T031 [US1] Implement `src/Special/SpecialEditInfobox.php`: requires `wizz-edit`; renders `<noscript>`/no-JS notice `wizz-nojs` with edit link, server-side notices for `wizz-noinfobox`/`wizz-parseerror` with edit link, and a mount point + module `ext.wizz.form`; register `SpecialPages` in `extension.json`
-- [ ] T032 [US1] Create Vue 3 + Codex app `modules/ext.wizz.form/init.js`, `modules/ext.wizz.form/App.vue`, `modules/ext.wizz.form/api.js` (wizzload/wizzsave via `mw.Api`), `modules/ext.wizz.form/FieldInput.vue` (TEXT → CdxTextInput/CdxTextArea for multi-line or wikitext values, INTEGER/DOUBLE → CdxTextInput `inputmode`, BOOLEAN → CdxCheckbox, PAGE → CdxTextInput, repeated → list of inputs); send only changed fields; register `ResourceModules` `ext.wizz.form` with `class` `MediaWiki\\ResourceLoader\\CodexModule` and `codexComponents` in `extension.json`
-- [ ] T033 [US1] Add all US1 UI/notice messages (`wizz-ui-*`, `wizz-nojs`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-summary`) to `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`
+- [ ] T019 [P] [US1] Add `buildSummary( changedParams, msg )` to `src/wizz-editor.js` using message `wizz-summary` (FR-007)
+- [ ] T020 [US1] Implement `src/wizz-save.js` `save( api, state, newText )` per contracts/api-calls.md request 6 (`baserevid`, `basetimestamp`, `starttimestamp`, `nocreate`, optional `tags`), mapping `Success` → `success` until T018 passes
+- [ ] T021 [US1] Implement form state building in `src/wizz-form.js`: from loaded page, definition and schema produce data-model.md FormState (`page`, `revid`, `basetimestamp`, `starttimestamp`, `instance`, `fields[].value`, `fields[].dirty`, `canTag`); refuse with `wizz-noinfobox` (and `action=edit` link) when no call matches; refuse with `wizz-parseerror` and line on malformed call
+- [ ] T022 [US1] Create `src/wizz-Field.vue`: Codex input per type (TEXT → `CdxTextArea` when the raw value contains markup, else `CdxTextInput`; INTEGER/DOUBLE → `CdxTextInput` `inputmode="decimal"`; BOOLEAN → `CdxCheckbox` writing data-model.md FieldDefinition.booleanValues; PAGE → `CdxTextInput` for now) inside `CdxField` with label/help from FieldDefinition.label and FieldDefinition.help; marks `dirty` on input
+- [ ] T023 [US1] Create `src/wizz-App.vue`: `CdxDialog` (full screen on Minerva) rendering fields in definition order, save and cancel buttons, refusal messages; on save build text with `applyEdits` and call `save`; on success reload the page view without `wizz`
+- [ ] T024 [US1] Add `start()` to `src/wizz-form.js` that loads data (T013), builds state (T021), loads `wizz-i18n-<lang>.json` into `mw.messages` with `en` fallback (research R11) and mounts `wizz-App.vue` with `Vue.createMwApp`
+- [ ] T025 [P] [US1] Create `src/wizz.less` using only Codex CSS custom properties and logical properties (`margin-inline-start`, …) for dark mode and RTL (research R10)
+- [ ] T026 [US1] Add US1 messages (`wizz-ui-save`, `wizz-ui-cancel`, `wizz-ui-title`, `wizz-summary`) to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
-**Checkpoint**: Editing and saving through the form works end-to-end for single-instance pages
+**Checkpoint**: US1 works end to end on the test wiki
 
 ---
 
 ## Phase 4: User Story 2 - Dữ liệu sai không vào được Bucket (Priority: P1)
 
-**Goal**: Server-side validation of every rule; client-side early feedback; invalid existing
-values shown with warning and only validated when edited
+**Goal**: every rule checked before saving; invalid fields block the save and are marked
 
-**Independent Test**: Submit each invalid value via the form and directly via the API; no
-revision is created and the right field is flagged (quickstart.md scenarios 3–5)
+**Independent Test**: with a definition using every rule, enter each invalid value and confirm no `action=edit` request is sent and the right field is marked (quickstart scenarios 3–5)
 
-### Tests (write first, must fail)
+### Tests for User Story 2
 
-- [ ] T034 [P] [US2] Write `tests/phpunit/unit/Validation/FieldValidatorTest.php` covering data-model.md `FieldDefinition.required`, `FieldDefinition.min`, `FieldDefinition.max`, `FieldDefinition.pattern`, `FieldDefinition.allowed`, `FieldDefinition.namespaces`, `FieldDefinition.mustExist`, `FieldDefinition.separator`, `FieldDefinition.booleanValues` and `BucketSchema.fields` types (INTEGER/DOUBLE reject text, wikitext and `~150`); repeated values validated per item with the failing item identified
-- [ ] T035 [P] [US2] Write `tests/phpunit/unit/Validation/SafeRegexTest.php`: catastrophic pattern `(a+)+$` on a long input fails fast with `wizz-error-regex-limit`; settings restored afterwards (research.md R9)
-- [ ] T036 [P] [US2] Extend `tests/phpunit/integration/Api/ApiWizzSaveTest.php`: invalid values via raw API → `invalid` with per-field errors and no revision; unchanged invalid existing value does not block saving another field (data-model.md `FormState.fields` warnings)
-- [ ] T037 [P] [US2] Write `tests/qunit/ext.wizz.form/validation.test.js` for client rules mirroring T034 (except `mustExist`)
+- [ ] T027 [P] [US2] Write `tests/validate.test.js`: types INTEGER/DOUBLE reject text, wikitext and `~150` (FR-011); data-model.md FieldDefinition.required, FieldDefinition.min / FieldDefinition.max (value for numbers, length for TEXT), FieldDefinition.allowed, FieldDefinition.namespaces; repeated values split on FieldDefinition.separator and checked per item with the failing item reported (FR-013); untouched invalid existing value → warning only (FR-015)
+- [ ] T028 [P] [US2] Write `tests/regex.test.js` (Node `worker_threads` stand-in for the Worker): FieldDefinition.pattern applied with flag `u`; `(a+)+$` on a long `a…!` value fails with `wizz-error-regex-timeout` within ~200 ms (FR-016, research R6)
 
-### Implementation
+### Implementation for User Story 2
 
-- [ ] T038 [P] [US2] Implement `src/Validation/ValidationError.php` and `src/Validation/SafeRegex.php` (`/…/u`, lowered `pcre.backtrack_limit`, JIT off, `preg_last_error()` check, `Wizz` log warning) until T035 passes
-- [ ] T039 [US2] Implement `src/Validation/FieldValidator.php` for all rules in data-model.md `FieldDefinition.*` by type, PAGE checks via `TitleParser` + `PageStore` until T034 passes
-- [ ] T040 [US2] Wire validation into `src/Edit/InfoboxEditor.php`: validate only fields whose submitted value differs from the current one; return `invalid`; add `warnings` for invalid existing values in `load()` until T036 passes
-- [ ] T041 [US2] Implement `modules/ext.wizz.form/validation.js` and show errors/warnings with CdxField `status`/messages bound to each input in `modules/ext.wizz.form/FieldInput.vue` until T037 passes; register QUnit module in `extension.json` `QUnitTestModule`
-- [ ] T042 [US2] Implement PAGE suggestions (FR-021) in `modules/ext.wizz.form/PageLookup.vue` with CdxLookup over `generator=prefixsearch` + `gpsnamespace` from `FieldDefinition.namespaces` and optional `FieldDefinition.category` filter via `prop=categories` (research.md R8)
-- [ ] T043 [US2] Add `wizz-error-*` and `wizz-warning-*` messages to `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`
+- [ ] T029 [US2] Implement `src/wizz-validate.js` (pure): `validateField( field, value, opts ) → { errors, warnings }` for the rules cited in T027, with type and repeated-ness from the bucket schema only (Constitution III) until T027 passes
+- [ ] T030 [US2] Implement `src/wizz-regex-worker.js` (worker source) and a `testPattern( pattern, value )` runner in `src/wizz-validate.js` that starts the Worker from a Blob URL, terminates and recreates it after 200 ms, and uses the fallback of research R6 when `Worker` cannot start, until T028 passes
+- [ ] T031 [US2] Add FieldDefinition.mustExist check to `src/wizz-save.js`: one batched `action=query&titles=` before save (contracts/api-calls.md request 4), missing titles become field errors
+- [ ] T032 [US2] Wire validation in `src/wizz-App.vue` and `src/wizz-Field.vue`: validate dirty fields on input and blur, show `CdxField` status `error`/`warning` with message tied to the field, block save and send nothing while any error remains (FR-009, FR-014); keep typed values
+- [ ] T033 [US2] Add messages `wizz-error-*` and `wizz-warning-invalid-existing` to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
-**Checkpoint**: SC-002 suite passes; no invalid value can be saved through Wizz
+**Checkpoint**: SC-002 suite green; US1 and US2 work together
 
 ---
 
 ## Phase 5: User Story 3 - Quản trị viên định nghĩa form cho một template (Priority: P1)
 
-**Goal**: Admins create `Wizz:<Template>` pages; invalid definitions are rejected on save; only
-authorised users can edit them; schema drift handled at load time
+**Goal**: JSON definition on a protected subpage, checked on load and on view, with field mapping and a preview
 
-**Independent Test**: Save a valid and several invalid definitions, and try as a normal user
-(quickstart.md scenario 6)
+**Independent Test**: one valid protected definition opens the form; an invalid one lists errors; an unprotected one is refused; viewing the definition page shows the check and a preview button (quickstart scenarios 6–8)
 
-### Tests (write first, must fail)
+### Tests for User Story 3
 
-- [ ] T044 [P] [US3] Write `tests/phpunit/integration/Hooks/DefinitionValidationHooksTest.php`: valid definition saves; rejected with precise JSON-path message for bad JSON structure, missing bucket (data-model.md `FormDefinition.bucket`), unknown field (data-model.md `FieldDefinition.field`), rule not allowed for the field's type (data-model.md `FieldDefinition.min`, `FieldDefinition.max`, `FieldDefinition.pattern`, `FieldDefinition.allowed`, `FieldDefinition.namespaces`, `FieldDefinition.mustExist`, `FieldDefinition.category`, `FieldDefinition.booleanValues`), non-compiling or > 500-char `FieldDefinition.pattern`, `FieldDefinition.separator` on a non-repeated field; non-`Wizz` JSON pages unaffected
-- [ ] T045 [P] [US3] Write `tests/phpunit/integration/Definition/DefinitionPermissionTest.php`: user without `wizz-editdefinition` cannot edit `Wizz:` pages; sysop and interface-admin can
-- [ ] T046 [P] [US3] Write `tests/phpunit/integration/Definition/SchemaDriftTest.php`: field removed from bucket → `FieldDefinition.state` `removed`, read-only, value preserved on save; type changed → validated by new type, incompatible rules ignored with warning (data-model.md `FieldDefinition.state`)
+- [ ] T034 [P] [US3] Write `tests/definition.test.js`: structure per contracts/form-definition.schema.json; data-model.md FormDefinition.bucket missing schema → error; FormDefinition.fields empty or duplicate `field`/`param` → error; FieldDefinition.field not in schema → error with JSON path; FieldDefinition.param defaults to `field` and override mapping works (FR-018); FieldDefinition.label defaults to `param`; FieldDefinition.pattern must compile with `u` and be ≤ 500 chars; rules not fitting the type (e.g. `pattern` on INTEGER, FieldDefinition.category / FieldDefinition.mustExist on non-PAGE, FieldDefinition.booleanValues on non-BOOLEAN) → warning and ignored; field removed from schema → `state: removed`, read-only
 
-### Implementation
+### Implementation for User Story 3
 
-- [ ] T047 [US3] Implement `src/Definition/DefinitionValidator.php` (cross-checks with `BucketSchemaLookup`, regex compile check via `SafeRegex`) until T044 passes
-- [ ] T048 [US3] Implement `src/Hooks/DefinitionValidationHooks.php` on `JsonValidateSave` for namespace `Wizz` only; register in `extension.json`
-- [ ] T049 [US3] Verify namespace protection and rights config in `extension.json` until T045 passes
-- [ ] T050 [US3] Implement schema-drift handling in `src/Definition/DefinitionLookup.php` and read-only rendering of `removed` fields in `modules/ext.wizz.form/FieldInput.vue` until T046 passes
-- [ ] T051 [US3] Add definition error messages (`wizz-def-error-*`) to `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`
+- [ ] T035 [US3] Implement `src/wizz-definition.js` (pure): `checkDefinition( json, schema ) → { definition, errors, warnings }` covering data-model.md FormDefinition and every FieldDefinition attribute cited in T034 (defaults from data-model.md), until T034 passes
+- [ ] T036 [US3] Use `checkDefinition` in `src/wizz-form.js`: any error → refuse with `wizz-definition-invalid` and the full list for every user (FR-019); untrusted → `wizz-definition-untrusted` (FR-028); removed fields rendered read-only with warning in `src/wizz-Field.vue`
+- [ ] T037 [US3] Add definition-page mode to `src/wizz.js`: on view of `Template:*/wizz.json` load the `wizz-form` gadget and show the check result plus a "Preview form" button that opens the form with empty values and no save button (FR-029)
+- [ ] T038 [US3] Add messages `wizz-definition-*` and `wizz-ui-preview-form` to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
-**Checkpoint**: MVP complete (US1 + US2 + US3)
+**Checkpoint**: MVP (US1–US3) complete
 
 ---
 
 ## Phase 6: User Story 4 - Xem trước, xem diff và xử lý xung đột (Priority: P2)
 
-**Goal**: Preview rendered infobox and wikitext diff; detect edit conflicts and rebase keeping
-typed values; CAPTCHA/AbuseFilter/protection behave like normal edits
+**Goal**: preview and diff before saving; conflicts, CAPTCHA and AbuseFilter handled like a normal edit
 
-**Independent Test**: Preview in one session; save from two sessions to trigger a conflict;
-enable ConfirmEdit/AbuseFilter/protection (quickstart.md scenarios 7–9)
+**Independent Test**: preview shows infobox and diff; two sessions produce a conflict that keeps typed values; protection/AbuseFilter/CAPTCHA behave as for wikitext (quickstart scenarios 9–11)
 
-### Tests (write first, must fail)
+### Tests for User Story 4
 
-- [ ] T052 [P] [US4] Write `tests/phpunit/integration/Api/ApiWizzPreviewTest.php`: returns `html` and `diff` for valid changes, `invalid` for bad values, `nochange` when identical; creates no revision and no Bucket rows
-- [ ] T053 [P] [US4] Extend `tests/phpunit/integration/Api/ApiWizzSaveTest.php`: stale `baserevid` → `conflict` with fresh payload; protected page / blocked user → `error`; ConfirmEdit and AbuseFilter cases (marked skipped when those extensions are not loaded) → `captcha` / `error`
+- [ ] T039 [P] [US4] Extend `tests/save.test.js`: `editconflict` → `conflict`; `edit.captcha` → `captcha` then resend with `captchaid`/`captchaword`; `abusefilter-warning` → `warning` then resend; other errors → `error` with API message (contracts/api-calls.md request 6 table)
 
-### Implementation
+### Implementation for User Story 4
 
-- [ ] T054 [US4] Add `preview()` to `src/Edit/InfoboxEditor.php`: render only the edited call with `ContentRenderer` in preview mode and full-page diff via `SlotDiffRenderer` (research.md R4)
-- [ ] T055 [US4] Implement `src/Api/ApiWizzPreview.php` (POST) per contracts/action-api.md; register in `extension.json` until T052 passes
-- [ ] T056 [US4] Add conflict branch (latest ≠ `EditRequest.baserevid` → `conflict` with fresh `FormState`) to `src/Edit/InfoboxEditor.php` and CAPTCHA/error mapping (`captchaid`, `captchaword`, `edit.captcha`) to `src/Edit/EditSaver.php` until T053 passes (data-model.md `EditRequest`, `EditResult.status`)
-- [ ] T057 [US4] Add preview panel and diff view (`modules/ext.wizz.form/PreviewPanel.vue`), conflict rebase keeping user-changed values, CAPTCHA prompt and core error display to `modules/ext.wizz.form/App.vue`
-- [ ] T058 [US4] Add preview/conflict/captcha messages to `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`
+- [ ] T040 [US4] Add `preview( api, state, callText, newText )` to `src/wizz-save.js`: parallel `action=parse` (edited call only) and `action=compare` (contracts/api-calls.md request 5)
+- [ ] T041 [US4] Implement result handling of T039 in `src/wizz-save.js`
+- [ ] T042 [US4] Add preview step to `src/wizz-App.vue`: show parsed infobox and diff (core HTML via `v-html`, the only allowed use) before confirming save
+- [ ] T043 [US4] Handle `conflict` in `src/wizz-form.js`: reload page, rebuild state on the new revision, re-apply dirty values, tell the user (FR-006)
+- [ ] T044 [US4] Add CAPTCHA (`CdxTextInput` plus image or question) and AbuseFilter warning confirmation to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
 
-**Checkpoint**: Safe save flow complete
+**Checkpoint**: safe for real wikis
 
 ---
 
-## Phase 7: User Story 5 - Chọn instance khi trang gọi template nhiều lần (Priority: P2)
+## Phase 7: User Story 5 - Chọn instance (Priority: P2)
 
-**Goal**: Pages with several calls of the form's template show a picker; only the chosen call
-changes
+**Goal**: pick one of several calls of the same template
 
-**Independent Test**: Page with two calls; edit the second; only it changes (quickstart.md
-scenario 10)
+**Independent Test**: on a page with two calls, choose the second, edit, save; only the second changes (quickstart scenario 12)
 
-### Tests (write first, must fail)
-
-- [ ] T059 [P] [US5] Extend `tests/phpunit/integration/Api/ApiWizzLoadTest.php` and `tests/phpunit/integration/Api/ApiWizzSaveTest.php`: multiple calls → `instances` with `TemplateCall.summary` and no `fields` until `instance` given; `wizz-badinstance` for out-of-range; saving instance 1 leaves instance 0 byte-identical; single call opens directly (data-model.md `TemplateCall.index`, `TemplateCall.summary`)
-
-### Implementation
-
-- [ ] T060 [US5] Add instance listing/selection (`TemplateCall.index`, `TemplateCall.summary` from the first two mapped fields) to `src/Edit/InfoboxEditor.php` and `instance` param handling to `src/Api/ApiWizzLoad.php`, `src/Api/ApiWizzPreview.php`, `src/Api/ApiWizzSave.php` until T059 passes
-- [ ] T061 [US5] Add instance picker (`modules/ext.wizz.form/InstancePicker.vue`, CdxRadio list) and `?instance=` support in `src/Special/SpecialEditInfobox.php`
-- [ ] T062 [US5] Add picker messages to `i18n/en.json`, `i18n/vi.json`, `i18n/qqq.json`
-
-**Checkpoint**: Multi-instance pages are safe to edit
+- [ ] T045 [P] [US5] Add tests to `tests/editor.test.js` and `tests/tokenizer.test.js`: per-template `index`, instance summary from the first two mapped field values (data-model.md TemplateCall.summary), editing instance 1 leaves instance 0 untouched
+- [ ] T046 [US5] Add `instances` and `instance` to state in `src/wizz-form.js`; honour `wizzinstance=<n>` URL parameter; one call → open directly
+- [ ] T047 [US5] Add instance picker (`CdxRadio` list) to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
 
 ---
 
-## Phase 8: User Story 6 - Mở form từ nhiều lối vào, trên cả điện thoại (Priority: P3)
+## Phase 8: User Story 6 - Lối vào và điện thoại (Priority: P3)
 
-**Goal**: Optional "Sửa infobox" tab; form comfortable on Minerva, Citizen, Vector 2022, light
-and dark, LTR and RTL
+**Goal**: tab entry point, PAGE suggestions, good on Minerva and in dark mode
 
-**Independent Test**: Toggle `$wgWizzEditTab`; check every skin/mode (quickstart.md scenario 11)
+**Independent Test**: tab appears only when enabled and the page has a form-backed infobox; form usable on Minerva, Citizen, Vector 2022, dark, RTL (quickstart scenario 13)
 
-### Tests (write first, must fail)
-
-- [ ] T063 [P] [US6] Write `tests/phpunit/integration/Hooks/EntryPointHooksTest.php`: tab shown only when `WizzEditTab` is true, the page is in `WizzNamespaces`, uses a template that has a `Wizz:` definition (via templatelinks, incl. redirects) and the user can edit; hidden otherwise
-
-### Implementation
-
-- [ ] T064 [US6] Implement `src/Hooks/EntryPointHooks.php` on `SkinTemplateNavigation::Universal` (list of templates with definitions cached in WANObjectCache, purged on `Wizz:` page save) and register in `extension.json` until T063 passes
-- [ ] T065 [US6] Create `modules/ext.wizz.form/styles.less` using only Codex tokens from `mediawiki.skin.variables.less`: one column under the mobile breakpoint, sticky save bar, logical properties for RTL
-- [ ] T066 [US6] Manually verify quickstart.md scenario 11 on Minerva, Citizen, Vector 2022 in light/dark and with `uselang=ar`; record results and screenshots in `specs/001-initialization/checklists/ui-verification.md`
-
-**Checkpoint**: All user stories complete
+- [ ] T048 [US6] Add the tab to `src/wizz.js`: when `editTab` is true, request `prop=templates` plus the existence part of contracts/api-calls.md request 2, then `mw.util.addPortletLink` (`p-views`; Minerva `page-actions-overflow`) with `tabLabel` from `wizz-config.json`, linking to `?wizz=1` (FR-023)
+- [ ] T049 [US6] Replace the PAGE input in `src/wizz-Field.vue` with `CdxLookup` backed by `list=prefixsearch` limited by FieldDefinition.namespaces and filtered by FieldDefinition.category (data-model.md; contracts/api-calls.md request 4; FR-021)
+- [ ] T050 [US6] Mobile and theme pass on `src/wizz.less` and `src/wizz-App.vue`: one column, sticky save bar on Minerva, check dark mode on Citizen and Vector 2022, `uselang=ar` (FR-024, SC-003)
 
 ---
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-- [ ] T067 [P] Write `tests/phpunit/integration/PerformanceTest.php`: tokenizer + load on a 2 MB page stays within default memory; `wizzload` on a 200 KB page adds < 300 ms (plan.md Performance Goals)
-- [ ] T068 [P] Security review against Constitution VIII: CSRF on `wizzpreview`/`wizzsave`, message escaping at output, no HTML modification after sanitising, only the latest visible revision is read (deleted/suppressed content never exposed) — record findings in `specs/001-initialization/checklists/security.md`
-- [ ] T069 [P] Run `banana-checker` and ensure every `i18n/en.json` key has `i18n/qqq.json` documentation; complete `i18n/vi.json`
-- [ ] T070 [P] Draft mediawiki.org pages `docs/mediawiki.org/Extension-Wizz.wiki` and `docs/mediawiki.org/Help-Extension-Wizz.wiki` (dependencies, configuration from most-used, compatibility policy, rights, comparison with Page Forms, uninstall notes)
-- [ ] T071 Run full quickstart.md validation (scenarios 1–12) on MW 1.45 and 1.46 and fix regressions, adding a round-trip fixture for any wikitext bug found (SC-004)
+- [ ] T051 [P] Write `README.md`: install steps (enable Gadgets, Bucket, Scribunto; run `npm run build`; create the pages of contracts/wiki-interface.md; set the gadget default; create tag `wizz`), definition reference (contracts/form-definition.schema.json with examples), scope limit of Constitution III and a recommended Lua validation pattern for templates
+- [ ] T052 [P] Add `CHANGELOG.md` with the first release entry
+- [ ] T053 Accessibility review of `src/wizz-App.vue` and `src/wizz-Field.vue`: labels, keyboard order, errors announced (`aria-live` via `CdxField`), contrast
+- [ ] T054 Run quickstart.md scenarios 1–14 on the Cloud VPS test wiki and record results in `specs/001-initialization/checklists/quickstart-run.md`
+- [ ] T055 Verify the **verify** items of research.md (CSP `blob:` workers, ConfirmEdit payload, Citizen tokens) on Miraheze and WikiOasis test wikis; update research.md R6/R8/R10 and code if needed
+- [ ] T056 Run the SC-005 user test (5 newcomers on phones) and record the outcome in `specs/001-initialization/checklists/sc-005.md`
 
 ---
 
@@ -236,44 +190,43 @@ and dark, LTR and RTL
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: none
-- **Foundational (Phase 2)**: after Setup — blocks all stories
+- **Foundational (Phase 2)**: after Setup; blocks all stories
 - **US1 (Phase 3)**: after Foundational
-- **US2 (Phase 4)**: after Foundational; its wiring task T040 edits `InfoboxEditor` from US1 (T029)
-- **US3 (Phase 5)**: after Foundational; T050 touches `FieldInput.vue` from US1 (T032)
-- **US4 (Phase 6)**: after US1 (extends `InfoboxEditor`, `EditSaver`, `App.vue`)
-- **US5 (Phase 7)**: after US1; benefits from US4's preview module (T055) for the `instance` param
-- **US6 (Phase 8)**: T063–T064 after Foundational; T065–T066 after US1 UI exists
-- **Polish (Phase 9)**: after all desired stories
+- **US2 (Phase 4)**: after Foundational; T032 edits `wizz-App.vue`/`wizz-Field.vue` from US1
+- **US3 (Phase 5)**: after Foundational; T036 edits `wizz-form.js` from US1
+- **US4 (Phase 6)**: after US1
+- **US5 (Phase 7)**: after US1
+- **US6 (Phase 8)**: T048 after Foundational; T049–T050 after US1 UI exists
+- **Polish (Phase 9)**: after the desired stories
 
 ### Within Each Story
 
-Tests first (must fail) → value objects/services → API/special page → UI → messages.
+Tests first (must fail) → pure modules → API calls → Vue components → messages.
 
 ### Parallel Opportunities
 
-- Setup: T002–T008 in parallel after T001
-- Foundational tests T009–T014 in parallel; then T015, T017, T018 in parallel
-- US1: T022–T024 in parallel; T026–T028 in parallel
-- US2: T034–T037 in parallel; US3 tests T044–T046 in parallel
-- After US1: US2, US3, US4, US5 and US6 (T063–T064) can proceed in parallel by different people, coordinating on `InfoboxEditor.php` and `App.vue`
+- Setup: T002–T006 in parallel after T001
+- Foundational: T008, T009, T010, T014 in parallel; T011 and T012 can proceed in parallel once their tests exist
+- US1: T017, T018, T019, T025 in parallel
+- US2: T027, T028 in parallel
+- After US1: US2, US3, US4, US5 can proceed in parallel, coordinating on `wizz-App.vue` and `wizz-form.js`
 
 ---
 
 ## Parallel Example: Phase 2
 
 ```bash
-Task: "Create round-trip fixture corpus in tests/phpunit/data/roundtrip/"
-Task: "Write tests/phpunit/unit/Bucket/BucketSchemaLookupTest.php"
-Task: "Write tests/phpunit/unit/Definition/DefinitionParserTest.php"
-Task: "Write tests/phpunit/integration/Edit/TemplateMatcherTest.php"
+Task: "Write tests/tokenizer.test.js"
+Task: "Write tests/editor.test.js"
+Task: "Write tests/load.test.js"
+Task: "Create build/fetch-parsetree.js"
 ```
 
-## Parallel Example: User Story 1
+## Parallel Example: User Story 2
 
 ```bash
-Task: "Implement src/Edit/SummaryBuilder.php"
-Task: "Implement src/Edit/EditSaver.php"
-Task: "Implement src/Hooks/ChangeTagHooks.php"
+Task: "Write tests/validate.test.js"
+Task: "Write tests/regex.test.js"
 ```
 
 ---
@@ -282,22 +235,14 @@ Task: "Implement src/Hooks/ChangeTagHooks.php"
 
 ### MVP (US1 + US2 + US3, all P1)
 
-1. Phase 1 Setup → Phase 2 Foundational (tokenizer proven on the corpus)
-2. US1 → validate scenarios 1–2 on the test wiki
-3. US2 → validate scenarios 3–5 (SC-002)
-4. US3 → validate scenario 6
-5. **STOP and VALIDATE**: MVP may go to the Cloud VPS test wiki; not to farms before US4
-   (conflict handling and CAPTCHA are required before real-wiki use, spec US4 rationale)
+1. Phase 1 → Phase 2 (tokenizer and editor proven on the corpus)
+2. US1 → quickstart scenarios 1–2
+3. US2 → scenarios 3–5 (SC-002)
+4. US3 → scenarios 6–8
+5. **STOP and VALIDATE** on the Cloud VPS test wiki; not on farm wikis before US4 (conflicts and
+   CAPTCHA are needed for real use, spec US4 rationale)
 
 ### Incremental Delivery
 
-US4 (safe save) → US5 (multi-instance) → US6 (tab, mobile polish) → Polish → farm submission.
-
----
-
-## Notes
-
-- Out-of-repo follow-ups (not tasks here): register namespace IDs 9620/9621 on mediawiki.org,
-  create the Phabricator project, register with translatewiki.net, announce new rights to target
-  communities (Constitution VIII).
-- Commit after each task or logical group; never remove a round-trip fixture to make tests pass.
+US4 → first tagged release for real wikis → US5 → US6 → Polish. Each story is tagged and
+released as its own minor version (Constitution VIII: wikis receive tagged releases only).

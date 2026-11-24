@@ -156,8 +156,8 @@ marked **verify**.
     `/wizz.json` subpage. Visible by default; `wizz-config.json` `editTab: false` hides it.
   - Definition pages: on view of `Template:*/wizz.json`, show the check result and a
     "preview form" button (FR-029).
-- **Config** `MediaWiki:Gadget-wizz-config.json`: `{ "namespaces": [0], "editTab": true }`.
-  Only these two keys (Constitution VII).
+- **Config** `MediaWiki:Gadget-wizz-config.json`: `{ "namespaces": [0], "editTab": true, "tabLabel": {…} }`.
+  Only these three keys (Constitution VII).
 
 ## R10. UI (Codex, mobile, dark mode, RTL)
 

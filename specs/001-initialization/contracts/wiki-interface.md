@@ -43,6 +43,7 @@ The exact definition lines are produced by `npm run build` (research R12).
 |-----|---------|---------|
 | `namespaces` | `[0]` | Namespaces where the form can open (FR-026). |
 | `editTab` | `true` | Show the "Edit infobox" tab (FR-023). |
+| `tabLabel` | `{ "en": "Edit infobox", "vi": "Sửa infobox" }` | Tab label by language, `en` fallback; the only text the entry gadget needs. |
 
 ## Change tag
 
