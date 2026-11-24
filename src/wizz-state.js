@@ -14,16 +14,27 @@ const TRUE_VALUES = [ '1', 'true', 'on', 'yes' ];
  * @param {Object} page Result of loadPage
  * @param {Object[]} definitions Result of loadDefinitions
  * @param {Object} nsIds wgNamespaceIds
- * @return {Object} { definition, call } of the first call (by position) of a trusted template
- * @throws {{code: string}} wizz-noinfobox; wizz-parseerror with `line`
+ * @return {Object} { definition, call } of the first call (by position) of a template with a
+ *  definition; the definition is still unchecked (see wizz-definition.js)
+ * @throws {{code: string}} wizz-noinfobox; wizz-parseerror with `line`; wizz-definition-untrusted;
+ *  wizz-definition-invalid with `list` when the definition page is not JSON
  */
 function findCall( page, definitions, nsIds ) {
 	// ponytail: first call only; the instance picker (US5) chooses among several.
-	const usable = definitions.filter( ( d ) => d.trusted && !d.jsonError );
 	for ( const call of parse( page.text ).calls ) {
-		const definition = usable.find(
+		const definition = definitions.find(
 			( d ) => matchesTemplate( call.nameText, d.template, d.redirects, nsIds )
 		);
+		if ( definition && !definition.trusted ) {
+			// FR-028: an untrusted definition is not even read.
+			throw Object.assign( new Error( 'wizz-definition-untrusted' ), { code: 'wizz-definition-untrusted' } );
+		}
+		if ( definition && definition.jsonError ) {
+			throw Object.assign( new Error( 'wizz-definition-invalid' ), {
+				code: 'wizz-definition-invalid',
+				list: [ 'definition: not valid JSON: ' + definition.jsonError ]
+			} );
+		}
 		if ( definition ) {
 			return { definition, call };
 		}
@@ -41,7 +52,9 @@ function findCall( page, definitions, nsIds ) {
 function buildState( page, definition, schema, call ) {
 	const fields = definition.fields.map( ( f ) => {
 		const param = f.param || f.field;
-		const { type = 'TEXT', repeated = false } = schema.fields[ f.field ] || {};
+		// A field gone from the schema is read-only with a warning, its value never rewritten.
+		const known = schema.fields[ f.field ];
+		const { type = 'TEXT', repeated = false } = known || {};
 		const found = call.params.filter( ( p ) => p.name === param );
 		let value = found.length ? found[ found.length - 1 ].value : '';
 		const booleanValues = f.booleanValues || [ 'yes', 'no' ];
@@ -61,8 +74,9 @@ function buildState( page, definition, schema, call ) {
 			initial: value,
 			dirty: false,
 			rules: f,
+			state: known ? 'ok' : 'removed',
 			errors: [],
-			warnings: []
+			warnings: known ? [] : [ { key: 'wizz-definition-removed', params: [] } ]
 		};
 	} );
 	return {

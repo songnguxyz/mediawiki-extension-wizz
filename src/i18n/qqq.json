@@ -29,5 +29,11 @@
 	"wizz-error-mustexist": "Field error when a page the field must link to does not exist. Parameters:\n* $1 - the title that failed",
 	"wizz-error-regex-timeout": "Field error when the regular expression of the field ran over the time limit (about 0.2 seconds). Parameters:\n* $1 - the value being checked",
 	"wizz-error-regex-unavailable": "Field error when the pattern could not be run safely, for example because the browser blocks background workers. Parameters:\n* $1 - the value being checked",
-	"wizz-warning-invalid-existing": "Field warning for a value that was already invalid when the form opened and that the user has not edited."
+	"wizz-warning-invalid-existing": "Field warning for a value that was already invalid when the form opened and that the user has not edited.",
+	"wizz-definition-invalid": "Shown to every user instead of the form when its definition page has errors, and on the definition page itself. A list of the errors follows the message.",
+	"wizz-definition-untrusted": "Shown instead of the form, and on the definition page, when the definition page is not edit-protected at administrator (sysop) level.",
+	"wizz-definition-valid": "Shown on a definition page (Module:<Name>/wizz.json) when the check finds no error.",
+	"wizz-definition-warnings": "Heading of the list of warnings (for example a rule ignored because it does not fit the field type) shown on a definition page.",
+	"wizz-definition-removed": "Field warning for a field in the definition that no longer exists in the bucket schema; the field is read-only.",
+	"wizz-ui-preview-form": "Label of the button on a definition page that opens the form with empty values, for trying it out. Nothing is saved."
 }

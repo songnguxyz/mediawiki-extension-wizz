@@ -4,7 +4,7 @@
 		class="wizz-dialog"
 		:title="$i18n( 'wizz-ui-title' ).text()"
 		:use-close-button="true"
-		:primary-action="state ? { label: $i18n( 'wizz-ui-save' ).text(), actionType: 'progressive', disabled: saving } : undefined"
+		:primary-action="state && !preview ? { label: $i18n( 'wizz-ui-save' ).text(), actionType: 'progressive', disabled: saving } : undefined"
 		:default-action="{ label: $i18n( 'wizz-ui-cancel' ).text() }"
 		@primary="onSave"
 		@default="open = false"
@@ -16,6 +16,11 @@
 			:inline="true"
 		>
 			{{ errorText }}
+			<ul v-if="error.list">
+				<li v-for="e in error.list" :key="e">
+					{{ e }}
+				</li>
+			</ul>
 		</cdx-message>
 		<p v-if="error && editUrl" class="wizz-form__links">
 			<a :href="editUrl">{{ $i18n( 'wizz-ui-editsource' ).text() }}</a>
@@ -55,7 +60,9 @@ export default {
 	props: {
 		// FormState, or null when the form is refused
 		state: { type: Object, default: null },
-		// { code, line?, message? } when the form is refused
+		// true: opened from a definition page, nothing may be saved (FR-029)
+		preview: { type: Boolean, default: false },
+		// { code, line?, list?, message? } when the form is refused
 		error: { type: Object, default: null },
 		api: { type: Object, required: true },
 		summaryMsg: { type: Function, required: true },
@@ -134,6 +141,9 @@ export default {
 			}
 		},
 		onSave() {
+			if ( this.preview ) {
+				return Promise.resolve();
+			}
 			const dirty = this.fields.filter( ( f ) => f.dirty );
 			let blocked = false;
 			this.saving = true;
@@ -192,7 +202,7 @@ export default {
 	},
 	created() {
 		// FR-015: values already invalid on the page get a warning, nothing else.
-		for ( const f of this.fields ) {
+		for ( const f of this.fields.filter( ( x ) => x.state === 'ok' && !this.preview ) ) {
 			f.warnings = validateField( f, f.value, this.checkOptions() ).warnings;
 		}
 	}

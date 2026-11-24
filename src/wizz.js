@@ -6,11 +6,14 @@
 
 	mw.libs.wizz = { version };
 
+	// A definition page (Module:*/wizz.json) always loads the form bundle, in any config.
+	const ns = mw.config.get( 'wgNamespaceNumber' );
+	const definitionPage = ns === 828 && mw.config.get( 'wgTitle' ).endsWith( '/wizz.json' );
 	if (
 		mw.config.get( 'wgAction' ) !== 'view' ||
 		mw.config.get( 'wgRevisionId' ) !== mw.config.get( 'wgCurRevisionId' ) ||
-		!config.namespaces.includes( mw.config.get( 'wgNamespaceNumber' ) ) ||
-		new URLSearchParams( location.search ).get( 'wizz' ) !== '1'
+		!( definitionPage || config.namespaces.includes( ns ) &&
+			new URLSearchParams( location.search ).get( 'wizz' ) === '1' )
 	) {
 		return;
 	}

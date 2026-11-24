@@ -45,10 +45,28 @@ QUnit.test( 'builds fields from the first matching call', ( assert ) => {
 	] );
 } );
 
-QUnit.test( 'no matching call or untrusted definition: wizz-noinfobox', ( assert ) => {
+QUnit.test( 'no matching call: wizz-noinfobox', ( assert ) => {
 	assert.throws( () => build( page( '{{Other}}' ) ), ( e ) => e.code === 'wizz-noinfobox' );
+} );
+
+QUnit.test( 'matching definition that is untrusted or not JSON is refused', ( assert ) => {
 	assert.throws( () => build( page( '{{IX}}' ), [ Object.assign( {}, def, { trusted: false } ) ] ),
-		( e ) => e.code === 'wizz-noinfobox' );
+		( e ) => e.code === 'wizz-definition-untrusted' );
+	const bad = { template: def.template, redirects: [], trusted: true, jsonError: 'Unexpected token' };
+	assert.throws( () => build( page( '{{Infobox x}}' ), [ bad ] ),
+		( e ) => e.code === 'wizz-definition-invalid' && e.list.length === 1 && e.list[ 0 ].includes( 'Unexpected token' ) );
+	assert.throws( () => build( page( '{{Infobox x}}' ), [ Object.assign( {}, bad, { trusted: false } ) ] ),
+		( e ) => e.code === 'wizz-definition-untrusted', 'untrusted is not even parsed' );
+} );
+
+QUnit.test( 'field missing from the schema: removed, read-only warning, value kept', ( assert ) => {
+	const d = Object.assign( {}, def, { fields: [ { field: 'ten' }, { field: 'gone', param: 'cũ' } ] } );
+	const { definition, call } = findCall( page( '{{IX|ten=a|cũ=old}}' ), [ d ], nsIds );
+	const s = buildState( page( '{{IX|ten=a|cũ=old}}' ), definition, schema, call );
+	assert.deepEqual( s.fields.map( ( f ) => [ f.state, f.value, f.warnings.map( ( w ) => w.key ) ] ), [
+		[ 'ok', 'a', [] ],
+		[ 'removed', 'old', [ 'wizz-definition-removed' ] ]
+	] );
 } );
 
 QUnit.test( 'malformed call: wizz-parseerror with line', ( assert ) => {

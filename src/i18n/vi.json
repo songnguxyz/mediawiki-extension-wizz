@@ -29,5 +29,11 @@
 	"wizz-error-mustexist": "Trang “$1” không tồn tại.",
 	"wizz-error-regex-timeout": "Việc kiểm tra “$1” quá lâu nên đã bị dừng. Hãy nhờ quản trị viên đơn giản hóa mẫu của ô này.",
 	"wizz-error-regex-unavailable": "Không thể kiểm tra “$1” theo mẫu của ô này trong trình duyệt này.",
-	"wizz-warning-invalid-existing": "Giá trị này đã không hợp lệ sẵn trên trang. Nó được giữ nguyên cho đến khi bạn sửa."
+	"wizz-warning-invalid-existing": "Giá trị này đã không hợp lệ sẵn trên trang. Nó được giữ nguyên cho đến khi bạn sửa.",
+	"wizz-definition-invalid": "Định nghĩa form có lỗi nên form không mở được:",
+	"wizz-definition-untrusted": "Định nghĩa form này chưa bị khóa sửa ở mức quản trị viên nên Wizz không dùng nó.",
+	"wizz-definition-valid": "Định nghĩa form hợp lệ.",
+	"wizz-definition-warnings": "Định nghĩa form dùng được nhưng có các cảnh báo sau:",
+	"wizz-definition-removed": "Trường này không còn trong bucket. Ô được hiện ở chế độ chỉ đọc và giữ nguyên giá trị.",
+	"wizz-ui-preview-form": "Xem thử form"
 }
