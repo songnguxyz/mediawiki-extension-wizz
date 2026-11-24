@@ -23,8 +23,7 @@ Vue 3 and Codex as shipped by MediaWiki, LESS.
 **Primary Dependencies**: on the wiki: MediaWiki ≥ 1.45, Gadgets, Bucket (schema pages only),
 Scribunto (used by the wiki's templates). ResourceLoader modules: `vue`, `@wikimedia/codex`,
 `mediawiki.api`, `mediawiki.util`, `mediawiki.jqueryMsg`. Dev only (npm): `qunit`,
-`eslint-config-wikimedia`, `stylelint-config-wikimedia`, `banana-checker`, `@vue/compiler-sfc`
-(to load `.vue` files in Node tests).
+`eslint-config-wikimedia`, `stylelint-config-wikimedia`, `banana-checker`.
 
 **Storage**: none of its own. Wiki pages only: `Template:<Name>/wizz.json` (definitions),
 `Bucket:` pages (read-only), article wikitext, `MediaWiki:Gadget-wizz-config.json`.
@@ -39,10 +38,10 @@ stored core parse trees (research R3). Manual cross-skin checks per
 
 **Project Type**: MediaWiki package gadget (front-end only).
 
-**Performance Goals**: page views without `?wizz=1` load only the entry file (< 3 KB before
-gzip) plus one batched API request when the tab is enabled; the form opens in ≤ 3 requests
-(research R5); tokenizer linear in page size, < 50 ms for 200 KB of wikitext on a mid-range
-phone.
+**Performance Goals**: page views without `?wizz=1` load only the entry gadget (entry file,
+config and the `wizz-tab` message; < 3 KB before gzip) plus one batched API request when the
+tab is enabled; the form opens in ≤ 3 requests (research R5); tokenizer linear in page size,
+< 50 ms for 200 KB of wikitext in the Node test run.
 
 **Constraints**: no server code, no external resources, no Bucket API, no Page Forms code or
 name collisions (`mw.libs.wizz`, `wizz-`), regex under a 200 ms time limit (R6), writes via

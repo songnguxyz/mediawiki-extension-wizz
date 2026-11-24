@@ -113,5 +113,5 @@ load ──► editing ──► preview ──► saving ──► success
   │         └───────────┘           ├──► captcha ──► saving
   │                                 ├──► warning (AbuseFilter) ─► saving (confirm) | editing
   │                                 └──► error (blocked/protected/disallowed) ─► editing
-  └──► refused (no infobox | parse error | definition invalid | definition not trusted)
+  └──► refused (no edit right | no infobox | parse error | definition invalid | definition not trusted)
 ```

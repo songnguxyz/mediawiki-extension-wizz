@@ -6,13 +6,14 @@ Wizz adds no API modules. It calls only core modules through `mw.Api`, always wi
 ## 1. Load page (form open; also tab check)
 
 ```text
-action=query & titles=<Page> & prop=revisions|info|templates
+action=query & titles=<Page> & prop=revisions|info|templates & intestactions=edit
   & rvprop=ids|timestamp|content & rvslots=main & tllimit=max & curtimestamp=1
   & meta=userinfo & uiprop=rights & list=tags & tgprop=active & tglimit=max
 ```
 
 Used: `revid`, `timestamp` (→ `basetimestamp`), `curtimestamp` (→ `starttimestamp`), wikitext,
-transcluded `templates`, user rights (`applychangetags`), whether tag `wizz` is active.
+transcluded `templates`, `actions.edit` (may the user edit this page; false → form refuses),
+user rights (`applychangetags`), whether tag `wizz` is active.
 The tab check (FR-023) sends only `prop=templates` and request 2's existence part.
 
 ## 2. Load definitions

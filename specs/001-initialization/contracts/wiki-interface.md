@@ -8,8 +8,8 @@
   `action=edit`. Malformed call: `wizz-parseerror` with line number plus an edit link.
 - Definition invalid: `wizz-definition-invalid` with the list of errors (FR-019). Not
   protected: `wizz-definition-untrusted` (FR-028).
-- No edit right: the save fails with core's permission error, shown in the form; the form
-  itself opens for anyone (FR-027, edge case for logged-out users).
+- No right to edit the page (including logged-out users on wikis that forbid it): the form
+  refuses at once with `wizz-noeditright` (FR-027, edge case).
 - No JavaScript: the gadget does not run; the page shows normally.
 
 ## Tab
@@ -31,8 +31,8 @@ form" button that opens the form with empty values and no save button (FR-029).
 | `MediaWiki:Gadgets-definition` lines or `Gadget definition:wizz.json` / `wizz-form.json` | `wizz` (default, entry) and `wizz-form` (hidden, loaded on demand) |
 | `MediaWiki:Gadget-wizz.js` | Entry |
 | `MediaWiki:Gadget-wizz-*.js`, `-*.vue`, `wizz.less` | Form code |
-| `MediaWiki:Gadget-wizz-config.json` | Config |
-| `MediaWiki:Gadget-wizz-i18n-en.json`, `-vi.json` | Messages |
+| `MediaWiki:Gadget-wizz-config.json` | Config and the `wizz-tab` label (entry gadget) |
+| `MediaWiki:Gadget-wizz-i18n-en.json`, `-vi.json` | Messages (form gadget) |
 | `MediaWiki:Gadget-wizz` | Gadget description in Special:Preferences |
 
 The exact definition lines are produced by `npm run build` (research R12).

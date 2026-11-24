@@ -36,7 +36,7 @@ Một biên tập viên mở form cho một trang đã có infobox, thấy các 
 2. **Given** form đang mở, **When** biên tập viên sửa một ô và lưu, **Then** diff của sửa đổi chỉ chứa thay đổi ở tham số đó.
 3. **Given** form đang mở, **When** biên tập viên lưu mà không sửa gì, **Then** wikitext của trang giữ nguyên từng byte và không tạo sửa đổi rỗng.
 4. **Given** infobox có tham số không được khai trong form, **When** biên tập viên lưu, **Then** các tham số đó giữ nguyên nội dung, vị trí và khoảng trắng.
-5. **Given** sửa đổi đã lưu thành công, **When** xem lịch sử trang, **Then** tóm tắt sửa đổi tự động liệt kê các tham số đã đổi (ví dụ "Sửa infobox: chieu_cao, cung") và sửa đổi mang tag `wizz`.
+5. **Given** sửa đổi đã lưu thành công, **When** xem lịch sử trang, **Then** tóm tắt sửa đổi tự động liệt kê các tham số đã đổi (ví dụ "Sửa infobox: chieu_cao, cung") và sửa đổi mang tag `wizz` (nếu tag đã bật).
 
 ---
 
@@ -116,7 +116,7 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 
 **Why this priority**: Tăng khả năng người mới tìm thấy form, nhưng URL `?wizz=1` đã đủ để dùng được sản phẩm.
 
-**Independent Test**: Bật lần lượt từng lối vào trong cấu hình wiki test và mở form từ mỗi lối vào trên skin Minerva, Citizen và Vector 2022.
+**Independent Test**: Bật/tắt tab trong cấu hình wiki test và mở form từ URL `?wizz=1` và từ tab trên skin Minerva, Citizen và Vector 2022.
 
 **Acceptance Scenarios**:
 
@@ -135,8 +135,8 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 - Schema bucket thay đổi sau khi định nghĩa form đã lưu: form luôn đọc schema hiện hành khi mở. Ô trỏ tới trường đã bị xóa hiện ở chế độ chỉ đọc kèm cảnh báo và giữ nguyên giá trị; ô bị đổi kiểu được validate theo kiểu mới; các ô khác dùng bình thường.
 - Template được gọi qua trang đổi hướng hoặc tên viết khác (chữ hoa đầu, khoảng trắng/gạch dưới, tiền tố namespace): Wizz nhận ra là cùng template; khi lưu giữ nguyên tên gọi gốc trong wikitext.
 - Giá trị nhập vào ô nhiều giá trị chứa chính ký tự phân tách: hệ thống tách thành nhiều giá trị, không cảnh báo; từng giá trị sau khi tách được validate riêng theo FR-013.
-- Một mẫu regex quá chậm thì máy chủ dừng kiểm tra và báo lỗi thay vì treo.
-- Người chưa đăng nhập: theo đúng quyền sửa của wiki; được sửa wikitext thì được dùng form, không được thì form báo lỗi quyền như khi lưu bình thường.
+- Một mẫu regex quá chậm: Wizz dừng kiểm tra sau giới hạn thời gian và báo lỗi ở ô đó; trình duyệt không bị treo.
+- Người không có quyền sửa trang (kể cả người chưa đăng nhập): theo đúng quyền sửa của wiki; được sửa wikitext thì được dùng form, không được thì form báo ngay khi mở rằng không có quyền sửa trang.
 - Trình duyệt tắt JavaScript: gadget không chạy, trang hiện như bình thường; muốn sửa thì sửa wikitext.
 
 ## Requirements *(mandatory)*
@@ -196,7 +196,7 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 - **Ô (field)**: một tham số template được sửa qua form; có tên trường bucket, tên tham số (mặc định trùng), nhãn, kiểu (lấy từ bucket), có nhiều giá trị hay không, và các luật validate.
 - **Instance infobox**: một lần gọi template trên một trang; có vị trí trên trang và tập tham số hiện tại.
 - **Schema bucket**: định nghĩa các trường và kiểu dữ liệu của một bucket; là nguồn sự thật về kiểu cho form.
-- **Sửa đổi qua form**: một phiên bản trang tạo bởi Wizz; mang tóm tắt tự động và tag `wizz`.
+- **Sửa đổi qua form**: một phiên bản trang tạo bởi Wizz; mang tóm tắt tự động và tag `wizz` (nếu tag đã bật).
 
 ## Success Criteria *(mandatory)*
 

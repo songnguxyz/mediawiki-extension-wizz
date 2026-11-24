@@ -25,12 +25,13 @@ marked **verify**.
 ## R2. Gadget packaging
 
 - **Decision**: One package gadget `wizz`, loaded on every page view (`default`), with
-  `ResourceLoader`, `package`, `dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,
-  mediawiki.jqueryMsg` and `codexIcons=…`. Pages: `MediaWiki:Gadget-wizz.js` (entry, tiny),
-  plain logic modules `wizz-*.js`, components `wizz-*.vue`, data `wizz-config.json` and
-  `wizz-i18n-<lang>.json`, style `wizz.less`. The entry checks the URL and page, then loads
-  the heavy part lazily with `mw.loader.using` on a second, hidden gadget `wizz-form`, so normal
-  page views pay only for the entry file.
+  `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`. Its pages:
+  `MediaWiki:Gadget-wizz.js` (entry, tiny) and `wizz-config.json` (config plus the `wizz-tab`
+  label in `en`/`vi`, the only message the entry needs). The entry checks the URL and page, then
+  loads the form lazily with `mw.loader.using` on a second, hidden package gadget `wizz-form`
+  (`dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`,
+  `codexIcons=…`): logic modules `wizz-*.js`, components `wizz-*.vue`, message bundles
+  `wizz-i18n-<lang>.json`, style `wizz.less`. Normal page views pay only for the entry gadget.
 - **Facts (Gadgets REL1_45 source)**:
   - `.vue` pages are accepted only in package gadgets (`Gadget::getVues`,
     `GadgetResourceLoaderModule` type `script-vue`).
@@ -77,8 +78,10 @@ marked **verify**.
 ## R5. Finding the template and its definition
 
 - **Decision**: Three requests when the form opens:
-  1. Page: `prop=revisions|info|templates` (latest wikitext, `revid`, `touched`, `starttimestamp`
-     via `curtimestamp`), `meta=userinfo&uiprop=rights`, `list=tags&tgprop=active`.
+  1. Page: `prop=revisions|info|templates` with `intestactions=edit` (latest wikitext, `revid`,
+     `starttimestamp` via `curtimestamp`, whether the user may edit this page),
+     `meta=userinfo&uiprop=rights`, `list=tags&tgprop=active`. If the user may not edit, the
+     form refuses at once with a permission message (edge case).
   2. Candidate definitions: for each transcluded template `T`, the title `T/wizz.json` with
      `prop=revisions|info&inprop=protection`, plus `prop=redirects` on the templates (names of
      redirects to each template). Only titles that exist go further.
@@ -169,7 +172,8 @@ marked **verify**.
 ## R11. i18n (FR-025)
 
 - **Decision**: message bundles `wizz-i18n-en.json`, `wizz-i18n-vi.json` and `qqq.json` (repo
-  only) checked by banana-checker. The entry file loads the bundle for `wgUserLanguage` with
+  only) checked by banana-checker, shipped in `wizz-form`; the entry carries only `wizz-tab`.
+  When the form starts it loads the bundle for `wgUserLanguage` with
   fallback to `en` into `mw.messages` with `mw.messages.set`. On-wiki message overrides are
   not supported in the MVP.
 - **Note**: translatewiki.net does not take gadgets; translation happens by pull request.
