@@ -160,9 +160,9 @@ later increments.
 
 **Independent Test**: on a page with two calls, choose the second, edit, save; only the second changes (quickstart scenario 12)
 
-- [ ] T046 [P] [US5] Add tests to `tests/editor.test.js` and `tests/tokenizer.test.js`: per-template `index`, instance summary from the first two mapped field values (data-model.md TemplateCall.summary), editing instance 1 leaves instance 0 untouched
-- [ ] T047 [US5] Add data-model.md FormState.instances (each with TemplateCall.summary) and FormState.instance to the state in `src/wizz-form.js`; recount TemplateCall.index after `matchesTemplate` so calls through redirects share one counter; honour the `wizzinstance=<n>` URL parameter; with only one call, open it directly
-- [ ] T048 [US5] Add instance picker (`CdxRadio` list) to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
+- [X] T046 [P] [US5] Add tests to `tests/editor.test.js` and `tests/tokenizer.test.js`: per-template `index`, instance summary from the first two mapped field values (data-model.md TemplateCall.summary), editing instance 1 leaves instance 0 untouched
+- [X] T047 [US5] Add data-model.md FormState.instances (each with TemplateCall.summary) and FormState.instance to the state in `src/wizz-form.js`; recount TemplateCall.index after `matchesTemplate` so calls through redirects share one counter; honour the `wizzinstance=<n>` URL parameter; with only one call, open it directly
+- [X] T048 [US5] Add instance picker (`CdxRadio` list) to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
 
 ---
 

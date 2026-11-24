@@ -34,17 +34,19 @@ const schemaOf = ( bucket ) => typeof bucket !== 'string' ? null : loadSchema( a
 		return null;
 	} );
 
-async function load() {
+async function load( instance ) {
 	const page = await loadPage( api, mw.config.get( 'wgPageName' ) );
 	const definitions = await loadDefinitions( api, page.templates );
-	const { definition: raw, call } = findCall( page, definitions, mw.config.get( 'wgNamespaceIds' ) );
+	// `wizzinstance` only before the user has picked one.
+	const wanted = instance === undefined ? parseInt( mw.util.getParamValue( 'wizzinstance' ), 10 ) : instance;
+	const { definition: raw, call, calls } = findCall( page, definitions, mw.config.get( 'wgNamespaceIds' ), wanted );
 	const schema = await schemaOf( raw.bucket );
 	// A field gone from the bucket must not stop the form (read-only, spec edge case).
 	const { definition, errors } = checkDefinition( jsonOf( raw ), schema, { tolerateRemoved: true } );
 	if ( errors.length ) {
 		throw Object.assign( new Error( 'wizz-definition-invalid' ), { code: 'wizz-definition-invalid', list: errors } );
 	}
-	return buildState( page, definition, schema, call );
+	return buildState( page, definition, schema, call, calls );
 }
 
 // FR-029: on Module:<Name>/wizz.json show the check result and a button that opens the form

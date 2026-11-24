@@ -45,5 +45,8 @@
 	"wizz-abusefilter-warning": "The wiki warns about this edit: $1 Press Save to save it anyway.",
 	"wizz-captcha-intro": "This wiki asks you to solve a CAPTCHA before saving.",
 	"wizz-captcha-image-label": "Type the characters shown in the image",
-	"wizz-captcha-unsupported": "This wiki uses a CAPTCHA that Wizz cannot show. Edit the page source instead."
+	"wizz-captcha-unsupported": "This wiki uses a CAPTCHA that Wizz cannot show. Edit the page source instead.",
+	"wizz-ui-pick": "This page has several infoboxes of this type. Choose the one to edit.",
+	"wizz-ui-instance": "Infobox $1",
+	"wizz-ui-choose": "Edit this infobox"
 }

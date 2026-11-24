@@ -4,9 +4,9 @@
 		class="wizz-dialog"
 		:title="$i18n( 'wizz-ui-title' ).text()"
 		:use-close-button="true"
-		:primary-action="state && !preview ? { label: ( review ? $i18n( 'wizz-ui-save' ) : $i18n( 'wizz-ui-review' ) ).text(), actionType: 'progressive', disabled: saving } : undefined"
+		:primary-action="state && !preview ? { label: ( picking ? $i18n( 'wizz-ui-choose' ) : review ? $i18n( 'wizz-ui-save' ) : $i18n( 'wizz-ui-review' ) ).text(), actionType: 'progressive', disabled: saving || ( picking && picked === null ) } : undefined"
 		:default-action="{ label: ( review ? $i18n( 'wizz-ui-back' ) : $i18n( 'wizz-ui-cancel' ) ).text() }"
-		@primary="review ? onSave() : onReview()"
+		@primary="picking ? onPick() : review ? onSave() : onReview()"
 		@default="onDefault"
 		@update:open="onOpen"
 	>
@@ -26,7 +26,27 @@
 			<a :href="editUrl">{{ $i18n( 'wizz-ui-editsource' ).text() }}</a>
 		</p>
 		<form
-			v-if="state && !review"
+			v-if="picking"
+			class="wizz-form"
+			@submit.prevent="onPick"
+		>
+			<cdx-field :is-fieldset="true">
+				<template #label>
+					{{ $i18n( 'wizz-ui-pick' ).text() }}
+				</template>
+				<cdx-radio
+					v-for="i in cur.instances"
+					:key="i.index"
+					v-model="picked"
+					name="wizz-instance"
+					:input-value="i.index"
+				>
+					{{ instanceLabel( i ) }}
+				</cdx-radio>
+			</cdx-field>
+		</form>
+		<form
+			v-if="state && !review && !picking"
 			class="wizz-form"
 			@submit.prevent="onReview"
 		>
@@ -84,7 +104,7 @@
 </template>
 
 <script>
-import { CdxDialog, CdxField, CdxMessage, CdxTextInput } from '@wikimedia/codex';
+import { CdxDialog, CdxField, CdxMessage, CdxRadio, CdxTextInput } from '@wikimedia/codex';
 import WizzField from './wizz-Field.vue';
 import { applyEdits, buildSummary } from './wizz-editor.js';
 import { save, preview, findMissing } from './wizz-save.js';
@@ -92,7 +112,7 @@ import { keepDirty } from './wizz-state.js';
 import { validateField, validatePattern, mustExistErrors, itemsOf } from './wizz-validate.js';
 
 export default {
-	components: { CdxDialog, CdxField, CdxMessage, CdxTextInput, WizzField },
+	components: { CdxDialog, CdxField, CdxMessage, CdxRadio, CdxTextInput, WizzField },
 	props: {
 		// FormState, or null when the form is refused
 		state: { type: Object, default: null },
@@ -101,7 +121,8 @@ export default {
 		// { code, line?, list?, message? } when the form is refused
 		error: { type: Object, default: null },
 		api: { type: Object, required: true },
-		// Loads the page again into a new FormState (after an edit conflict)
+		// Loads the page again into a new FormState: of the given instance (after an edit conflict
+		// or the choice of one)
 		reload: { type: Function, default: null },
 		summaryMsg: { type: Function, required: true },
 		// { source, createWorker? } of the regex worker, see testPattern
@@ -120,12 +141,18 @@ export default {
 			// The CAPTCHA the wiki asked for, and the answer typed
 			captcha: null,
 			captchaWord: '',
+			// Instance chosen in the picker
+			picked: null,
 			fields: this.state ? this.state.fields : [],
 			// Latest check per field: a slower, older check must not overwrite a newer one.
 			latest: {}
 		};
 	},
 	computed: {
+		// Several calls of the template and none chosen yet (US5)
+		picking() {
+			return !!this.cur && this.cur.instance === null;
+		},
 		errorText() {
 			const { code, line, message } = this.error;
 			return mw.messages.exists( code ) ? mw.msg( code, line ) : message || code;
@@ -136,6 +163,28 @@ export default {
 		}
 	},
 	methods: {
+		instanceLabel( i ) {
+			const n = mw.msg( 'wizz-ui-instance', i.index + 1 );
+			return i.summary ? n + ' \u2014 ' + i.summary : n;
+		},
+		// FR-015: values already invalid on the page get a warning, nothing else.
+		warnExisting() {
+			for ( const f of this.fields.filter( ( x ) => x.state === 'ok' && !this.preview ) ) {
+				f.warnings = validateField( f, f.value, this.checkOptions() ).warnings;
+			}
+		},
+		onPick() {
+			this.saving = true;
+			return this.reload( this.picked ).then( ( fresh ) => {
+				this.cur = fresh;
+				this.fields = fresh.fields;
+				this.warnExisting();
+			}, ( e ) => {
+				this.notice = { type: 'error', text: mw.msg( 'wizz-error-save', e.message || e ) };
+			} ).then( () => {
+				this.saving = false;
+			} );
+		},
 		checkOptions() {
 			return { nsIds: mw.config.get( 'wgNamespaceIds' ) };
 		},
@@ -286,7 +335,7 @@ export default {
 				} );
 			} else {
 				// Conflict (FR-006): the new revision, the user's changed values kept.
-				return this.reload().then( ( fresh ) => {
+				return this.reload( this.cur.instance ).then( ( fresh ) => {
 					keepDirty( fresh, this.fields );
 					this.cur = fresh;
 					this.fields = fresh.fields;
@@ -307,10 +356,7 @@ export default {
 		}
 	},
 	created() {
-		// FR-015: values already invalid on the page get a warning, nothing else.
-		for ( const f of this.fields.filter( ( x ) => x.state === 'ok' && !this.preview ) ) {
-			f.warnings = validateField( f, f.value, this.checkOptions() ).warnings;
-		}
+		this.warnExisting();
 	}
 };
 </script>

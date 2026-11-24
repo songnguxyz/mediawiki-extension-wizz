@@ -45,5 +45,8 @@
 	"wizz-abusefilter-warning": "Wiki cảnh báo về sửa đổi này: $1 Nhấn Lưu để vẫn lưu.",
 	"wizz-captcha-intro": "Wiki yêu cầu bạn giải CAPTCHA trước khi lưu.",
 	"wizz-captcha-image-label": "Nhập các ký tự trong hình",
-	"wizz-captcha-unsupported": "Wiki này dùng loại CAPTCHA mà Wizz không hiển thị được. Hãy sửa mã nguồn trang."
+	"wizz-captcha-unsupported": "Wiki này dùng loại CAPTCHA mà Wizz không hiển thị được. Hãy sửa mã nguồn trang.",
+	"wizz-ui-pick": "Trang này có nhiều hộp thông tin cùng loại. Chọn hộp cần sửa.",
+	"wizz-ui-instance": "Hộp thông tin $1",
+	"wizz-ui-choose": "Sửa hộp này"
 }

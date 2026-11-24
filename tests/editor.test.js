@@ -97,3 +97,10 @@ QUnit.test( 'matchesTemplate', ( assert ) => {
 	assert.false( m( ':Infobox person' ) );
 	assert.false( m( 'Hồ sơ' ), 'redirect not given' );
 } );
+
+QUnit.test( 'editing instance 1 leaves instance 0 byte for byte', ( assert ) => {
+	const text = 'a {{IX|ten = A\n}} b {{Infobox x|ten = B\n}} c';
+	const second = tokenizer.parse( text ).calls[ 1 ];
+	const out = editor.applyEdits( text, second, { ten: 'B2' } );
+	assert.strictEqual( out, 'a {{IX|ten = A\n}} b {{Infobox x|ten = B2\n}} c' );
+} );

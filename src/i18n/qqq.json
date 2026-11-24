@@ -45,5 +45,8 @@
 	"wizz-abusefilter-warning": "Shown when AbuseFilter warns about the edit. Parameters:\n* $1 - the warning text from the wiki. Saving again confirms the edit.",
 	"wizz-captcha-intro": "Shown when the wiki requires a CAPTCHA to save.",
 	"wizz-captcha-image-label": "Label of the answer field, and alt text of the image, for an image CAPTCHA.",
-	"wizz-captcha-unsupported": "Shown when the wiki's CAPTCHA is of a kind Wizz cannot display (neither a question nor an image)."
+	"wizz-captcha-unsupported": "Shown when the wiki's CAPTCHA is of a kind Wizz cannot display (neither a question nor an image).",
+	"wizz-ui-pick": "Heading of the list shown when the page calls the same template several times; the user picks one call to edit.",
+	"wizz-ui-instance": "Label of one choice in the instance list, followed by the first values of that call. Parameters:\\n* $1 - position on the page, starting at 1.",
+	"wizz-ui-choose": "Button that opens the form for the chosen call."
 }

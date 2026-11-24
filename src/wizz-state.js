@@ -10,18 +10,24 @@ const { matchesTemplate } = require( './wizz-editor.js' );
 // Values Bucket casts to true; the definition's own true text is added per field.
 const TRUE_VALUES = [ '1', 'true', 'on', 'yes' ];
 
+// Value of the last parameter of that name (MediaWiki semantics), '' if absent.
+const valueOf = ( call, name ) => call.params.filter( ( p ) => p.name === name ).map( ( p ) => p.value ).pop() || '';
+
 /**
  * @param {Object} page Result of loadPage
  * @param {Object[]} definitions Result of loadDefinitions
  * @param {Object} nsIds wgNamespaceIds
- * @return {Object} { definition, call } of the first call (by position) of a template with a
- *  definition; the definition is still unchecked (see wizz-definition.js)
+ * @param {number} [wanted] Instance index (`wizzinstance`)
+ * @return {Object} { definition, call, calls } for the first template with a definition. `calls`
+ *  are all its calls, `index` recounted across redirects, with `summary`. `call` is the wanted
+ *  one, the only one if there is just one, else null (the user must choose). The definition is
+ *  still unchecked (see wizz-definition.js)
  * @throws {{code: string}} wizz-noinfobox; wizz-parseerror with `line`; wizz-definition-untrusted;
  *  wizz-definition-invalid with `list` when the definition page is not JSON
  */
-function findCall( page, definitions, nsIds ) {
-	// ponytail: first call only; the instance picker (US5) chooses among several.
-	for ( const call of parse( page.text ).calls ) {
+function findCall( page, definitions, nsIds, wanted ) {
+	const all = parse( page.text ).calls;
+	for ( const call of all ) {
 		const definition = definitions.find(
 			( d ) => matchesTemplate( call.nameText, d.template, d.redirects, nsIds )
 		);
@@ -36,7 +42,15 @@ function findCall( page, definitions, nsIds ) {
 			} );
 		}
 		if ( definition ) {
-			return { definition, call };
+			const calls = all.filter(
+				( c ) => matchesTemplate( c.nameText, definition.template, definition.redirects, nsIds )
+			);
+			calls.forEach( ( c, i ) => {
+				c.index = i;
+				c.summary = definition.fields.slice( 0, 2 )
+					.map( ( f ) => valueOf( c, f.param || f.field ) ).filter( Boolean ).join( ', ' );
+			} );
+			return { definition, calls, call: calls[ wanted ] || ( calls.length === 1 ? calls[ 0 ] : null ) };
 		}
 	}
 	throw Object.assign( new Error( 'wizz-noinfobox' ), { code: 'wizz-noinfobox' } );
@@ -46,11 +60,12 @@ function findCall( page, definitions, nsIds ) {
  * @param {Object} page Result of loadPage
  * @param {Object} definition Chosen definition
  * @param {Object} schema Bucket schema
- * @param {Object} call TemplateCall
+ * @param {Object|null} call TemplateCall; null while the user still has to choose an instance
+ * @param {Object[]} [calls] All calls of the template (findCall)
  * @return {Object} FormState, plus `text` and `call` (what the save needs)
  */
-function buildState( page, definition, schema, call ) {
-	const fields = definition.fields.map( ( f ) => {
+function buildState( page, definition, schema, call, calls ) {
+	const fields = !call ? [] : definition.fields.map( ( f ) => {
 		const param = f.param || f.field;
 		// A field gone from the schema is read-only with a warning, its value never rewritten.
 		const known = schema.fields[ f.field ];
@@ -86,7 +101,8 @@ function buildState( page, definition, schema, call ) {
 		starttimestamp: page.starttimestamp,
 		text: page.text,
 		call,
-		instance: call.index,
+		instances: calls && calls.length > 1 ? calls.map( ( c ) => ( { index: c.index, summary: c.summary } ) ) : [],
+		instance: call ? call.index : null,
 		fields,
 		assert: page.anon ? 'anon' : 'user',
 		canTag: page.tagActive && page.rights.includes( 'applychangetags' )

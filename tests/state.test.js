@@ -24,15 +24,15 @@ const schema = { fields: {
 const nsIds = { template: 10 };
 
 const build = ( p, defs ) => {
-	const { definition, call } = findCall( p, defs || [ def ], nsIds );
-	return buildState( p, definition, schema, call );
+	const { definition, call, calls } = findCall( p, defs || [ def ], nsIds );
+	return buildState( p, definition, schema, call, calls );
 };
 
 QUnit.module( 'wizz-state' );
 
-QUnit.test( 'builds fields from the first matching call', ( assert ) => {
+QUnit.test( 'builds fields from the only matching call', ( assert ) => {
 	const text = 'x {{IX|ten = A <ref>r</ref>|chiều cao=~150|còn sống = có}} ' +
-		'{{Infobox x|ten=B}}';
+		'{{Other|ten=B}}';
 	const s = build( page( text ) );
 	assert.deepEqual( [ s.page, s.revid, s.basetimestamp, s.starttimestamp, s.canTag, s.instance ],
 		[ 'P', 7, 'T1', 'T2', true, 0 ] );
@@ -96,4 +96,30 @@ QUnit.test( 'keepDirty: changed values move to the new revision, others take its
 	// Someone else made the same change: nothing left to save for that field.
 	assert.deepEqual( [ get( 'cao' ).value, get( 'cao' ).dirty ], [ '9', false ] );
 	assert.deepEqual( [ get( 'moi' ).value, get( 'moi' ).dirty ], [ 'y', false ] );
+} );
+
+QUnit.test( 'instances: index recounted across redirects, summary from the first two fields', ( assert ) => {
+	const text = '{{Other}}{{IX|ten=A|chiều cao=1}}{{Infobox x|ten=B|chiều cao=2|moi=z}}{{Infobox_x|chiều cao=3}}';
+	const s = build( page( text ) );
+	assert.strictEqual( s.instances.length, 3 );
+	assert.deepEqual( s.instances.map( ( i ) => [ i.index, i.summary ] ),
+		[ [ 0, 'A, 1' ], [ 1, 'B, 2' ], [ 2, '3' ] ] );
+	assert.strictEqual( s.instance, null, 'must choose' );
+	assert.deepEqual( s.fields, [] );
+} );
+
+QUnit.test( 'instances: wanted index opens that call, an unknown one asks again', ( assert ) => {
+	const text = '{{IX|ten=A}}{{Infobox x|ten=B}}';
+	const p = page( text );
+	const at = ( n ) => {
+		const { definition, call, calls } = findCall( p, [ def ], nsIds, n );
+		return buildState( p, definition, schema, call, calls );
+	};
+	assert.deepEqual( [ at( 1 ).instance, at( 1 ).fields[ 0 ].value, at( 1 ).call.index ], [ 1, 'B', 1 ] );
+	assert.strictEqual( at( 7 ).instance, null );
+} );
+
+QUnit.test( 'one call opens directly, no instance list', ( assert ) => {
+	const s = build( page( '{{Other}}{{IX|ten=A}}' ) );
+	assert.deepEqual( [ s.instance, s.instances.length, s.fields[ 0 ].value ], [ 0, 0, 'A' ] );
 } );

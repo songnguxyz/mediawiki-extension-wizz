@@ -222,3 +222,8 @@ QUnit.test( 'timing: 200 KB page parses in under 50 ms', ( assert ) => {
 	assert.true( calls.length > 100, 'found calls' );
 	assert.true( ms < 50, ms.toFixed( 1 ) + ' ms' );
 } );
+
+QUnit.test( 'index counts by normalised name: prefix, underscore, comment', ( assert ) => {
+	const { calls } = tokenizer.parse( '{{Infobox x}}{{Template:infobox_x}}{{Infobox<!-- c --> x}}' );
+	assert.deepEqual( calls.map( ( c ) => c.index ), [ 0, 1, 2 ] );
+} );
