@@ -8,6 +8,7 @@ const state = ( over ) => Object.assign( {
 	basetimestamp: '2026-11-24T09:00:00Z',
 	starttimestamp: '2026-11-24T10:00:00Z',
 	text: 'old',
+	assert: 'user',
 	canTag: false
 }, over );
 
@@ -43,6 +44,7 @@ QUnit.test( 'sends the edit with the revision base and returns newrevid', async 
 		basetimestamp: '2026-11-24T09:00:00Z',
 		starttimestamp: '2026-11-24T10:00:00Z',
 		nocreate: 1,
+		assert: 'user',
 		summary: 'Edit infobox: cung'
 	} );
 } );

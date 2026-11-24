@@ -71,6 +71,7 @@ function buildState( page, definition, schema, call ) {
 		call,
 		instance: call.index,
 		fields,
+		assert: page.anon ? 'anon' : 'user',
 		canTag: page.tagActive && page.rights.includes( 'applychangetags' )
 	};
 }

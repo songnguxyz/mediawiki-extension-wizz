@@ -51,6 +51,7 @@ async function loadPage( api, title ) {
 		text: rev.slots.main.content,
 		templates: ( page.templates || [] ).map( ( t ) => t.title ),
 		rights: data.query.userinfo.rights,
+		anon: !!data.query.userinfo.anon,
 		tagActive: data.query.tags.some( ( t ) => t.name === 'wizz' && t.active )
 	};
 }

@@ -57,6 +57,7 @@ QUnit.module( 'wizz-load', () => {
 			text: '{{Infobox nhân vật|a=1}}',
 			templates: [ 'Template:Infobox nhân vật', 'Template:Khác' ],
 			rights: [ 'edit', 'applychangetags' ],
+			anon: false,
 			tagActive: true
 		} );
 		assert.strictEqual( api.requests[ 0 ].formatversion, 2 );

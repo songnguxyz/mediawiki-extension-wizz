@@ -5,7 +5,7 @@
  * object with postWithEditToken( params ).
  *
  * @param {Object} api
- * @param {Object} state { page, revid, basetimestamp, starttimestamp, text, canTag }, `text`
+ * @param {Object} state { page, revid, basetimestamp, starttimestamp, text, assert, canTag }, `text`
  *  being the wikitext the form was built from
  * @param {string} newText Full new page text
  * @param {string} summary
@@ -25,6 +25,7 @@ async function save( api, state, newText, summary ) {
 		basetimestamp: state.basetimestamp,
 		starttimestamp: state.starttimestamp,
 		nocreate: 1,
+		assert: state.assert,
 		summary
 	};
 	if ( state.canTag ) {

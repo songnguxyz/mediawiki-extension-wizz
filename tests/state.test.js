@@ -55,6 +55,11 @@ QUnit.test( 'malformed call: wizz-parseerror with line', ( assert ) => {
 	assert.throws( () => build( page( 'a\n{{IX|ten=1' ) ), ( e ) => e.code === 'wizz-parseerror' && e.line === 2 );
 } );
 
+QUnit.test( 'assert follows the loaded user', ( assert ) => {
+	assert.strictEqual( build( page( '{{IX}}' ) ).assert, 'user' );
+	assert.strictEqual( build( page( '{{IX}}', { anon: true } ) ).assert, 'anon' );
+} );
+
 QUnit.test( 'canTag needs the tag active and the right', ( assert ) => {
 	assert.false( build( page( '{{IX}}', { tagActive: false } ) ).canTag );
 	assert.false( build( page( '{{IX}}', { rights: [ 'edit' ] } ) ).canTag );

@@ -63,6 +63,7 @@ Both are POST (texts can be long). Neither writes data.
 ```text
 postWithEditToken: action=edit & title=<Page> & text=<new full text>
   & baserevid=<revid> & basetimestamp=<ts> & starttimestamp=<ts> & nocreate=1
+  & assert=user|anon (as loaded in request 1, `userinfo.anon`)
   & summary=<wizz-summary> [& tags=wizz] [& captchaid & captchaword]
 ```
 

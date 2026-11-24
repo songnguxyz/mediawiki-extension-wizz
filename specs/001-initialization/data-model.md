@@ -96,6 +96,7 @@ and leaves earlier ones untouched.
 | `instances` | List of `{index, summary}` when more than one call exists. |
 | `instance` | Selected index. |
 | `fields` | List of `{field, param, label, help, type, repeated, rules, value, state, warnings, dirty}`. Existing values are shown even if invalid, with a warning (FR-015). |
+| `assert` | `user` or `anon` as loaded; sent with the save so a session lost mid-edit fails instead of saving as an IP. |
 | `canTag` | Tag `wizz` is active and the user has `applychangetags`. |
 
 ## Save flow

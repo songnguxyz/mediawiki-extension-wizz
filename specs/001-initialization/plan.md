@@ -107,7 +107,8 @@ src/
 ├── wizz-definition.js    # pure: parse + check definition against schema
 ├── wizz-validate.js      # pure: field rules
 ├── wizz-regex-worker.js  # worker source (run via Blob URL)
-├── wizz-form.js          # form gadget entry: build state, mount app
+├── wizz-form.js          # form bundle entry (Vite): load, build state, mount app
+├── wizz-state.js         # pure: find the call, build FormState (testable under Node)
 ├── wizz-load.js          # API: page, definition, schema (R5)
 ├── wizz-save.js          # API: preview, diff, save (R7, R8)
 ├── wizz-App.vue          # form shell, instance picker, preview/diff, save flow
