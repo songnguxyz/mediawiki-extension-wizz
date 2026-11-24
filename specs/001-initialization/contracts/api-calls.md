@@ -7,7 +7,7 @@ Wizz adds no API modules. It calls only core modules through `mw.Api`, always wi
 
 ```text
 action=query & titles=<Page> & prop=revisions|info|templates & intestactions=edit
-  & rvprop=ids|timestamp|content & rvslots=main & tllimit=max & curtimestamp=1
+  & rvprop=ids|timestamp|content & rvslots=main & tllimit=max & tlnamespace=10 & curtimestamp=1
   & meta=userinfo & uiprop=rights & list=tags & tgprop=active & tglimit=max
 ```
 
@@ -20,12 +20,15 @@ The tab check (FR-023) sends only `prop=templates` and request 2's existence par
 
 ```text
 action=query & titles=Module:<T1>/wizz.json|Module:<T2>/wizz.json|…
-  & prop=revisions|info & rvprop=content & rvslots=main & inprop=protection
+  & prop=revisions|info|redirects & rvprop=content & rvslots=main & inprop=protection
+  & rdlimit=max & rdnamespace=10
 ```
 
 `<Tn>` is a transcluded template's name without its namespace prefix. Plus, in the same
 request when possible, `prop=redirects` for `Template:<T1>|Template:<T2>|…` (names of
-redirects to each template). Only existing definitions are kept. Trust rule: a `protection`
+redirects to each template). Titles go in chunks of 25 templates (50 titles, the limit
+without `apihighlimits`), so a page transcluding more than 25 templates needs more than one
+request. Only existing definitions are kept. Trust rule: a `protection`
 entry `{type: "edit", level: "sysop"}`, direct or with `source` (cascade) (FR-028).
 
 ## 3. Load bucket schema

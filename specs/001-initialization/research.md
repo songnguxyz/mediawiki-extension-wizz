@@ -79,6 +79,11 @@ marked **verify**.
   plus one space if the original used that style, otherwise the bare separator.
 - Positional parameters are preserved, never mapped to fields.
 - Duplicate named parameters: the last one wins (MediaWiki semantics) and is the one edited.
+- Only top-level template calls are found (a call nested in another template, argument or
+  extension tag is not offered), as on a normal page view.
+- Safety check: after editing, the call is parsed again; if the parameter count or any value
+  differs from what was intended (e.g. an unescaped `|` or `}}` in a value), the edit is
+  refused with `wizz-unsafevalue` (Constitution I).
 
 ## R5. Finding the template and its definition
 

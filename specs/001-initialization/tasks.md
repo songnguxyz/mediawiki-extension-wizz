@@ -80,9 +80,9 @@ later increments.
 - [ ] T022 [US1] Implement form state building in `src/wizz-form.js`: from loaded page, definition and schema produce data-model.md FormState (`page`, `revid`, `basetimestamp`, `starttimestamp`, `instance`, `fields[].value`, `fields[].dirty`, `canTag`); refuse with `wizz-noinfobox` (and `action=edit` link) when no call matches; refuse with `wizz-parseerror` and line on malformed call
 - [ ] T023 [US1] Create `src/wizz-Field.vue`: Codex input per type (TEXT → `CdxTextArea` when the raw value contains markup, else `CdxTextInput`; INTEGER/DOUBLE → `CdxTextInput` `inputmode="decimal"`; BOOLEAN → `CdxCheckbox` writing data-model.md FieldDefinition.booleanValues; PAGE → `CdxTextInput` for now) inside `CdxField` with label/help from FieldDefinition.label and FieldDefinition.help; marks `dirty` on input
 - [ ] T024 [US1] Create `src/wizz-App.vue`: `CdxDialog` (full screen on Minerva) rendering fields in definition order, save and cancel buttons, refusal messages; on save build text with `applyEdits` and call `save`; on success reload the page view without `wizz`
-- [ ] T025 [US1] Add `start()` to `src/wizz-form.js` that loads data (T014), builds state (T022), loads the bundled `src/i18n/<lang>.json` for `wgUserLanguage` into `mw.messages` with `en` fallback (research R11), adds the inlined LESS with `mw.util.addCSS`, and sets `mw.libs.wizz.form = function ( require ) {…}` as the bundle's only export and mounts `wizz-App.vue` with `Vue.createMwApp`
+- [ ] T025 [US1] Add `start()` to `src/wizz-form.js` that loads data (T014), builds state (T022), loads the bundled `src/i18n/<lang>.json` for `wgUserLanguage` into `mw.messages` with `en` fallback (research R11), adds the inlined LESS with `mw.util.addCSS`, runs as the bundle's top-level code (the build wraps the bundle in `mw.libs.wizz.form = function ( require ) {…}`, so the module exports nothing) and mounts `wizz-App.vue` with `Vue.createMwApp`
 - [ ] T026 [P] [US1] Create `src/wizz.less` using only Codex CSS custom properties and logical properties (`margin-inline-start`, …) for dark mode and RTL (research R10)
-- [ ] T027 [US1] Add US1 messages (`wizz-ui-save`, `wizz-ui-cancel`, `wizz-ui-title`, `wizz-summary`) to `src/i18n/en.json`, `vi.json`, `qqq.json`
+- [ ] T027 [US1] Add US1 messages (`wizz-ui-save`, `wizz-ui-cancel`, `wizz-ui-title`, `wizz-summary`, `wizz-unsafevalue`) to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
 **Checkpoint**: US1 works end to end on the test wiki
 
@@ -161,7 +161,7 @@ later increments.
 **Independent Test**: on a page with two calls, choose the second, edit, save; only the second changes (quickstart scenario 12)
 
 - [ ] T046 [P] [US5] Add tests to `tests/editor.test.js` and `tests/tokenizer.test.js`: per-template `index`, instance summary from the first two mapped field values (data-model.md TemplateCall.summary), editing instance 1 leaves instance 0 untouched
-- [ ] T047 [US5] Add data-model.md FormState.instances (each with TemplateCall.summary) and FormState.instance to the state in `src/wizz-form.js`; honour the `wizzinstance=<n>` URL parameter; with only one call, open it directly
+- [ ] T047 [US5] Add data-model.md FormState.instances (each with TemplateCall.summary) and FormState.instance to the state in `src/wizz-form.js`; recount TemplateCall.index after `matchesTemplate` so calls through redirects share one counter; honour the `wizzinstance=<n>` URL parameter; with only one call, open it directly
 - [ ] T048 [US5] Add instance picker (`CdxRadio` list) to `src/wizz-App.vue`; add messages to `src/i18n/*.json`
 
 ---

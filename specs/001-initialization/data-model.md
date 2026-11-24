@@ -65,7 +65,7 @@ Produced by `wizz-tokenizer.js` from the latest revision's wikitext.
 
 | Attribute | Type | Notes |
 |-----------|------|-------|
-| `index` | int | 0-based position among calls of the *same* template on the page. Identifies the instance in the URL (`wizzinstance=`). |
+| `index` | int | 0-based position among calls of the *same* template on the page. Identifies the instance in the URL (`wizzinstance=`). The tokenizer counts by written name; the form recounts after `matchesTemplate`, so calls through redirects share one counter (T047). |
 | `start`, `end` | int | String offsets of `{{` … `}}`. |
 | `nameText` | string | Name exactly as written (preserved on save). |
 | `params` | ordered list of TemplateParam | Includes positional params (kept, never mapped). |
@@ -83,7 +83,7 @@ and the redirects to it (research R5). Calls whose name starts with
 | `name` | string (trimmed) or positional index |
 | `nameSpan`, `valueSpan` | [start, end) string offsets |
 | `rawValue` | string, exact bytes of the value span |
-| `value` | `rawValue` trimmed (what the form shows) |
+| `value` | `rawValue` with leading/trailing whitespace and HTML comments trimmed (what the form shows); the trimmed parts are kept on save |
 
 Duplicate named params: the last one wins (MediaWiki semantics); the form edits the last one
 and leaves earlier ones untouched.
