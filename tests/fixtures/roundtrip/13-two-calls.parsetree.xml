@@ -1,0 +1,8 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> An
+</value></part></template>
+text
+<template lineStart="1"><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> Bình
+</value></part></template>
+</root>

@@ -1,0 +1,8 @@
+{{Infobox person
+| name = An
+| bio = Dòng một.
+Dòng hai.
+
+* mục
+| born = 1990
+}}

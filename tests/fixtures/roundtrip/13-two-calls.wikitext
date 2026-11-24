@@ -1,0 +1,7 @@
+{{Infobox person
+| name = An
+}}
+text
+{{Infobox person
+| name = Bình
+}}

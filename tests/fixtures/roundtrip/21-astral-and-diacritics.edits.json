@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"sinh": "1991"
+	},
+	"expected": "😀 Đây là bài 😀\n{{Infobox nhân vật\n| tên = Đặng Thị Ánh 😀\n| sinh = 1991\n}}\n😀 hết\n"
+}

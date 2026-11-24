@@ -1,0 +1,10 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> An
+</value></part></template>
+{| class=&quot;wikitable&quot;
+|-
+| a || b
+|}
+<h level="2" i="1">== Mục ==</h>
+[[Thể loại:Nhân vật|An]]
+</root>

@@ -1,0 +1,5 @@
+{{Infobox person
+| image = [[Tập tin:An.jpg|thumb|An năm 1990]]
+| birth_place = [[Hà Nội|thủ đô]], [[Việt Nam]]
+| born = 1990
+}}

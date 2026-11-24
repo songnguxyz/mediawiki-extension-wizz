@@ -1,0 +1,4 @@
+{{Infobox person
+| url = http://example.org/?a=1&b=2
+| name = An = Bình
+}}

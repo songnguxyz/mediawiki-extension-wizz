@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"born": "1991"
+	},
+	"expected": "{{Infobox person\n| name = <nowiki>}} | = {{</nowiki>An\n| born = 1991\n| code = <nowiki/>x\n}}\n"
+}

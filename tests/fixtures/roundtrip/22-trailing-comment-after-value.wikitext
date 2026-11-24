@@ -1,0 +1,4 @@
+{{Infobox person
+| name = An <!-- do not touch -->
+| born = 1990 <!-- sách A --> 
+}}

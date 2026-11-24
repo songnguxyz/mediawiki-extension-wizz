@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"name": "Bình"
+	},
+	"expected": "{{#if: x | a | b }}{{subst:Welcome|a=1}}{{safesubst:Foo|a=1}}{{:Trang chính|a=1}}{{SUBST:Bar}}\n{{Infobox person\n| name = Bình\n}}\n"
+}

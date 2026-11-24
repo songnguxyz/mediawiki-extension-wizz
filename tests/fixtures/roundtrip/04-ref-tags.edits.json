@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"job": "Thầy"
+	},
+	"expected": "{{Infobox person\n| name = An<ref name=\"a\">{{cite web|url=http://example.org/?a=1|title=T | x}}</ref>\n| note = <ref name=\"b\" />\n| born = 1990<ref>Sách A, tr. 3}}</ref>\n| job = Thầy\n}}\n"
+}

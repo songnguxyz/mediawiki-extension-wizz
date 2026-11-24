@@ -1,0 +1,7 @@
+{{Infobox person
+| name = An
+| sample = <pre>
+{{x|y}} }} | [[
+</pre>
+| born = 1990
+}}

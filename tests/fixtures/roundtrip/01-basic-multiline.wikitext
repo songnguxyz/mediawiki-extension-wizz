@@ -1,0 +1,7 @@
+Intro.
+{{Infobox person
+| name = Nguyễn Văn An
+| born = 1990
+| occupation = Giáo viên
+}}
+Body text.

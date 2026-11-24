@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"sinh": "1371"
+	},
+	"expected": "{{Infobox nhân vật|tên=Lê Lai|sinh=1371|mất=1418}} là một người."
+}

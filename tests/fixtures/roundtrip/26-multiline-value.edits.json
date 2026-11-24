@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"bio": "Mới"
+	},
+	"expected": "{{Infobox person\n| name = An\n| bio = Mới\n| born = 1990\n}}\n"
+}

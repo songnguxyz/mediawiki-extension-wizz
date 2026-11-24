@@ -1,0 +1,5 @@
+{{Infobox person
+| name = {{nowrap|An {{small|(Bình)}}}}
+| born = {{birth date|1990|1|2}}
+| height = {{convert|1.7|m}}
+}}

@@ -1,0 +1,5 @@
+<root><template><title>Infobox person
+</title><part><name> url </name><equals>=</equals><value> http://example.org/?a=1&amp;b=2
+</value></part><part><name> name </name><equals>=</equals><value> An = Bình
+</value></part></template>
+</root>

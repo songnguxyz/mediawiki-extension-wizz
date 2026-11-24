@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"url": "http://example.org/?c=3"
+	},
+	"expected": "{{Infobox person\n| url = http://example.org/?c=3\n| name = An = Bình\n}}\n"
+}

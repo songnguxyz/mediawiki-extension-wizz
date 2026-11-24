@@ -1,0 +1,7 @@
+{
+	"call": 1,
+	"changes": {
+		"name": "B2"
+	},
+	"expected": "{{infobox_person|name=A}}\n{{Template:Infobox person|name=B2}}\n{{ Infobox  person |name=C}}\n{{Bản mẫu:Infobox person|name=D}}\n"
+}

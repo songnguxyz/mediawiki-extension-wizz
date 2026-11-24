@@ -1,0 +1,4 @@
+Intro
+{{Infobox person
+| name = An
+| born = 1990

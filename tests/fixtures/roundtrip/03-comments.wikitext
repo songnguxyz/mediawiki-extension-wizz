@@ -1,0 +1,6 @@
+{{Infobox person <!-- header -->
+<!-- first --> | name = An <!-- keep -->
+| <!-- c2 --> born = 1990
+<!-- between -->
+| died = <!-- unknown -->
+}}

@@ -1,0 +1,7 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> Một
+</value></part><part><name> born </name><equals>=</equals><value> 1980
+</value></part><part><name> name </name><equals>=</equals><value> Hai
+</value></part><part><name> name </name><equals>=</equals><value> Ba
+</value></part></template>
+</root>

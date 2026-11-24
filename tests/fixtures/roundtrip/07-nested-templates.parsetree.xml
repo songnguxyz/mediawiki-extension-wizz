@@ -1,0 +1,6 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> <template><title>nowrap</title><part><name index="1"/><value>An <template><title>small</title><part><name index="1"/><value>(Bình)</value></part></template></value></part></template>
+</value></part><part><name> born </name><equals>=</equals><value> <template><title>birth date</title><part><name index="1"/><value>1990</value></part><part><name index="2"/><value>1</value></part><part><name index="3"/><value>2</value></part></template>
+</value></part><part><name> height </name><equals>=</equals><value> <template><title>convert</title><part><name index="1"/><value>1.7</value></part><part><name index="2"/><value>m</value></part></template>
+</value></part></template>
+</root>

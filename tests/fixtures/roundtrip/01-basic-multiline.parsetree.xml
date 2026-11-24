@@ -1,0 +1,8 @@
+<root>Intro.
+<template lineStart="1"><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> Nguyễn Văn An
+</value></part><part><name> born </name><equals>=</equals><value> 1990
+</value></part><part><name> occupation </name><equals>=</equals><value> Giáo viên
+</value></part></template>
+Body text.
+</root>

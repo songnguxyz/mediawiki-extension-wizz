@@ -1,0 +1,9 @@
+{
+	"call": 0,
+	"changes": {
+		"name": "An",
+		"born": "1990",
+		"died": ""
+	},
+	"expected": "{{Infobox person\n|name =  An  \n|born=1990\n}}\n"
+}

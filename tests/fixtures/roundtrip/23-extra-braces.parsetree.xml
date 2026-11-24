@@ -1,0 +1,3 @@
+<root>{<tplarg><title>Infobox person</title><part><name>name</name><equals>=</equals><value>An</value></part></tplarg>}
+<template lineStart="1"><title>Infobox person</title><part><name>name</name><equals>=</equals><value>Bình</value></part></template>
+</root>

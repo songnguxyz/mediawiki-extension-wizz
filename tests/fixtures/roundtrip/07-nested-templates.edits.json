@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"height": "{{convert|1.8|m}}"
+	},
+	"expected": "{{Infobox person\n| name = {{nowrap|An {{small|(Bình)}}}}\n| born = {{birth date|1990|1|2}}\n| height = {{convert|1.8|m}}\n}}\n"
+}

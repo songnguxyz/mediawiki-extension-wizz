@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"born": "1991"
+	},
+	"expected": "Intro.\n{{Infobox person\n| name = Nguyễn Văn An\n| born = 1991\n| occupation = Giáo viên\n}}\nBody text.\n"
+}

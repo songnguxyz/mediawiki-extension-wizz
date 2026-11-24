@@ -1,0 +1,5 @@
+{{Infobox person
+| name = <nowiki>}} | = {{</nowiki>An
+| born = 1990
+| code = <nowiki/>x
+}}

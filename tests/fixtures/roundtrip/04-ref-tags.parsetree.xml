@@ -1,0 +1,7 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> An<ext><name>ref</name><attr> name=&quot;a&quot;</attr><inner>{{cite web|url=http://example.org/?a=1|title=T | x}}</inner><close>&lt;/ref&gt;</close></ext>
+</value></part><part><name> note </name><equals>=</equals><value> <ext><name>ref</name><attr> name=&quot;b&quot; </attr></ext>
+</value></part><part><name> born </name><equals>=</equals><value> 1990<ext><name>ref</name><attr/><inner>Sách A, tr. 3}}</inner><close>&lt;/ref&gt;</close></ext>
+</value></part><part><name> job </name><equals>=</equals><value> Thợ
+</value></part></template>
+</root>

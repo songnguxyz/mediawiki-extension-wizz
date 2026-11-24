@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"name": "Bình"
+	},
+	"expected": "{{Infobox person\n| name = Bình\n| sample = <pre>\n{{x|y}} }} | [[\n</pre>\n| born = 1990\n}}\n"
+}

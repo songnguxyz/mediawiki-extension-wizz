@@ -1,0 +1,5 @@
+{{Infobox person
+| name = {{{name|{{{title|}}}}}}
+| born = {{{1|}}}
+| died = {{{{{x|y}}}}}
+}}

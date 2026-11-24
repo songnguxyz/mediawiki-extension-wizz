@@ -1,0 +1,4 @@
+{{Infobox person
+| name = An<ref>x
+| born = 1990
+}}

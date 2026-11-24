@@ -1,0 +1,6 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> <ext><name>nowiki</name><attr/><inner>}} | = {{</inner><close>&lt;/nowiki&gt;</close></ext>An
+</value></part><part><name> born </name><equals>=</equals><value> 1990
+</value></part><part><name> code </name><equals>=</equals><value> <ext><name>nowiki</name><attr/></ext>x
+</value></part></template>
+</root>

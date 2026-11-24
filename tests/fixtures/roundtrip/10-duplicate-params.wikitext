@@ -1,0 +1,6 @@
+{{Infobox person
+| name = Một
+| born = 1980
+| name = Hai
+| name = Ba
+}}

@@ -1,0 +1,5 @@
+<root><template><title>infobox_person</title><part><name>name</name><equals>=</equals><value>A</value></part></template>
+<template lineStart="1"><title>Template:Infobox person</title><part><name>name</name><equals>=</equals><value>B</value></part></template>
+<template lineStart="1"><title> Infobox  person </title><part><name>name</name><equals>=</equals><value>C</value></part></template>
+<template lineStart="1"><title>Bản mẫu:Infobox person</title><part><name>name</name><equals>=</equals><value>D</value></part></template>
+</root>

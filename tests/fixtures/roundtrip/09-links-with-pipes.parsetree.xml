@@ -1,0 +1,6 @@
+<root><template><title>Infobox person
+</title><part><name> image </name><equals>=</equals><value> [[Tập tin:An.jpg|thumb|An năm 1990]]
+</value></part><part><name> birth_place </name><equals>=</equals><value> [[Hà Nội|thủ đô]], [[Việt Nam]]
+</value></part><part><name> born </name><equals>=</equals><value> 1990
+</value></part></template>
+</root>

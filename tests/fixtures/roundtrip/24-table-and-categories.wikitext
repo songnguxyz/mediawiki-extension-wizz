@@ -1,0 +1,9 @@
+{{Infobox person
+| name = An
+}}
+{| class="wikitable"
+|-
+| a || b
+|}
+== Mục ==
+[[Thể loại:Nhân vật|An]]

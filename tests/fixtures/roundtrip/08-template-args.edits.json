@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"born": "{{{born|}}}"
+	},
+	"expected": "{{Infobox person\n| name = {{{name|{{{title|}}}}}}\n| born = {{{born|}}}\n| died = {{{{{x|y}}}}}\n}}\n"
+}

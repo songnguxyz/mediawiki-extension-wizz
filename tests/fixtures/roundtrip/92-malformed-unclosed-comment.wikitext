@@ -1,0 +1,6 @@
+Text
+
+{{Infobox person
+| name = An <!-- oops
+| born = 1990
+}}

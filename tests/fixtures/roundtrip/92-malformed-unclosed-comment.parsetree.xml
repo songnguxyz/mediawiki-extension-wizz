@@ -1,0 +1,7 @@
+<root>Text
+
+{{Infobox person
+| name <equals>=</equals> An <comment>&lt;!-- oops
+| born = 1990
+}}
+</comment></root>

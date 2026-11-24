@@ -1,0 +1,9 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> An
+</value></part><part><name> bio </name><equals>=</equals><value> Dòng một.
+Dòng hai.
+
+* mục
+</value></part><part><name> born </name><equals>=</equals><value> 1990
+</value></part></template>
+</root>

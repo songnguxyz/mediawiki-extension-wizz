@@ -1,0 +1,4 @@
+{{infobox_person|name=A}}
+{{Template:Infobox person|name=B}}
+{{ Infobox  person |name=C}}
+{{Bản mẫu:Infobox person|name=D}}

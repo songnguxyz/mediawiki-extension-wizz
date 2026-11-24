@@ -1,0 +1,5 @@
+<root><template><title>Infobox person</title><part><name index="1"/><value>first</value></part><part><name index="2"/><value>second
+</value></part><part><name> name </name><equals>=</equals><value> An
+</value></part><part><name index="3"/><value>third
+</value></part></template>
+</root>

@@ -1,0 +1,6 @@
+{{Infobox person
+| name = An<ref name="a">{{cite web|url=http://example.org/?a=1|title=T | x}}</ref>
+| note = <ref name="b" />
+| born = 1990<ref>Sách A, tr. 3}}</ref>
+| job = Thợ
+}}

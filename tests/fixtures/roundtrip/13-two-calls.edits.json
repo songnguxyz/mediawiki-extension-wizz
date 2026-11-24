@@ -1,0 +1,7 @@
+{
+	"call": 1,
+	"changes": {
+		"name": "Chi"
+	},
+	"expected": "{{Infobox person\n| name = An\n}}\ntext\n{{Infobox person\n| name = Chi\n}}\n"
+}

@@ -1,0 +1,6 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> <tplarg><title>name</title><part><name index="1"/><value><tplarg><title>title</title><part><name index="1"/><value/></part></tplarg></value></part></tplarg>
+</value></part><part><name> born </name><equals>=</equals><value> <tplarg><title>1</title><part><name index="1"/><value/></part></tplarg>
+</value></part><part><name> died </name><equals>=</equals><value> <template><title><tplarg><title>x</title><part><name index="1"/><value>y</value></part></tplarg></title></template>
+</value></part></template>
+</root>

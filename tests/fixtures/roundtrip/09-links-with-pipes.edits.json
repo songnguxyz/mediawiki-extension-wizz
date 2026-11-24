@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"birth_place": "[[Huế|cố đô]]"
+	},
+	"expected": "{{Infobox person\n| image = [[Tập tin:An.jpg|thumb|An năm 1990]]\n| birth_place = [[Huế|cố đô]]\n| born = 1990\n}}\n"
+}

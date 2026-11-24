@@ -1,0 +1,7 @@
+{
+	"call": 0,
+	"changes": {
+		"height": "170"
+	},
+	"expected": "{{Infobox person|name=An|born=1990|height=170}}"
+}

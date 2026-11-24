@@ -1,0 +1,5 @@
+<root><template><title>#if: x </title><part><name index="1"/><value> a </value></part><part><name index="2"/><value> b </value></part></template><template><title>subst:Welcome</title><part><name>a</name><equals>=</equals><value>1</value></part></template><template><title>safesubst:Foo</title><part><name>a</name><equals>=</equals><value>1</value></part></template><template><title>:Trang chính</title><part><name>a</name><equals>=</equals><value>1</value></part></template><template><title>SUBST:Bar</title></template>
+<template lineStart="1"><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> An
+</value></part></template>
+</root>

@@ -1,0 +1,8 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> An
+</value></part><part><name> sample </name><equals>=</equals><value> <ext><name>pre</name><attr/><inner>
+{{x|y}} }} | [[
+</inner><close>&lt;/pre&gt;</close></ext>
+</value></part><part><name> born </name><equals>=</equals><value> 1990
+</value></part></template>
+</root>

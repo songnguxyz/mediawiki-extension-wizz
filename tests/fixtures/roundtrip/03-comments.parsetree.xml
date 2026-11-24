@@ -1,0 +1,7 @@
+<root><template><title>Infobox person <comment>&lt;!-- header --&gt;</comment>
+<comment>&lt;!-- first --&gt;</comment> </title><part><name> name </name><equals>=</equals><value> An <comment>&lt;!-- keep --&gt;</comment>
+</value></part><part><name> <comment>&lt;!-- c2 --&gt;</comment> born </name><equals>=</equals><value> 1990
+<comment>&lt;!-- between --&gt;
+</comment></value></part><part><name> died </name><equals>=</equals><value> <comment>&lt;!-- unknown --&gt;</comment>
+</value></part></template>
+</root>

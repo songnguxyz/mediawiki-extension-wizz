@@ -1,0 +1,5 @@
+<root><template><title>Infobox person
+</title><part><name> name </name><equals>=</equals><value> An <comment>&lt;!-- do not touch --&gt;</comment>
+</value></part><part><name> born </name><equals>=</equals><value> 1990 <comment>&lt;!-- sách A --&gt;</comment> 
+</value></part></template>
+</root>
