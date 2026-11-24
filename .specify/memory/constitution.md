@@ -55,8 +55,8 @@ A gadget has no server side, so the guarantee is stated honestly instead of over
   protection, AbuseFilter, CAPTCHA, rate limits, blocks and edit-conflict detection apply exactly
   as for a normal wikitext edit.
 - Using a form requires exactly the right to edit the page; Wizz adds no rights of its own.
-- A form definition MUST be used only if its page is edit-protected at administrator level (or
-  lives in the MediaWiki namespace); Wizz MUST check the protection before trusting it.
+- A form definition MUST be used only if its page is edit-protected at administrator level
+  (directly or by cascade); Wizz MUST check the protection before trusting it.
 - The "Edit infobox" tab is on by default; each wiki MUST be able to turn it off.
 
 Rationale: a form must never become a way around a wiki's anti-vandalism defences, and an
@@ -154,4 +154,4 @@ self-contained, documented code is what earns that trust.
 - Compliance is checked at plan time (Constitution Check) and at review. Exceptions MUST be
   documented with rationale in the plan's Complexity Tracking.
 
-**Version**: 2.1.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24
+**Version**: 2.1.1 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24

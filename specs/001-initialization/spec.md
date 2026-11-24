@@ -181,13 +181,13 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 - **FR-022**: Form MUST mở được qua URL `<Trang>?wizz=1` trên mọi wiki đã cài gadget, không cần cấu hình thêm.
 - **FR-023**: Wiki MUST bật hoặc tắt được tab "Sửa infobox"; mặc định bật.
 - **FR-024**: Form MUST dùng được trên các skin Minerva (điện thoại), Citizen và Vector 2022, ở cả chế độ sáng và tối.
-- **FR-025**: Giao diện MUST dịch được qua hệ thống dịch chuẩn của MediaWiki, có sẵn tiếng Việt và tiếng Anh.
+- **FR-025**: Giao diện MUST dịch được qua các gói thông điệp trong repo, có sẵn tiếng Việt và tiếng Anh.
 - **FR-026**: Wiki MUST giới hạn được namespace nào dùng form (mặc định chỉ namespace chính); cấu hình nằm ở `MediaWiki:Gadget-wizz-config.json` do quản trị viên giao diện sửa.
 
 **Quyền**
 
 - **FR-027**: Dùng form MUST cần đúng quyền sửa trang đó như khi sửa wikitext; Wizz không thêm quyền riêng.
-- **FR-028**: Hệ thống MUST chỉ dùng định nghĩa form khi trang của nó bị khóa sửa ở mức quản trị viên (khóa trực tiếp hoặc khóa lan) hoặc nằm trong namespace MediaWiki; nếu không, form MUST NOT mở và báo định nghĩa chưa được tin cậy.
+- **FR-028**: Hệ thống MUST chỉ dùng định nghĩa form khi trang của nó bị khóa sửa ở mức quản trị viên (khóa trực tiếp hoặc khóa lan); nếu không, form MUST NOT mở và báo định nghĩa chưa được tin cậy.
 - **FR-029**: Khi xem trang `Template:<Tên>/wizz.json`, hệ thống MUST chạy bước kiểm tra của FR-019 và FR-028 và hiện kết quả (hợp lệ hoặc danh sách lỗi), kèm nút xem thử form với giá trị trống; xem thử MUST NOT lưu gì.
 
 ### Key Entities
