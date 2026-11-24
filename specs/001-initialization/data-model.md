@@ -5,13 +5,14 @@ articles) or in-memory objects built in the browser when the form opens.
 
 ## FormDefinition
 
-Stored as the JSON subpage `Template:<Name>/wizz.json` (content model `json`, set automatically by
-the `.json` suffix). The parent page is the template the form edits, so one template has at most
-one form. Trusted only if edit-protected at `sysop` level, directly or by cascade (FR-028).
+Stored as the JSON page `Module:<Name>/wizz.json`, where `<Name>` is the template's name
+without its namespace prefix (content model `json`, set by Scribunto for `Module:*.json`;
+research R14). The page `Template:<Name>` is the template the form edits, so one template has
+at most one form. Trusted only if edit-protected at `sysop` level, directly or by cascade (FR-028).
 
 | Attribute | Type | Rules |
 |-----------|------|-------|
-| `template` | Title (parent of the subpage) | Derived, not written in the JSON. |
+| `template` | Title (`Template:<Name>` for page `Module:<Name>/wizz.json`) | Derived, not written in the JSON. |
 | `bucket` | string | Required. A page `Bucket:<bucket>` must exist and hold a valid schema when the form loads. |
 | `fields` | list of FieldDefinition | Required, ≥ 1. Order in the list is display order. No two entries may share `field` or `param`. |
 

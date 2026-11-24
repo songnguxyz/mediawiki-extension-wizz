@@ -31,7 +31,7 @@ later increments.
 **Purpose**: Repository tooling and CI for a package gadget
 
 - [X] T001 Create `package.json` (license `MIT`, private, dev dependencies `qunit`, `eslint-config-wikimedia`, `stylelint-config-wikimedia`, `grunt-banana-checker` (its `banana-checker` CLI, no Grunt); scripts `test` = lint + banana + `qunit tests/`, `build` = `node build/build.js`, `fixtures:parsetree` = `node build/fetch-parsetree.js`)
-- [X] T002 [P] Create `.eslintrc.json` (root, `wikimedia/client`, `wikimedia/vue3-es6`, `wikimedia/mediawiki`; override `tests/` and `build/` for `wikimedia/server` Node env) and `.eslintignore` for `dist/`
+- [X] T002 [P] Create `.eslintrc.json` (root, `wikimedia/client`, `wikimedia/vue3/es6`, `wikimedia/mediawiki`; override `tests/` and `build/` for `wikimedia/server` Node env) and `.eslintignore` for `dist/`
 - [X] T003 [P] Create `.stylelintrc.json` extending `stylelint-config-wikimedia` and `.gitignore` (`node_modules/`, `dist/`)
 - [X] T004 [P] Create `src/i18n/en.json`, `src/i18n/vi.json`, `src/i18n/qqq.json` with `@metadata` and the key families of contracts/wiki-interface.md (Messages), starting with `wizz-summary`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-noeditright`
 - [X] T005 [P] Create `.github/workflows/ci.yml` running `npm ci` and `npm test` on Node LTS for pushes and pull requests
@@ -54,8 +54,9 @@ later increments.
 - [ ] T013 Implement `src/wizz-editor.js` (pure): `applyEdits( text, call, changes ) → newText` and `matchesTemplate( nameText, templateTitle, redirects, nsIds )` (data-model.md TemplateCall normalisation rules) until T011 passes
 - [ ] T014 Implement `src/wizz-load.js`: `loadPage( api, title )` (contracts/api-calls.md request 1, incl. `intestactions=edit`), `loadDefinitions( api, templates )` (request 2 incl. protection and redirects; each result carries data-model.md FormDefinition.template, the parent template of the subpage), `loadSchema( api, bucket )` (request 3) returning plain objects; Bucket defaults `index: true`, `repeated: false` (research R1); the schema result follows data-model.md BucketSchema.fields
 - [ ] T015 [P] Write `tests/load.test.js` with a fake `api` object returning recorded responses: user cannot edit → `wizz-noeditright`; protection `sysop` direct and cascading → trusted; `autoconfirmed` or none → `wizz-definition-untrusted` (research R5, FR-028); opening a form makes ≤ 3 API requests (plan Performance Goals, research R5)
-- [ ] T016 Create `src/wizz.js` (entry gadget): exit unless `wgAction === 'view'`, latest revision and namespace in `wizz-config.json` `namespaces` (the namespace check does not apply to `Template:*/wizz.json`, see T038); on `?wizz=1` call `mw.loader.using( 'ext.gadget.wizz-form' )` and call `start()` exported by `wizz-form.js` (written in T025; until then the entry only logs that the form gadget is missing); expose `mw.libs.wizz = { version }` (research R2, R9)
-- [ ] T017 Create `build/build.js`: copy `src/*` to `dist/` with on-wiki names (`i18n/en.json` → `wizz-i18n-en.json`), print `MediaWiki:Gadgets-definition` lines and `Gadget definition:` JSON for gadgets `wizz` (default, `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`, pages `wizz.js`, `wizz-config.json`) and `wizz-form` (hidden, `package`, `dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`, `codexIcons`, all other pages) (research R2, R12); fail the build if the entry gadget (`wizz.js` + `wizz-config.json`) exceeds 3 KB
+- [ ] T016 Create `src/wizz.js` (entry gadget): exit unless `wgAction === 'view'`, latest revision and namespace in `wizz-config.json` `namespaces` (the namespace check does not apply to `Module:*/wizz.json`, see T038); on `?wizz=1` call `mw.loader.using` on `ext.gadget.wizz-form` plus its dependencies and call `mw.libs.wizz.form( require )` with the resolved `require`; when config `cdn` is `true`, `mw.loader.using` only the dependencies, then `mw.loader.getScript` the jsDelivr URL of the entry's own version (contracts/wiki-interface.md Configuration) before the same call (until T025 exists the entry only logs that the form is missing); expose `mw.libs.wizz = { version }`, the version injected by the build (research R2, R9, R12)
+- [ ] T017 Add pinned devDependencies `vite`, `@vitejs/plugin-vue`, `less`, `vue` (the version MediaWiki 1.43 ships) and `@wikimedia/codex-icons`; create `vite.config.js` (entry `src/wizz-form.js`, output `dist/wizz-form.js`, `target: 'es2018'`, `vue` and `@wikimedia/codex` external through the passed-in `require`, LESS imported with `?inline`) and `build/build.js` (`npm run build`): run Vite, copy `wizz.js` with the version from `package.json` injected and `wizz-config.json`, write `dist/gadgets-definition.txt` (gadgets `wizz`: default, `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`, pages `wizz.js`, `wizz-config.json`; `wizz-form`: hidden, `package`, `dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`, page `wizz-form.js`), `dist/deploy.json` (Litmus format, `wizz-config.json` `createOnly`) and `dist/SHA256SUMS`; fail the build if the entry (`wizz.js` + `wizz-config.json`) exceeds 3 KB (research R2, R12)
+- [ ] T059 Update `dev/test-wiki/`: support `MW_VERSION=1.43` (Bucket `REL1_43`); remove the `ContentHandlerDefaultModelFor` hook from `setup.sh`; move the test definition to `Module:Infobox nhân vật/wizz.json` (protected, `json` model from Scribunto); make `deploy.js` read `dist/deploy.json` (titles and `createOnly`) and `dist/gadgets-definition.txt`; verify on 1.43, 1.45 and 1.46 (research R13, R14)
 
 **Checkpoint**: tokenizer and editor proven on the corpus (SC-001 suite green); data can be loaded
 
@@ -79,7 +80,7 @@ later increments.
 - [ ] T022 [US1] Implement form state building in `src/wizz-form.js`: from loaded page, definition and schema produce data-model.md FormState (`page`, `revid`, `basetimestamp`, `starttimestamp`, `instance`, `fields[].value`, `fields[].dirty`, `canTag`); refuse with `wizz-noinfobox` (and `action=edit` link) when no call matches; refuse with `wizz-parseerror` and line on malformed call
 - [ ] T023 [US1] Create `src/wizz-Field.vue`: Codex input per type (TEXT → `CdxTextArea` when the raw value contains markup, else `CdxTextInput`; INTEGER/DOUBLE → `CdxTextInput` `inputmode="decimal"`; BOOLEAN → `CdxCheckbox` writing data-model.md FieldDefinition.booleanValues; PAGE → `CdxTextInput` for now) inside `CdxField` with label/help from FieldDefinition.label and FieldDefinition.help; marks `dirty` on input
 - [ ] T024 [US1] Create `src/wizz-App.vue`: `CdxDialog` (full screen on Minerva) rendering fields in definition order, save and cancel buttons, refusal messages; on save build text with `applyEdits` and call `save`; on success reload the page view without `wizz`
-- [ ] T025 [US1] Add `start()` to `src/wizz-form.js` that loads data (T014), builds state (T022), loads `wizz-i18n-<lang>.json` into `mw.messages` with `en` fallback (research R11) and mounts `wizz-App.vue` with `Vue.createMwApp`
+- [ ] T025 [US1] Add `start()` to `src/wizz-form.js` that loads data (T014), builds state (T022), loads the bundled `src/i18n/<lang>.json` for `wgUserLanguage` into `mw.messages` with `en` fallback (research R11), adds the inlined LESS with `mw.util.addCSS`, and sets `mw.libs.wizz.form = function ( require ) {…}` as the bundle's only export and mounts `wizz-App.vue` with `Vue.createMwApp`
 - [ ] T026 [P] [US1] Create `src/wizz.less` using only Codex CSS custom properties and logical properties (`margin-inline-start`, …) for dark mode and RTL (research R10)
 - [ ] T027 [US1] Add US1 messages (`wizz-ui-save`, `wizz-ui-cancel`, `wizz-ui-title`, `wizz-summary`) to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
@@ -124,7 +125,7 @@ later increments.
 
 - [ ] T036 [US3] Implement `src/wizz-definition.js` (pure): `checkDefinition( json, schema ) → { definition, errors, warnings }` checking data-model.md FormDefinition.bucket and FormDefinition.fields, and FieldDefinition.field, FieldDefinition.param, FieldDefinition.label, FieldDefinition.pattern, FieldDefinition.separator and the type fit of every other FieldDefinition rule, with the defaults given there, until T035 passes
 - [ ] T037 [US3] Use `checkDefinition` in `src/wizz-form.js`: any error → refuse with `wizz-definition-invalid` and the full list for every user (FR-019); untrusted → `wizz-definition-untrusted` (FR-028); fields whose derived data-model.md FieldDefinition `state` is `removed` rendered read-only with warning in `src/wizz-Field.vue`; derived `type` and `repeated` come from the schema, never from the definition
-- [ ] T038 [US3] Add definition-page mode to `src/wizz.js`: on view of `Template:*/wizz.json` load the `wizz-form` gadget and show the check result plus a "Preview form" button that opens the form with empty values and no save button (FR-029)
+- [ ] T038 [US3] Add definition-page mode to `src/wizz.js`: on view of `Module:*/wizz.json` load the `wizz-form` gadget and show the check result plus a "Preview form" button that opens the form with empty values and no save button (FR-029)
 - [ ] T039 [US3] Add messages `wizz-definition-*` and `wizz-ui-preview-form` to `src/i18n/en.json`, `vi.json`, `qqq.json`
 
 **Checkpoint**: MVP (US1–US3) complete
@@ -179,13 +180,14 @@ later increments.
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-- [ ] T052 [P] Write `README.md`: install steps (enable Gadgets, Bucket, Scribunto; run `npm run build`; create the pages of contracts/wiki-interface.md; set the gadget default; create tag `wizz`), definition reference (contracts/form-definition.schema.json with examples), scope limit of Constitution III and a recommended Lua validation pattern for templates
+- [ ] T052 [P] Write `README.md`: supported MediaWiki versions (research R13), install steps (enable Gadgets, Bucket, Scribunto; then one of the three routes of research R12: copy a release's `dist/` pages, Litmus `gadget-deploy`, or jsDelivr mode with `cdn: true`; set the gadget default; create tag `wizz`), definition reference (`Module:<Name>/wizz.json`, contracts/form-definition.schema.json with examples), scope limit of Constitution III and a recommended Lua validation pattern for templates that reads the same definition with `mw.loadJsonData`
 - [ ] T053 [P] Add `CHANGELOG.md` with the first release entry
 - [ ] T054 Accessibility review of `src/wizz-App.vue` and `src/wizz-Field.vue`: labels, keyboard order, errors announced (`aria-live` via `CdxField`), contrast
-- [ ] T055 Run quickstart.md scenarios 1–14 on the Docker test wiki (T007, deployed with `deploy.js`) with `MW_VERSION=1.45`, then once with `MW_VERSION=1.46`, and record results in `specs/001-initialization/checklists/quickstart-run.md`
-- [ ] T056 Verify the **verify** items of research.md (CSP `blob:` workers, ConfirmEdit payload, Citizen tokens) on Miraheze and WikiOasis test wikis; update research.md R6/R8/R10 and code if needed
+- [ ] T055 Run quickstart.md scenarios 1–14 on the Docker test wiki (T007, deployed with `deploy.js`) with `MW_VERSION=1.43`, `1.45` and `1.46`, also once in jsDelivr mode (`cdn: true`) against a pushed tag, and record results in `specs/001-initialization/checklists/quickstart-run.md`
+- [ ] T056 Verify the **verify** items of research.md (CSP `blob:` workers and `cdn.jsdelivr.net`, ConfirmEdit payload, Citizen tokens; jsDelivr mode loads the form) on Miraheze and WikiOasis test wikis; update research.md R6/R8/R10 and code if needed
 - [ ] T057 Run the SC-005 user test (5 newcomers on phones) and record the outcome in `specs/001-initialization/checklists/sc-005.md`
-- [ ] T058 Tag the first release `v0.1.0` in git with the CHANGELOG entry and attach the `dist/` pages built from that tag (Constitution VIII)
+- [ ] T060 Create `.github/workflows/release.yml` (`workflow_dispatch` with input `version`, minimal `permissions`, no third-party actions beyond checkout/setup-node): `npm ci`, `npm test`, `npm run build`, commit `dist/` (forced past `.gitignore`) on a detached commit on top of `main`, tag `v<version>`, push the tag, create the GitHub Release with every `dist/` file, then call Litmus `POST /c2c/api/gadget-releases` as in Litmus `docs/examples/gadget-release.yml` (`curl` + `jq`, secrets `LITMUS_CLIENT_ID`/`LITMUS_CLIENT_SECRET` via env, tag via env) (research R12)
+- [ ] T058 Release `v0.1.0` with the CHANGELOG entry by running the T060 workflow (Constitution VIII)
 
 ---
 
@@ -194,7 +196,7 @@ later increments.
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: none
-- **Foundational (Phase 2)**: after Setup; blocks all stories; T009 (`fetch-parsetree`) needs the test wiki from T007
+- **Foundational (Phase 2)**: after Setup; blocks all stories; T009 (`fetch-parsetree`) needs the test wiki from T007; T059 before T017's deploy is tried on the wiki
 - **US1 (Phase 3)**: after Foundational
 - **US2 (Phase 4)**: after Foundational; T033 edits `wizz-App.vue`/`wizz-Field.vue` from US1
 - **US3 (Phase 5)**: after Foundational; T037 edits `wizz-form.js` from US1

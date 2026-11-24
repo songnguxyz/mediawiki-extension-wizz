@@ -66,10 +66,14 @@ trang định nghĩa không bị khóa sẽ cho bất kỳ ai đổi luật mà 
 
 - Wizz là một gadget ResourceLoader: cài đặt MUST chỉ cần quyền quản trị viên giao diện trên
   wiki, không có code chạy phía máy chủ.
-- Nhắm MediaWiki 1.45 trở lên có các extension Gadgets, Bucket và Scribunto. Chỉ dùng API
+- Nhắm mọi bản MediaWiki còn được bảo trì theo lịch Version lifecycle của mediawiki.org (hiện
+  là 1.43 LTS, 1.45, 1.46) có các extension Gadgets, Bucket và Scribunto. Phạm vi hỗ trợ đi theo
+  lịch đó: thêm một bản khi nó phát hành, bỏ khi nó hết hạn bảo trì. Chỉ dùng API
   front-end công khai, ổn định (`mw.Api`, `mw.util`, `mw.config`, `mw.messages`, module
   ResourceLoader, Codex); MUST NOT đưa vào API đã bị deprecate.
-- Wizz MUST NOT tải tài nguyên từ máy chủ bên ngoài.
+- Wizz MUST NOT tải tài nguyên từ máy chủ bên ngoài, trừ chế độ jsDelivr tùy chọn: bundle form
+  của cùng bản phát hành có tag, tải từ `cdn.jsdelivr.net`, ghim đúng phiên bản, mỗi wiki bật
+  bằng cấu hình. Lượt xem trang thông thường MUST NOT gọi tới máy chủ bên ngoài nào.
 - Wizz MUST NOT phụ thuộc API bên thứ ba chưa ổn định của Bucket; Wizz đọc trang schema
   `Bucket:` và sửa tham số template, để template/module Lua của wiki ghi vào Bucket.
 - Wizz MUST NOT dùng lại code Page Forms và MUST cùng tồn tại được với Page Forms: biến toàn cục
@@ -107,7 +111,9 @@ Lý do: codebase nhỏ dễ duyệt, dễ giữ không hồi quy và dễ đư�
 - Theo quy chuẩn JavaScript của MediaWiki, kiểm tra bằng `eslint-config-wikimedia` và
   `stylelint-config-wikimedia`.
 - Phát hành dạng package gadget, khai đủ mọi dependency ResourceLoader (`vue`,
-  `@wikimedia/codex`, `mediawiki.api`, …); không tải gì bằng URL lúc chạy.
+  `@wikimedia/codex`, `mediawiki.api`, …); thứ duy nhất tải bằng URL lúc chạy là chế độ jsDelivr
+  của Nguyên tắc V. Mỗi bản phát hành triển khai được theo ba cách từ cùng một bản build: chép
+  tay, lệnh `gadget-deploy` của Litmus, hoặc jsDelivr.
 - Không viết cứng wikitext hay giả định về template: mọi thứ riêng của từng wiki lấy từ định
   nghĩa form.
 - Logic (bộ phân tích template, validate, sửa wikitext) MUST là các module thuần, không phụ
@@ -125,14 +131,17 @@ liệu là thứ giúp có được sự tin tưởng đó.
 
 ## Ràng buộc kỹ thuật
 
-- Ngôn ngữ và cấu trúc: JavaScript (ES2017+), Vue 3 và Codex theo bản MediaWiki cung cấp, LESS
-  với design token của Codex.
+- Ngôn ngữ và cấu trúc: JavaScript build bằng Vite với target ES2018; Vue 3 và Codex theo bản
+  MediaWiki cung cấp (không bao giờ gói vào bundle); LESS do Vite biên dịch, dùng design token
+  của Codex qua CSS custom property có giá trị dự phòng.
 - Quy chuẩn code: `eslint-config-wikimedia` và `stylelint-config-wikimedia`; gói thông điệp
   được banana-checker kiểm tra. Lỗi lint chặn merge.
 - Test: QUnit trên Node cho các module logic; test mức trình duyệt chỉ thêm khi spec yêu cầu.
-- Phụ thuộc: Gadgets, Bucket và Scribunto trên wiki. Không có phụ thuộc npm lúc chạy; gói npm
+- Phụ thuộc: Gadgets, Bucket và Scribunto trên wiki. Code npm được gói vào bản build
+  MUST tương thích MIT và được liệt kê trong plan (hiện chỉ có `@wikimedia/codex-icons`); gói npm
   chỉ dùng khi phát triển không cần giải trình ngoài plan.
-- Môi trường test: một wiki MediaWiki chạy bằng Docker, dựng lại từ script trong repo, dùng dữ
+- Môi trường test: một wiki MediaWiki chạy bằng Docker cho mỗi bản MediaWiki được hỗ trợ, dựng
+  lại từ script trong repo, dùng dữ
   liệu tự tạo theo cấu trúc infobox thật; MUST NOT chép nội dung wiki thật.
 
 ## Quy trình phát triển
@@ -155,4 +164,4 @@ liệu là thứ giúp có được sự tin tưởng đó.
 - Việc tuân thủ được kiểm tra khi lập plan (Constitution Check) và khi review. Ngoại lệ MUST
   được ghi lại kèm lý do ở mục Complexity Tracking của plan.
 
-**Phiên bản**: 2.1.3 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24
+**Phiên bản**: 2.2.0 | **Thông qua**: 2026-11-19 | **Sửa đổi lần cuối**: 2026-11-24

@@ -1,7 +1,7 @@
 # Phase 0 Research: Wizz — infobox form editing (gadget)
 
 Rewritten on 2026-11-24 after the switch from an extension to a gadget (constitution v2.1.0).
-Sources: Gadgets REL1_45 source, Bucket source (`weirdgloop/mediawiki-extensions-Bucket`),
+Sources: Gadgets REL1_43 and REL1_45 source, Bucket source (`weirdgloop/mediawiki-extensions-Bucket`),
 Page Forms source, Miraheze/WikiOasis ManageWiki config, all read from GitHub mirrors.
 mediawiki.org, Gerrit and meta.miraheze.org were unreachable; items that depend on them are
 marked **verify**.
@@ -28,23 +28,28 @@ marked **verify**.
   `ResourceLoader`, `package`, `dependencies=mediawiki.api,mediawiki.util`. Its pages:
   `MediaWiki:Gadget-wizz.js` (entry, tiny) and `wizz-config.json` (config plus the tab label
   `tabLabel` in `en`/`vi`, the only message the entry needs). The entry checks the URL and page, then
-  loads the form lazily with `mw.loader.using` on a second, hidden package gadget `wizz-form`
-  (`dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`,
-  `codexIcons=…`): logic modules `wizz-*.js`, components `wizz-*.vue`, message bundles
-  `wizz-i18n-<lang>.json`, style `wizz.less`. Normal page views pay only for the entry gadget.
-- **Facts (Gadgets REL1_45 source)**:
-  - `.vue` pages are accepted only in package gadgets (`Gadget::getVues`,
-    `GadgetResourceLoaderModule` type `script-vue`).
+  loads the form lazily: `mw.loader.using` on a second, hidden package gadget `wizz-form`
+  (`dependencies=vue,@wikimedia/codex,mediawiki.api,mediawiki.util,mediawiki.jqueryMsg`) with
+  one page, `wizz-form.js`, the Vite bundle (code, compiled `.vue`, messages, styles, icons).
+  The bundle only sets `mw.libs.wizz.form = function ( require ) {…}`; the entry calls it with
+  the `require` that `mw.loader.using` resolves with, so `vue` and `@wikimedia/codex` come from
+  MediaWiki. In jsDelivr mode (`cdn: true`) the entry instead calls `mw.loader.using` on the
+  dependencies, loads the same file of its own version from jsDelivr with
+  `mw.loader.getScript`, then calls `mw.libs.wizz.form( require )`. Normal page views pay only
+  for the entry gadget and never contact jsDelivr.
+- **Facts (Gadgets REL1_43 and REL1_45 source)**:
   - `.json` pages in a package gadget become `data` files readable with `require()`.
-  - `codexIcons` puts an `icons.json` file into the module.
   - `require()` keys are page names without the `MediaWiki:Gadget-` prefix
     (`titleWithoutPrefix`).
-  - Both definition formats parse every option above (`MediaWiki:Gadgets-definition` legacy
-    lines and `Gadget definition:` JSON pages).
-  - `requiresES6` is ignored for default gadgets; not needed, since MediaWiki 1.45 itself
-    requires ES2017 browsers.
+  - REL1_43 has no `codexIcons` option, so icons are bundled from `@wikimedia/codex-icons`
+    (MIT). Codex itself (GPL) is never bundled.
+  - Only `MediaWiki:Gadgets-definition` lines are used: `Gadget definition:` pages need
+    `$wgGadgetsRepo = 'json-definition'`, which wikis do not set by default, and Litmus
+    `gadget-deploy` merges only into `MediaWiki:Gadgets-definition`.
+  - MediaWiki 1.43+ serves JavaScript to ES2017 browsers; the ES2018 build drops the few
+    ES2017-only browsers (e.g. Safari 11), accepted by Song Ngư.
 - **Rationale**: Install needs only interface-admin rights (Constitution V); the lazy second
-  gadget keeps page-view cost close to zero.
+  gadget keeps page-view cost close to zero; one bundle file serves all three deploy routes.
 - **Alternatives rejected**: one big default gadget (loads Vue on every page); a user-script
   install (cannot be default for all users).
 
@@ -82,7 +87,8 @@ marked **verify**.
      `starttimestamp` via `curtimestamp`, whether the user may edit this page),
      `meta=userinfo&uiprop=rights`, `list=tags&tgprop=active`. If the user may not edit, the
      form refuses at once with a permission message (edge case).
-  2. Candidate definitions: for each transcluded template `T`, the title `T/wizz.json` with
+  2. Candidate definitions: for each transcluded template `T`, the title
+     `Module:<name of T without namespace prefix>/wizz.json` with
      `prop=revisions|info&inprop=protection`, plus `prop=redirects` on the templates (names of
      redirects to each template). Only titles that exist go further.
   3. Bucket schema page named in the definition.
@@ -102,7 +108,8 @@ marked **verify**.
   namespaces and must-exist for PAGE, per item for repeated fields. Must-exist is checked with
   one batched `action=query&titles=` just before save (and on blur, debounced).
 - **Regex**: patterns are ECMAScript regular expressions with the `u` flag. They run in a Web
-  Worker created from a Blob URL of the worker's source (no external URL). Each test has a
+  Worker created from a Blob URL of the worker's source, bundled as a string (no external
+  URL). Each test has a
   **200 ms** limit; on timeout the worker is terminated and recreated and the field fails with
   `wizz-error-regex-timeout`.
 - **verify**: that the farms' Content-Security-Policy allows `blob:` workers. Fallback if the
@@ -153,11 +160,11 @@ marked **verify**.
     `history.replaceState`.
   - Tab "Edit infobox" via `mw.util.addPortletLink` in `p-views` (Minerva: `page-actions`
     overflow), shown only on pages that transclude a template with an existing
-    `/wizz.json` subpage. Visible by default; `wizz-config.json` `editTab: false` hides it.
-  - Definition pages: on view of `Template:*/wizz.json`, show the check result and a
+    `Module:<Name>/wizz.json` page. Visible by default; `wizz-config.json` `editTab: false` hides it.
+  - Definition pages: on view of `Module:*/wizz.json`, show the check result and a
     "preview form" button (FR-029).
-- **Config** `MediaWiki:Gadget-wizz-config.json`: `{ "namespaces": [0], "editTab": true, "tabLabel": {…} }`.
-  Only these three keys (Constitution VII).
+- **Config** `MediaWiki:Gadget-wizz-config.json`: `{ "namespaces": [0], "editTab": true, "tabLabel": {…}, "cdn": false }`.
+  Only these four keys (Constitution VII).
 
 ## R10. UI (Codex, mobile, dark mode, RTL)
 
@@ -171,8 +178,8 @@ marked **verify**.
 
 ## R11. i18n (FR-025)
 
-- **Decision**: message bundles `wizz-i18n-en.json`, `wizz-i18n-vi.json` and `qqq.json` (repo
-  only) checked by banana-checker, shipped in `wizz-form`; the entry carries only `tabLabel` from the config.
+- **Decision**: message bundles `src/i18n/en.json`, `vi.json` and `qqq.json` (repo only)
+  checked by banana-checker; `en` and `vi` are bundled into `wizz-form.js`; the entry carries only `tabLabel` from the config.
   When the form starts it loads the bundle for `wgUserLanguage` with
   fallback to `en` into `mw.messages` with `mw.messages.set`. On-wiki message overrides are
   not supported in the MVP.
@@ -180,14 +187,48 @@ marked **verify**.
 
 ## R12. Build and release
 
-- **Decision**: `npm run build` copies `src/` to `dist/` with the on-wiki page names and
-  writes the gadget definition lines for both definition formats. Releases are git tags; an
-  interface admin copies `dist/` pages to the wiki (an optional dev script can upload them with
-  a bot password). Nothing is bundled or minified beyond what ResourceLoader does.
-- **Rationale**: Constitution VIII (git is source of truth), VII (no bundler).
+- **Decision**: `npm run build` runs Vite (`target: 'es2018'`, `vue` and `@wikimedia/codex`
+  external, LESS imported with `?inline` and added with `mw.util.addCSS`) and writes `dist/`:
+  `wizz.js` (version injected), `wizz-config.json`, `wizz-form.js`, `gadgets-definition.txt`,
+  `deploy.json` (Litmus format, `pages[{file,title,createOnly?}]` with `wizz-config.json`
+  `createOnly`, `definition.file`) and `SHA256SUMS`. The build fails if the entry
+  (`wizz.js` + `wizz-config.json`) exceeds 3 KB.
+- **Release**: `.github/workflows/release.yml`, run by hand with a version: test, build,
+  commit `dist/` (forced past `.gitignore`) on a detached commit on top of `main`, tag it
+  `v<version>`, push the tag, create the GitHub Release with every `dist/` file as an asset,
+  then call Litmus `POST /c2c/api/gadget-releases` as in Litmus's `gadget-release.yml`
+  (`curl` + `jq`, secrets via env). All in one workflow, because a release created with
+  `GITHUB_TOKEN` does not trigger other workflows. `main` never holds `dist/`.
+- **Three deploy routes** from the same release:
+  1. by hand: an interface admin copies the `dist/` pages and the definition lines;
+  2. Litmus `gadget-deploy` on the GitHub Release (dry run, then a person approves);
+  3. jsDelivr: install only `wizz.js` and `wizz-config.json` with `cdn: true`; the entry
+     loads `https://cdn.jsdelivr.net/gh/songnguxyz/mediawiki-extension-wizz@v<version>/dist/wizz-form.js`,
+     the exact version of its own release.
+- **Rationale**: Constitution VIII (git is source of truth, tagged releases only, three deploy
+  routes). jsDelivr serves files from git tags, not from release assets, hence `dist/` on the
+  tagged commit.
 
 ## R13. Hosting
 
-- Miraheze and WikiOasis run MediaWiki 1.46 stable; Wizz targets 1.45+. Gadgets, Scribunto and
+- Supported MediaWiki versions follow mediawiki.org Version lifecycle (read 2026-11-24):
+  1.43 LTS (until 2027-12), 1.45 (until 2026-12), 1.46 (until 2027-07). 1.44 is obsolete.
+  1.47 LTS (expected 2026-11) is added when released; a version is dropped at its end of life.
+  Bucket has `REL1_43`, `REL1_45` and `REL1_46` branches.
+- Miraheze and WikiOasis run MediaWiki 1.46 stable. Gadgets, Scribunto and
   Bucket are available through ManageWiki on both farms. A gadget needs no farm review.
-- Test wiki: local Docker MediaWiki (`dev/test-wiki/`) with self-made data (Constitution, Technical Constraints).
+- CSP: Miraheze allows `cdn.jsdelivr.net` and `blob:` in `script-src` (seen in a real response
+  header). **verify** WikiOasis.
+- Test wiki: local Docker MediaWiki (`dev/test-wiki/`, `MW_VERSION` 1.43, 1.45 or 1.46) with
+  self-made data (Constitution, Technical Constraints).
+
+## R14. Content model of definition pages
+
+- **Decision**: definitions live at `Module:<Template name>/wizz.json`.
+- **Facts**: core gives the `json` model by suffix only in the MediaWiki namespace and to user
+  subpages (`MainSlotRoleHandler.php`); a `Template:*/wizz.json` page would be wikitext.
+  Scribunto gives every `Module:*.json` page the `json` model (`Hooks.php`,
+  `onContentHandlerDefaultModelFor`), so the wiki checks the JSON syntax on save and Lua can
+  read the same definition with `mw.loadJsonData`.
+- **Alternatives rejected**: `Template:<Name>/wizz.json` (wikitext model on farms, which cannot
+  add a hook; would need `Special:ChangeContentModel` by hand).

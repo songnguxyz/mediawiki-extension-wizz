@@ -66,10 +66,14 @@ unprotected definition page would let anyone change the rules the form enforces.
 
 - Wizz is a ResourceLoader gadget: installing it MUST need only interface-administrator rights
   on the wiki, with no server-side code.
-- Target MediaWiki 1.45+ with the Gadgets, Bucket and Scribunto extensions. Use only stable,
+- Target every MediaWiki version still maintained per the mediawiki.org Version lifecycle (now
+  1.43 LTS, 1.45, 1.46), with the Gadgets, Bucket and Scribunto extensions. Support follows that
+  schedule: a version is added when released and dropped at its end of life. Use only stable,
   public front-end APIs (`mw.Api`, `mw.util`, `mw.config`, `mw.messages`, ResourceLoader
   modules, Codex); deprecated APIs MUST NOT be introduced.
-- Wizz MUST NOT load resources from external hosts.
+- Wizz MUST NOT load resources from external hosts, except the optional jsDelivr mode: the form
+  bundle of the same tagged release from `cdn.jsdelivr.net`, exact version pinned, turned on per
+  wiki by config. Ordinary page views MUST NOT contact any external host.
 - Wizz MUST NOT depend on Bucket's unstable third-party API; it reads `Bucket:` schema pages and
   edits template parameters, letting the wiki's templates/Lua modules write to Bucket.
 - Wizz MUST NOT reuse Page Forms code and MUST coexist with Page Forms: its only global is
@@ -105,8 +109,10 @@ Rationale: a small codebase is easier to review, keep regression-free and trust.
 
 - Follow the MediaWiki JavaScript coding conventions and lint with `eslint-config-wikimedia`
   and `stylelint-config-wikimedia`.
-- Ship as a package gadget that declares every ResourceLoader dependency (`vue`,
-  `@wikimedia/codex`, `mediawiki.api`, …); load nothing at runtime by URL.
+- Ship as package gadgets that declare every ResourceLoader dependency (`vue`,
+  `@wikimedia/codex`, `mediawiki.api`, …); the only runtime URL load is the jsDelivr mode of
+  Principle V. Every release is deployable three ways from the same build: by hand, by Litmus
+  `gadget-deploy`, or by jsDelivr.
 - No hard-coded wikitext or template assumptions: everything wiki-specific comes from form
   definitions.
 - Logic (tokenizer, validation, wikitext editing) MUST be plain modules independent of Vue and
@@ -123,15 +129,18 @@ self-contained, documented code is what earns that trust.
 
 ## Technical Constraints
 
-- Language and layout: JavaScript (ES2017+), Vue 3 and Codex as shipped by MediaWiki, LESS with
-  Codex design tokens.
+- Language and layout: JavaScript built with Vite to target ES2018; Vue 3 and Codex as shipped by
+  MediaWiki (never bundled); LESS compiled by Vite, using Codex design tokens through CSS custom
+  properties with fallbacks.
 - Code style: `eslint-config-wikimedia` and `stylelint-config-wikimedia`; message bundles
   checked by banana-checker. Lint errors block merge.
 - Tests: QUnit under Node for logic modules; browser-level tests only where a spec requires
   them.
-- Dependencies: Gadgets, Bucket and Scribunto on the wiki. No runtime npm dependency; dev-only
-  npm packages need no justification beyond the plan.
-- Test environment: a local Docker MediaWiki wiki, rebuilt from a script in the repo, using
+- Dependencies: Gadgets, Bucket and Scribunto on the wiki. npm code bundled into
+  the build MUST be MIT-compatible and listed in the plan (now only `@wikimedia/codex-icons`);
+  dev-only npm packages need no justification beyond the plan.
+- Test environment: a local Docker MediaWiki wiki for each supported MediaWiki version, rebuilt
+  from a script in the repo, using
   self-made data modelled on real infobox structures; real wiki content MUST NOT be copied.
 
 ## Development Workflow
@@ -154,4 +163,4 @@ self-contained, documented code is what earns that trust.
 - Compliance is checked at plan time (Constitution Check) and at review. Exceptions MUST be
   documented with rationale in the plan's Complexity Tracking.
 
-**Version**: 2.1.3 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24
+**Version**: 2.2.0 | **Ratified**: 2026-11-19 | **Last Amended**: 2026-11-24

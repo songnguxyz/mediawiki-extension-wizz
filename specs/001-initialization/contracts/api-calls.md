@@ -19,11 +19,12 @@ The tab check (FR-023) sends only `prop=templates` and request 2's existence par
 ## 2. Load definitions
 
 ```text
-action=query & titles=<T1>/wizz.json|<T2>/wizz.json|…
+action=query & titles=Module:<T1>/wizz.json|Module:<T2>/wizz.json|…
   & prop=revisions|info & rvprop=content & rvslots=main & inprop=protection
 ```
 
-plus, in the same request when possible, `prop=redirects` for `<T1>|<T2>|…` (names of
+`<Tn>` is a transcluded template's name without its namespace prefix. Plus, in the same
+request when possible, `prop=redirects` for `Template:<T1>|Template:<T2>|…` (names of
 redirects to each template). Only existing definitions are kept. Trust rule: a `protection`
 entry `{type: "edit", level: "sysop"}`, direct or with `source` (cascade) (FR-028).
 

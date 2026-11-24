@@ -8,7 +8,7 @@ Run guide for proving the feature works. Calls are in
 ## Prerequisites
 
 - Node.js LTS and `npm install` in the repo.
-- A test wiki (Docker, `dev/test-wiki/setup.sh`) on MediaWiki 1.45 (also run once on 1.46) with Gadgets,
+- A test wiki (Docker, `dev/test-wiki/setup.sh`) on MediaWiki 1.43, 1.45 and 1.46 (`MW_VERSION`) with Gadgets,
   Scribunto and Bucket; an interface-admin account; optionally AbuseFilter and ConfirmEdit.
 
 ## Static checks and unit tests
@@ -27,9 +27,10 @@ the stored core parse tree).
 npm run build
 ```
 
-Copy the pages in `dist/` to the wiki as listed in
-[wiki-interface.md](contracts/wiki-interface.md), and add the gadget definition lines printed
-by the build.
+Deploy `dist/` with `node dev/test-wiki/deploy.js` (pages listed in
+[wiki-interface.md](contracts/wiki-interface.md), definition lines from
+`dist/gadgets-definition.txt`). On production wikis use a tagged release: by hand, by Litmus
+`gadget-deploy`, or jsDelivr mode (`cdn: true`).
 
 ## Test data (self-made)
 
@@ -37,7 +38,7 @@ by the build.
    `ban_be` (PAGE, repeated), `con_song` (BOOLEAN).
 2. Create `Template:Infobox nhân vật` and a Lua module that calls `bucket("nhan_vat").put{…}`;
    create the redirect `Template:Infobox_nv` to it.
-3. Create `Template:Infobox nhân vật/wizz.json` with the example in
+3. Create `Module:Infobox nhân vật/wizz.json` with the example in
    [form-definition.schema.json](contracts/form-definition.schema.json); protect it
    (edit = sysop).
 4. Create the tag `wizz` at Special:Tags.

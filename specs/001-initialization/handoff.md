@@ -20,7 +20,7 @@ Hướng đi: Wizz là **gadget** (không phải extension), Vue 3 + Codex, gi�
 
 ## Quyết định chính (đã được Song Ngư duyệt)
 
-- Định nghĩa form: `Template:<Tên>/wizz.json`, chỉ tin khi khóa sửa mức `sysop` (trực tiếp hoặc
+- Định nghĩa form: `Module:<Tên template>/wizz.json` (Scribunto tự gán model JSON), chỉ tin khi khóa sửa mức `sysop` (trực tiếp hoặc
   khóa lan); kiểm tra khi nạp và khi xem trang định nghĩa (FR-029, có nút xem thử form). Không có
   GUI soạn định nghĩa ở MVP.
 - Lối vào: `<Trang>?wizz=1` và tab "Sửa infobox" (mặc định bật, tắt bằng `editTab: false`).
@@ -29,7 +29,14 @@ Hướng đi: Wizz là **gadget** (không phải extension), Vue 3 + Codex, gi�
   200 ms. Dữ liệu nhập bằng sửa wikitext là việc của template/Lua (ghi trong hiến pháp III).
 - Tag `wizz` chỉ gắn khi tag đã bật và người dùng có `applychangetags`.
 - Hai gadget: `wizz` (mặc định, nhỏ) và `wizz-form` (ẩn, nạp khi cần).
-- Cấu hình `MediaWiki:Gadget-wizz-config.json`: `namespaces`, `editTab`, `tabLabel`.
+- Cấu hình `MediaWiki:Gadget-wizz-config.json`: `namespaces`, `editTab`, `tabLabel`, `cdn`.
+- Build bằng Vite (target ES2018, giữ LESS); Vue/Codex lấy từ MediaWiki, icon gói từ
+  `@wikimedia/codex-icons` (MIT).
+- Ba cách triển khai từ cùng một bản phát hành: chép tay, Litmus `gadget-deploy`, jsDelivr
+  (`cdn: true`, ghim phiên bản). Workflow phát hành commit `dist/` lên commit gắn tag tách khỏi
+  `main`.
+- Hỗ trợ mọi bản MW còn bảo trì theo Version lifecycle: 1.43 LTS, 1.45, 1.46 (thêm 1.47 LTS khi
+  phát hành).
 
 ## Việc chờ quyết
 
@@ -40,6 +47,8 @@ Hướng đi: Wizz là **gadget** (không phải extension), Vue 3 + Codex, gi�
    2.1.2.
 3. `/speckit-analyze` lần 4: sửa cả 10 mục (hiến pháp 2.1.3: chỉ wiki thật mới bắt buộc bản có
    tag; thêm `deploy.js` và chạy 1.46 vào T007/T055; T058 là bản phát hành đầu tiên). Test parse tree chạy với wiki Docker, không cần bỏ qua.
+4. Yêu cầu deploy mới (hiến pháp 2.2.0): jsDelivr, Litmus, Vite ES2018, ma trận phiên bản MW;
+   định nghĩa chuyển sang `Module:<Tên>/wizz.json` (research R14). Thêm T059, T060.
 
 ## Việc tiếp theo
 

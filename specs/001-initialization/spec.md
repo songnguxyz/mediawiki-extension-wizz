@@ -167,7 +167,7 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 
 **Định nghĩa form**
 
-- **FR-017**: Quản trị viên MUST định nghĩa được form trên trang con `Template:<Tên>/wizz.json` (JSON) của template đó, trỏ tới đúng một bucket; vị trí trang tự bảo đảm mỗi template chỉ có một form.
+- **FR-017**: Quản trị viên MUST định nghĩa được form trên trang `Module:<Tên template>/wizz.json` (JSON; Scribunto tự gán content model JSON và module Lua đọc được bằng `mw.loadJsonData`), trỏ tới đúng một bucket; vị trí trang tự bảo đảm mỗi template chỉ có một form.
 - **FR-018**: Hệ thống MUST ghép tham số template với trường bucket theo tên mặc định, và cho khai ánh xạ đè khi tên khác nhau.
 - **FR-019**: Hệ thống MUST kiểm tra định nghĩa form khi nạp; nếu sai cấu trúc, trỏ tới bucket không tồn tại hoặc khai trường không có trong bucket thì form MUST NOT mở và MUST liệt kê lỗi cho mọi người dùng.
 - **FR-020**: Định nghĩa form MUST cho khai nhãn hiển thị, thứ tự các ô và các luật ở FR-012.
@@ -188,7 +188,7 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 
 - **FR-027**: Dùng form MUST cần đúng quyền sửa trang đó như khi sửa wikitext; Wizz không thêm quyền riêng.
 - **FR-028**: Hệ thống MUST chỉ dùng định nghĩa form khi trang của nó bị khóa sửa ở mức quản trị viên (khóa trực tiếp hoặc khóa lan); nếu không, form MUST NOT mở và báo định nghĩa chưa được tin cậy.
-- **FR-029**: Khi xem trang `Template:<Tên>/wizz.json`, hệ thống MUST chạy bước kiểm tra của FR-019 và FR-028 và hiện kết quả (hợp lệ hoặc danh sách lỗi), kèm nút xem thử form với giá trị trống; xem thử MUST NOT lưu gì.
+- **FR-029**: Khi xem trang `Module:<Tên>/wizz.json`, hệ thống MUST chạy bước kiểm tra của FR-019 và FR-028 và hiện kết quả (hợp lệ hoặc danh sách lỗi), kèm nút xem thử form với giá trị trống; xem thử MUST NOT lưu gì.
 
 ### Key Entities
 
@@ -211,8 +211,8 @@ Biên tập viên mở form qua URL `?wizz=1`, hoặc từ tab "Sửa infobox" n
 ## Assumptions
 
 - **Người dùng mục tiêu**: biên tập viên của các wiki fan (bao gồm người mới ngại sửa wikitext) và quản trị viên wiki định nghĩa form.
-- **Môi trường**: MediaWiki 1.45 trở lên, theo bản stable mới nhất mà các wiki farm chạy; Gadgets, Bucket và Scribunto đã cài. MVP bắt buộc có Bucket.
-- **Đích triển khai**: Miraheze và WikiOasis; Wizz được quản trị viên giao diện cài như một gadget, không cần farm duyệt; không tải tài nguyên từ bên ngoài.
+- **Môi trường**: mọi bản MediaWiki còn được bảo trì theo lịch Version lifecycle (hiện tại 1.43 LTS, 1.45, 1.46); Gadgets, Bucket và Scribunto đã cài. MVP bắt buộc có Bucket.
+- **Đích triển khai**: Miraheze và WikiOasis; Wizz được quản trị viên giao diện cài như một gadget, không cần farm duyệt. Ba cách triển khai: chép tay, Litmus `gadget-deploy`, hoặc jsDelivr. Chỉ cách jsDelivr tải phần form từ `cdn.jsdelivr.net` (ghim đúng phiên bản); trang xem thường không gọi máy chủ ngoài nào.
 - **Môi trường test**: một wiki MediaWiki chạy bằng Docker (`dev/test-wiki/`), dùng dữ liệu tự tạo theo cấu trúc infobox thật, không chép nội dung wiki thật; wiki này cũng dùng để test gadget.
 - **Phụ thuộc**: dữ liệu vào Bucket qua template và module Lua của wiki; Wizz chỉ sửa tham số template, không ghi trực tiếp vào Bucket. API Bucket cho bên thứ ba chưa ổn định nên MVP không phụ thuộc vào nó.
 - **Ngoài phạm vi MVP**: tạo trang mới bằng form, form truy vấn kiểu RunQuery, sửa nhiều template khác nhau trong một form, sửa hàng loạt, nút sửa đặt ngay trên infobox, trình soạn định nghĩa form dạng đồ họa (GUI), chặn dữ liệu sai nhập bằng sửa wikitext hoặc gọi API trực tiếp (thuộc trách nhiệm của template/Lua), chế độ chạy không cần Bucket, gợi ý giá trị từ dữ liệu Bucket.

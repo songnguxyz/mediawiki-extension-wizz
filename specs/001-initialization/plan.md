@@ -8,7 +8,7 @@
 
 Wizz is a gadget that lets editors change the parameters of an existing infobox template call
 through a validated form, without touching the rest of the page. A form is defined on a
-sysop-protected JSON subpage `Template:<Name>/wizz.json` that binds the template to a Bucket;
+sysop-protected JSON page `Module:<Name>/wizz.json` that binds the template to a Bucket;
 field types come from the `Bucket:` schema page. A small tokenizer locates template calls and
 rewrites only changed parameter values. All rules run in the browser before saving; the edit is
 saved with `action=edit` in the user's session, so protection, AbuseFilter, CAPTCHA and
@@ -17,15 +17,21 @@ edit-conflict detection apply. The form is a Vue 3 + Codex app opened by `?wizz=
 
 ## Technical Context
 
-**Language/Version**: JavaScript ES2017+ (CommonJS modules as ResourceLoader package files),
-Vue 3 and Codex as shipped by MediaWiki, LESS.
+**Language/Version**: source in CommonJS JavaScript, `.vue` single-file components and LESS.
+Vite builds the form into one file, `wizz-form.js` (target `es2018`): `.vue` compiled, i18n,
+CSS, icons and the regex worker source bundled in; `vue` and `@wikimedia/codex` stay external
+and are reached through `require`. The entry `wizz.js` is not bundled: the build copies it and
+injects the version number.
 
-**Primary Dependencies**: on the wiki: MediaWiki ≥ 1.45, Gadgets, Bucket (schema pages only),
+**Primary Dependencies**: on the wiki: MediaWiki 1.43 LTS, 1.45 or 1.46, Gadgets, Bucket (schema pages only),
 Scribunto (used by the wiki's templates). ResourceLoader modules: `vue`, `@wikimedia/codex`,
 `mediawiki.api`, `mediawiki.util`, `mediawiki.jqueryMsg`. Dev only (npm): `qunit`,
-`eslint-config-wikimedia`, `stylelint-config-wikimedia`, `banana-checker`.
+`eslint-config-wikimedia`, `stylelint-config-wikimedia`, `banana-checker`, `vite`,
+`@vitejs/plugin-vue`, `less`, `vue` (pinned to the Vue version MediaWiki 1.43 ships, for the
+template compiler). Bundled into the build: `@wikimedia/codex-icons` (MIT) only; no
+`codexIcons` gadget option (Gadgets REL1_43 lacks it).
 
-**Storage**: none of its own. Wiki pages only: `Template:<Name>/wizz.json` (definitions),
+**Storage**: none of its own. Wiki pages only: `Module:<Name>/wizz.json` (definitions),
 `Bucket:` pages (read-only), article wikitext, `MediaWiki:Gadget-wizz-config.json`.
 
 **Testing**: QUnit under Node (`npm test`) for the pure modules (tokenizer, editor, validator,
@@ -33,8 +39,8 @@ definition checker, summary). Round-trip fixture corpus in `tests/fixtures/round
 stored core parse trees (research R3). Manual cross-skin checks per
 [quickstart.md](quickstart.md). CI on GitHub Actions: lint + tests.
 
-**Target Platform**: browsers supported by MediaWiki 1.45+ on Miraheze and WikiOasis (both run
-1.46); skins Minerva, Citizen, Vector 2022; light and dark; LTR and RTL.
+**Target Platform**: browsers supported by MediaWiki 1.43+ (ES2018 output) on Miraheze and
+WikiOasis (both run 1.46) and self-hosted wikis; skins Minerva, Citizen, Vector 2022; light and dark; LTR and RTL.
 
 **Project Type**: MediaWiki package gadget (front-end only).
 
@@ -43,7 +49,8 @@ config with the tab label; < 3 KB before gzip) plus one batched API request when
 tab is enabled; the form opens in ≤ 3 requests (research R5); tokenizer linear in page size,
 < 50 ms for 200 KB of wikitext in the Node test run.
 
-**Constraints**: no server code, no external resources, no Bucket API, no Page Forms code or
+**Constraints**: no server code, no external resources except the jsDelivr mode (config
+`cdn: true`, form bundle only; readers never contact jsDelivr), no Bucket API, no Page Forms code or
 name collisions (`mw.libs.wizz`, `wizz-`), regex under a 200 ms time limit (R6), writes via
 `postWithEditToken`, JS required (no-JS users simply see the page).
 
@@ -60,10 +67,10 @@ calls per page.
 | II. Regression-proof testing | Test-first pure modules under QUnit/Node; permanent round-trip corpus; comparison with core parse trees; CI blocks merge. | Pass |
 | III. Validate before saving | One `wizz-validate.js` for typing and saving; types from `Bucket:` page; regex in a Worker with 200 ms limit; invalid existing values warned; definition checked on load and on view (FR-029); scope limit documented. | Pass (CSP for `blob:` workers to verify, fallback defined) |
 | IV. No privilege bypass | `action=edit` in the user's session (R8); no own rights; definition used only if sysop-protected (R5); tab on by default, configurable off. | Pass |
-| V. Portable gadget | Interface-admin install; MW 1.45+ with Gadgets/Bucket/Scribunto; stable front-end APIs; no external hosts; schema read as a page; `mw.libs.wizz`, `wizz-` prefix; MIT. | Pass |
+| V. Portable gadget | Interface-admin install; maintained MW versions (1.43 LTS, 1.45, 1.46) with Gadgets/Bucket/Scribunto; stable front-end APIs; external host only in the pinned jsDelivr mode; schema read as a page; `mw.libs.wizz`, `wizz-` prefix; MIT. | Pass |
 | VI. Newcomers, any device | Codex components and tokens; full-screen dialog on Minerva; dark mode via skin tokens; logical CSS for RTL; `en`/`vi`/`qqq` bundles; labelled inputs and field-bound errors. | Pass |
-| VII. Simplicity | Two config keys; no bundler; lazy second gadget is the only added structure (justified below). | Pass |
-| VIII. Gadget best practices | eslint/stylelint wikimedia configs; package gadget with declared dependencies; pure logic modules; `postWithEditToken`; no raw HTML from user values; git tags as releases; docs listed in R12. | Pass |
+| VII. Simplicity | Four config keys; Vite build and lazy second gadget are the only added structure (justified below). | Pass |
+| VIII. Gadget best practices | eslint/stylelint wikimedia configs; package gadgets with declared dependencies; one build deployable by hand, by Litmus or by jsDelivr; pure logic modules; `postWithEditToken`; no raw HTML from user values; git tags as releases; docs listed in R12. | Pass |
 
 **Post-design re-check (after Phase 1)**: still Pass. Follow-ups, not violations: verify CSP
 for `blob:` workers, the ConfirmEdit captcha payload and Citizen's dark-mode tokens on the
@@ -109,20 +116,22 @@ src/
 ├── wizz-config.json
 └── i18n/  en.json  vi.json  qqq.json
 build/
-├── build.js              # src → dist with on-wiki names + gadget definitions (R12)
+├── build.js              # runs Vite, writes dist/: pages, gadgets-definition.txt, deploy.json, SHA256SUMS (R12)
 └── fetch-parsetree.js    # fixtures → *.parsetree.xml from the test wiki (R3)
 dev/test-wiki/
-├── docker-compose.yml    # local MediaWiki (MW_VERSION, default 1.45)
+├── docker-compose.yml    # local MediaWiki (MW_VERSION 1.43, 1.45 default, 1.46)
 ├── setup.sh              # extensions, bot password, self-made test data
 └── deploy.js             # dist/ → test wiki (untagged builds, test wiki only)
 .github/workflows/ci.yml  # lint + tests
+.github/workflows/release.yml  # build, tag with dist/, GitHub Release, Litmus (R12)
+vite.config.js
 tests/
 ├── *.test.js             # QUnit under Node
 └── fixtures/roundtrip/   # *.wikitext, *.edits.json, *.parsetree.xml
 ```
 
-**Structure Decision**: flat `src/` because on-wiki gadget pages are flat; the file prefix is
-the page name. Logic modules export plain functions and have no `mw`, Vue or DOM use, so
+**Structure Decision**: flat `src/`; the entry and its config keep their on-wiki page names, and
+everything else is bundled into `wizz-form.js`. Logic modules export plain functions and have no `mw`, Vue or DOM use, so
 Node can require them directly; `wizz-load.js`/`wizz-save.js` take an `mw.Api` instance as a
 parameter for testing with a fake.
 
@@ -131,4 +140,5 @@ parameter for testing with a fake.
 | Addition | Why needed | Simpler alternative rejected because |
 |----------|------------|--------------------------------------|
 | Second hidden gadget `wizz-form` loaded on demand | Keeps Vue/Codex and the form code off normal page views | A single default gadget would load Vue on every page for every reader |
+| Vite build | jsDelivr cannot serve `.vue` to ResourceLoader; one compiled bundle serves all three deploy routes; ES2018 output and bundled icons work on MW 1.43 | Shipping raw package files rules out the jsDelivr route and `codexIcons` on 1.43 |
 | Regex Web Worker from a Blob URL | Only way to stop a runaway regex in a browser (Constitution III) | Main-thread regex cannot be interrupted |

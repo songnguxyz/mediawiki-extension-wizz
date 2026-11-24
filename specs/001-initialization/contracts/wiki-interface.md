@@ -15,12 +15,12 @@
 ## Tab
 
 "Edit infobox" (label from `tabLabel`) in the page actions, only on pages that transclude a template with
-an existing `/wizz.json` subpage. On by default; `editTab: false` in the config hides it
+an existing `Module:<Name>/wizz.json` page. On by default; `editTab: false` in the config hides it
 (FR-023).
 
 ## Definition pages
 
-`Template:<Name>/wizz.json`, schema [form-definition.schema.json](form-definition.schema.json).
+`Module:<Name>/wizz.json` (Scribunto gives `Module:*.json` the `json` content model), schema [form-definition.schema.json](form-definition.schema.json).
 Must be edit-protected at `sysop` level. Viewing it shows the check result and a "Preview
 form" button that opens the form with empty values and no save button (FR-029).
 
@@ -28,14 +28,16 @@ form" button that opens the form with empty values and no save button (FR-029).
 
 | Page | Purpose |
 |------|---------|
-| `MediaWiki:Gadgets-definition` lines or `Gadget definition:wizz.json` / `wizz-form.json` | `wizz` (default, entry) and `wizz-form` (hidden, loaded on demand) |
+| `MediaWiki:Gadgets-definition` lines | `wizz` (default, entry) and `wizz-form` (hidden, loaded on demand; not needed in jsDelivr mode) |
 | `MediaWiki:Gadget-wizz.js` | Entry |
-| `MediaWiki:Gadget-wizz-*.js`, `-*.vue`, `wizz.less` | Form code |
-| `MediaWiki:Gadget-wizz-config.json` | Config and the tab label (entry gadget) |
-| `MediaWiki:Gadget-wizz-i18n-en.json`, `-vi.json` | Messages (form gadget) |
+| `MediaWiki:Gadget-wizz-config.json` | Config and the tab label (entry gadget); created once, never overwritten by a release |
+| `MediaWiki:Gadget-wizz-form.js` | Form bundle: code, messages, styles, icons (not needed in jsDelivr mode) |
 | `MediaWiki:Gadget-wizz` | Gadget description in Special:Preferences |
 
-The exact definition lines are produced by `npm run build` (research R12).
+The exact definition lines are produced by `npm run build` in `dist/gadgets-definition.txt`
+(research R12). Three ways to install: copy the `dist/` pages by hand; run Litmus
+`gadget-deploy` on the GitHub Release; or install only the entry and the config with
+`cdn: true`.
 
 ## Configuration (`MediaWiki:Gadget-wizz-config.json`)
 
@@ -44,6 +46,7 @@ The exact definition lines are produced by `npm run build` (research R12).
 | `namespaces` | `[0]` | Namespaces where the form can open (FR-026). |
 | `editTab` | `true` | Show the "Edit infobox" tab (FR-023). |
 | `tabLabel` | `{ "en": "Edit infobox", "vi": "Sửa infobox" }` | Tab label by language, `en` fallback; the only text the entry gadget needs. |
+| `cdn` | `false` | Load the form bundle of the entry's own release from `https://cdn.jsdelivr.net/gh/songnguxyz/mediawiki-extension-wizz@v<version>/dist/wizz-form.js` instead of the `wizz-form` gadget. |
 
 ## Change tag
 
