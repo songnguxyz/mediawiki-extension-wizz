@@ -1,0 +1,20 @@
+{
+	"name": "wizz",
+	"version": "0.0.0",
+	"description": "Form-based infobox editor for MediaWiki (package gadget)",
+	"license": "MIT",
+	"private": true,
+	"scripts": {
+		"test": "eslint . && stylelint \"src/**/*.{css,less,vue}\" --allow-empty-input && banana-checker src/i18n && if find tests -name \"*.js\" 2>/dev/null | grep -q .; then qunit tests/; fi",
+		"build": "node build/build.js",
+		"fixtures:parsetree": "node build/fetch-parsetree.js"
+	},
+	"devDependencies": {
+		"eslint": "^8.57.1",
+		"eslint-config-wikimedia": "^0.33.1",
+		"grunt-banana-checker": "^0.13.0",
+		"qunit": "^3.0.0",
+		"stylelint": "^17.6.0",
+		"stylelint-config-wikimedia": "^0.20.1"
+	}
+}

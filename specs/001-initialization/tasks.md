@@ -30,12 +30,12 @@ later increments.
 
 **Purpose**: Repository tooling and CI for a package gadget
 
-- [ ] T001 Create `package.json` (license `MIT`, private, dev dependencies `qunit`, `eslint-config-wikimedia`, `stylelint-config-wikimedia`, `grunt-banana-checker` (its `banana-checker` CLI, no Grunt); scripts `test` = lint + banana + `qunit tests/`, `build` = `node build/build.js`, `fixtures:parsetree` = `node build/fetch-parsetree.js`)
-- [ ] T002 [P] Create `.eslintrc.json` (root, `wikimedia/client`, `wikimedia/vue3-es6`, `wikimedia/mediawiki`; override `tests/` and `build/` for `wikimedia/server` Node env) and `.eslintignore` for `dist/`
-- [ ] T003 [P] Create `.stylelintrc.json` extending `stylelint-config-wikimedia` and `.gitignore` (`node_modules/`, `dist/`)
-- [ ] T004 [P] Create `src/i18n/en.json`, `src/i18n/vi.json`, `src/i18n/qqq.json` with `@metadata` and the key families of contracts/wiki-interface.md (Messages), starting with `wizz-summary`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-noeditright`
-- [ ] T005 [P] Create `.github/workflows/ci.yml` running `npm ci` and `npm test` on Node LTS for pushes and pull requests
-- [ ] T006 [P] Create `src/wizz-config.json` with `{ "namespaces": [0], "editTab": true, "tabLabel": { "en": "Edit infobox", "vi": "Sửa infobox" } }` (contracts/wiki-interface.md Configuration; research R2 entry message)
+- [X] T001 Create `package.json` (license `MIT`, private, dev dependencies `qunit`, `eslint-config-wikimedia`, `stylelint-config-wikimedia`, `grunt-banana-checker` (its `banana-checker` CLI, no Grunt); scripts `test` = lint + banana + `qunit tests/`, `build` = `node build/build.js`, `fixtures:parsetree` = `node build/fetch-parsetree.js`)
+- [X] T002 [P] Create `.eslintrc.json` (root, `wikimedia/client`, `wikimedia/vue3-es6`, `wikimedia/mediawiki`; override `tests/` and `build/` for `wikimedia/server` Node env) and `.eslintignore` for `dist/`
+- [X] T003 [P] Create `.stylelintrc.json` extending `stylelint-config-wikimedia` and `.gitignore` (`node_modules/`, `dist/`)
+- [X] T004 [P] Create `src/i18n/en.json`, `src/i18n/vi.json`, `src/i18n/qqq.json` with `@metadata` and the key families of contracts/wiki-interface.md (Messages), starting with `wizz-summary`, `wizz-noinfobox`, `wizz-parseerror`, `wizz-noeditright`
+- [X] T005 [P] Create `.github/workflows/ci.yml` running `npm ci` and `npm test` on Node LTS for pushes and pull requests
+- [X] T006 [P] Create `src/wizz-config.json` with `{ "namespaces": [0], "editTab": true, "tabLabel": { "en": "Edit infobox", "vi": "Sửa infobox" } }` (contracts/wiki-interface.md Configuration; research R2 entry message)
 - [ ] T007 Create `dev/test-wiki/` (`docker-compose.yml` + `setup.sh`) that builds a local MediaWiki at `http://localhost:8080` (version from env `MW_VERSION`, default 1.45; 1.46 also supported) with Gadgets, Scribunto, Bucket, AbuseFilter and ConfirmEdit; an interface-admin bot password for `WIZZ_TEST_API`; create the test data of quickstart.md "Test data (self-made)" steps 1 to 5; and `dev/test-wiki/deploy.js` that writes the `dist/` pages and gadget definitions from T017 to the test wiki through `WIZZ_TEST_API` (untagged builds allowed on the test wiki only, Constitution VIII)
 
 ---

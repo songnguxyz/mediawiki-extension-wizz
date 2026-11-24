@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [ "Wizz contributors" ]
+	},
+	"wizz-summary": "Edit infobox: $1",
+	"wizz-noinfobox": "This page has no infobox that Wizz can edit.",
+	"wizz-parseerror": "Wizz could not read the infobox on line $1.",
+	"wizz-noeditright": "You do not have permission to edit this page."
+}

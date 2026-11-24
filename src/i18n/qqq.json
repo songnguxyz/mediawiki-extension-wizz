@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [ "Wizz contributors" ]
+	},
+	"wizz-summary": "Automatic edit summary when saving through the Wizz infobox form. Parameters:\n* $1 - comma-separated list of the changed template parameter names",
+	"wizz-noinfobox": "Shown when the page has no call of a template that has a Wizz form definition.",
+	"wizz-parseerror": "Shown when a template call on the page is malformed and cannot be parsed. Parameters:\n* $1 - line number in the wikitext where the problem was found",
+	"wizz-noeditright": "Shown instead of the form when the current user may not edit the page, including logged-out users on wikis that forbid it."
+}
