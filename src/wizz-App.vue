@@ -54,6 +54,7 @@
 				v-for="f in fields"
 				:key="f.param"
 				:field="f"
+				:api="api"
 				@update:model-value="onInput( f, $event )"
 				@blur="onBlur( f )"
 			></wizz-field>

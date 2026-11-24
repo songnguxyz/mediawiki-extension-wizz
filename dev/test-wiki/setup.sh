@@ -10,6 +10,10 @@ BUCKET_DIR=ext/Bucket-$MW_VERSION
 [ -d "$BUCKET_DIR" ] || git clone -q --depth 1 -b "REL${MW_VERSION//./_}" \
   https://github.com/weirdgloop/mediawiki-extensions-Bucket "$BUCKET_DIR"
 
+# Citizen skin (US6 dark mode), pinned; Minerva and Vector ship with the image. Use with ?useskin=citizen.
+[ -d ext/Citizen ] || git clone -q --depth 1 -b v3.25.1 \
+  https://github.com/StarCitizenTools/mediawiki-skins-Citizen ext/Citizen
+
 dc() { docker compose "$@"; }
 mw() { dc exec -T web php maintenance/run.php "$@"; }
 dc up -d --wait
@@ -34,6 +38,13 @@ $wgCaptchaTriggers['create'] = false;
 $wgGroupPermissions['*']['edit'] = true;
 $wgCapitalLinkOverrides[ 9592 ] = false; // Bucket names are lower-case
 $wgShowExceptionDetails = true;
+EOF
+fi
+if ! dc exec -T web grep -q WIZZ-SKINS /conf/LocalSettings.php; then
+  dc exec -T web sh -c 'cat >> /conf/LocalSettings.php' <<'EOF'
+# WIZZ-SKINS
+wfLoadSkin( 'Citizen' );
+$wgVectorNightMode = [ 'logged_in' => true, 'logged_out' => true ]; // dark mode for anonymous users too
 EOF
 fi
 

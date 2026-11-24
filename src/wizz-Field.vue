@@ -11,6 +11,18 @@
 		>
 			{{ field.label }}
 		</cdx-checkbox>
+		<cdx-lookup
+			v-else-if="field.type === 'PAGE'"
+			v-model:selected="selected"
+			:input-value="field.value"
+			:menu-items="items"
+			:status="status"
+			:disabled="field.state === 'removed'"
+			:aria-invalid="status === 'error' ? 'true' : undefined"
+			@update:input-value="$emit( 'update:modelValue', $event )"
+			@input="onSearch"
+			@blur="$emit( 'blur' )"
+		></cdx-lookup>
 		<cdx-text-area
 			v-else-if="multiline"
 			:model-value="field.value"
@@ -40,15 +52,23 @@
 </template>
 
 <script>
-import { CdxCheckbox, CdxField, CdxTextArea, CdxTextInput } from '@wikimedia/codex';
+import { CdxCheckbox, CdxField, CdxLookup, CdxTextArea, CdxTextInput } from '@wikimedia/codex';
+import { splitValue, suggestTitles } from './wizz-suggest.js';
 
 // A value with markup or line breaks needs room.
 const MARKUP = /[\n<[{]/;
 
 export default {
-	components: { CdxCheckbox, CdxField, CdxTextArea, CdxTextInput },
-	props: { field: { type: Object, required: true } },
+	components: { CdxCheckbox, CdxField, CdxLookup, CdxTextArea, CdxTextInput },
+	props: {
+		field: { type: Object, required: true },
+		// Only PAGE fields search titles
+		api: { type: Object, default: null }
+	},
 	emits: [ 'update:modelValue', 'blur' ],
+	data() {
+		return { items: [], selected: null, searches: 0 };
+	},
 	computed: {
 		// An error wins over a warning; only the first problem is shown.
 		problem() {
@@ -65,6 +85,19 @@ export default {
 		},
 		multiline() {
 			return typeof this.field.initial === 'string' && MARKUP.test( this.field.initial );
+		}
+	},
+	methods: {
+		// Typed by the user (not a pick, which also changes the input): suggest titles. The
+		// latest search wins; a failed one just shows no suggestions.
+		onSearch( text ) {
+			const n = ++this.searches;
+			const { head, term } = splitValue( this.field, text );
+			suggestTitles( this.api, this.field.rules, term ).catch( () => [] ).then( ( titles ) => {
+				if ( n === this.searches ) {
+					this.items = titles.map( ( t ) => ( { value: head + t } ) );
+				}
+			} );
 		}
 	}
 };

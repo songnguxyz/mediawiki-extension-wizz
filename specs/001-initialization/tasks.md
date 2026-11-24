@@ -172,9 +172,9 @@ later increments.
 
 **Independent Test**: tab appears only when enabled and the page has a form-backed infobox; form usable on Minerva, Citizen, Vector 2022, dark, RTL (quickstart scenario 13)
 
-- [ ] T049 [US6] Add the tab to `src/wizz.js`: when `editTab` is true, request `prop=templates` plus the existence part of contracts/api-calls.md request 2, then `mw.util.addPortletLink` (`p-views`; Minerva `page-actions-overflow`) with `tabLabel` from `wizz-config.json`, linking to `?wizz=1` (FR-023)
-- [ ] T050 [US6] Replace the PAGE input in `src/wizz-Field.vue` with `CdxLookup` backed by `list=prefixsearch` limited by FieldDefinition.namespaces and filtered by FieldDefinition.category (data-model.md; contracts/api-calls.md request 4; FR-021)
-- [ ] T051 [US6] Mobile and theme pass on `src/wizz.less` and `src/wizz-App.vue`: one column, sticky save bar on Minerva, check dark mode on Citizen and Vector 2022, `uselang=ar` (FR-024, SC-003)
+- [X] T049 [US6] Add the tab to `src/wizz.js`: when `editTab` is true, request `prop=templates` plus the existence part of contracts/api-calls.md request 2, then `mw.util.addPortletLink` (`p-views`; Minerva `page-actions-overflow`) with `tabLabel` from `wizz-config.json`, linking to `?wizz=1` (FR-023)
+- [X] T050 [US6] Replace the PAGE input in `src/wizz-Field.vue` with `CdxLookup` backed by `list=prefixsearch` limited by FieldDefinition.namespaces and filtered by FieldDefinition.category (data-model.md; contracts/api-calls.md request 4; FR-021)
+- [X] T051 [US6] Mobile and theme pass on `src/wizz.less` and `src/wizz-App.vue`: one column, sticky save bar on Minerva, check dark mode on Citizen and Vector 2022, `uselang=ar` (FR-024, SC-003)
 
 ---
 
